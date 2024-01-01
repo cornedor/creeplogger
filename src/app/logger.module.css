@@ -1,0 +1,12 @@
+.page {
+  background-color: #242328;
+  background-image: url(/BG.png);
+  background-position: left center;
+  background-repeat: no-repeat;
+
+  color: white;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  width: 100%;
+}
