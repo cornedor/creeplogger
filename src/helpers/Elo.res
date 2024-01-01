@@ -1,6 +1,6 @@
 type team = array<Players.player>
 
-let kFactor = 20.0
+let kFactor = 32.0
 
 let getTotalEloFromTeam = (team: team) =>
   Array.reduce(team, 0.0, (acc, creeper) => acc +. creeper.elo)
