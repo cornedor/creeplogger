@@ -1,3 +1,4 @@
+@@directive("'use client';")
 @module external styles: {..} = "./logger.module.css"
 type nextFont = {className: string}
 @module("../helpers/fonts") external inter: nextFont = "inter"

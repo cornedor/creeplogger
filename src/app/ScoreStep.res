@@ -80,8 +80,8 @@ let make = (
     })
 
     let winningTeam = switch (blueState, redState) {
-    | (b, r) if b < r => Players.Blue
-    | (b, r) if r < b => Players.Red
+    | (b, r) if b > r => Players.Blue
+    | (b, r) if r > b => Players.Red
     | (_b, _r) => panic("Tie not implemented")
     }
 
@@ -98,7 +98,7 @@ let make = (
       }
     }
 
-    setEarnedPoints(_ => points)
+    setEarnedPoints(_ => points->Float.toInt)
 
     let _ = await Promise.all(
       Array.map(bluePlayers, async player => {
@@ -111,13 +111,11 @@ let make = (
       }),
     )
 
-    let _ = await sendCreepsUpdate(blueState, redState, points)
+    let _ = await sendCreepsUpdate(blueState, redState, points->Int.fromFloat)
 
     setIsSaving(_ => false)
     setStep(step => LoggerStep.getNextStep(step))
   }
-
-  let _ = Elo.calculateScore
 
   <>
     <Header

@@ -51,7 +51,7 @@ let make = (
 
   <>
     <Header
-      step={LoggerStep.ScoreForm}
+      step={LoggerStep.UserSelection}
       onNextStep={() => setStep(step => LoggerStep.getNextStep(step))}
       onReset={reset}
       disabled={Belt.Map.String.size(selectedUsers) <= 1}

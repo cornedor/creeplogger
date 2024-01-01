@@ -1,7 +1,9 @@
 type team = array<Players.player>
 
+let kFactor = 20.0
+
 let getTotalEloFromTeam = (team: team) =>
-  Array.reduce(team, 0.0, (acc, creeper) => acc +. Int.toFloat(creeper.elo))
+  Array.reduce(team, 0.0, (acc, creeper) => acc +. creeper.elo)
 
 let getCombinedTeamScores = (teamA: team, teamB: team) => {
   let totalEloA = getTotalEloFromTeam(teamA)
@@ -19,30 +21,28 @@ let getCombinedTeamScores = (teamA: team, teamB: team) => {
 let getExpected = (scoreA, scoreB) =>
   1.0 /. (1.0 +. Math.pow(10.0, ~exp=(scoreB -. scoreA) /. 400.0))
 
-let getRatingDelta = (expected, actual) => 32.0 *. (actual -. expected)
-
-let updateRating = (expected, actual, current) =>
-  Math.round(current +. 32.0 *. (actual -. expected))->Float.toInt
+let getRatingChange = (expected, actual) => kFactor *. (actual -. expected)
 
 let calculateScore = (winners: team, losers: team) => {
   let (winnersScore, losersScore) = getCombinedTeamScores(winners, losers)
 
-  let expectedWinners = getExpected(winnersScore, losersScore)
+  let expectedScoreWinners = getExpected(winnersScore, losersScore)
+  let expectedScoreLosers = getExpected(losersScore, winnersScore)
 
   let winners = Array.map(winners, creeper => {
-    let elo = updateRating(expectedWinners, 1.0, creeper.elo->Int.toFloat)
+    let elo = creeper.elo +. getRatingChange(expectedScoreWinners, 1.0)
     {
       ...creeper,
       elo,
     }
   })
   let losers = Array.map(losers, creeper => {
-    let elo = updateRating(expectedWinners, 0.0, creeper.elo->Int.toFloat)
+    let elo = creeper.elo +. getRatingChange(expectedScoreLosers, 0.0)
     {
       ...creeper,
       elo,
     }
   })
 
-  (winners, losers, Float.toInt(32.0 *. (1.0 -. expectedWinners)))
+  (winners, losers, getRatingChange(expectedScoreWinners, 1.0))
 }
