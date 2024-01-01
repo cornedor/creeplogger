@@ -16,7 +16,6 @@
     "@rescript/core",
     "@glennsl/rescript-fetch",
     "rescript-schema",
-    "rescript-next",
     "@greenlabs/ppx-rhf",
     "rescript-classnames"
   ],
