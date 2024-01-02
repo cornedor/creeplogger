@@ -9,16 +9,6 @@ export const metadata: Metadata = {
   description: "Houd de score bij van je tafelvoetbalwedstrijden",
   robots: "noindex",
   manifest: "/manifest.json",
-  icons: {
-    apple: [57, 60, 72, 76, 114, 120, 144, 152, 180, 192].map((size) => ({
-      url: `/${size}.png`,
-      sizes: `${size}x${size}`,
-    })),
-    icon: {
-      sizes: "32x32",
-      url: "/32.png",
-    },
-  },
 };
 
 export const viewport: Viewport = {
