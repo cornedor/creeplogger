@@ -87,11 +87,12 @@ let addPlayer = async name => {
   ref
 }
 
-let useAllPlayers = () => {
+type playersOrder = [#games | #elo]
+let useAllPlayers = (~orderBy: playersOrder=#games) => {
   let (players, setPlayers) = React.useState(_ => [])
   let playersRef = Firebase.Database.query1(
     Firebase.Database.refPath(Database.database, bucket),
-    Firebase.Database.orderByChild("games"),
+    Firebase.Database.orderByChild(orderBy),
   )
 
   React.useEffect(() => {

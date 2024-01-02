@@ -2,7 +2,7 @@
 
 @react.component
 let make = (~step: LoggerStep.step, ~onNextStep, ~onReset, ~disabled=false) => {
-  let (_showScores, setShowScores) = React.useState(_ => false)
+  let (showScores, setShowScores) = React.useState(_ => false)
   let isConnected = FirebaseStatus.useFirebaseStatus()
 
   let nextLabel = switch step {
@@ -11,8 +11,7 @@ let make = (~step: LoggerStep.step, ~onNextStep, ~onReset, ~disabled=false) => {
   }
 
   <>
-    // <Changelog />
-    // <Scores \"open"={showScores} onClose={() => setShowScores(_ => false)} />
+    <LeaderboardModal show={showScores} setShow={setShowScores} />
     <div className={styles["header"]}>
       <div className={styles["headerGrid"]}>
         <div className={styles["buttonWrapper"]}>

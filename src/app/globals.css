@@ -5,3 +5,22 @@
 .content-padding {
   padding: 18px 40px 40px;
 }
+
+.modal {
+  --overflow: 120px;
+  position: fixed;
+  left: calc(var(--overflow) * -1);
+  top: 0;
+  height: 100vh;
+  width: min(calc(600px + var(--overflow)), calc(100vw + var(--overflow)));
+  background-color: rgba(36, 35, 40, 0.7);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  z-index: 200;
+  overflow: auto;
+  overscroll-behavior: contain;
+  padding: 20px 40px;
+  padding-left: calc(var(--overflow) + 20px);
+  box-shadow: 0px 0 8px rgba(0, 0, 0, 0.25);
+  transition: transform 0.2s ease;
+}
