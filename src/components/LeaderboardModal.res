@@ -1,6 +1,7 @@
 @react.component
 let make = (~show, ~setShow) => {
-  let players = Players.useAllPlayers(~orderBy=#elo)
+  let (order, setOrder) = React.useState(_ => true)
+  let players = Players.useAllPlayers(~orderBy=#elo, ~asc=order)
 
   <div
     className="modal"
@@ -13,7 +14,11 @@ let make = (~show, ~setShow) => {
         <tr>
           <th className="text-lg text-left"> {React.string("#")} </th>
           <th className="text-lg text-left"> {React.string("Speler")} </th>
-          <th className="text-lg text-left"> {React.string("Score")} </th>
+          <th className="text-lg text-left">
+            <button onClick={_ => setOrder(order => !order)}>
+              {React.string("Score " ++ (order ? "↑" : "↓"))}
+            </button>
+          </th>
           <th className="text-lg text-left"> {React.string("Groei")} </th>
         </tr>
       </thead>
