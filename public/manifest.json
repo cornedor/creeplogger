@@ -1,0 +1,11 @@
+{
+  "short_name": "Kruiplogger",
+  "name": "Kruiplogger",
+  "id": "/?source=pwa",
+  "start_url": "/?source=pwa",
+  "background_color": "#242328",
+  "display": "standalone",
+  "orientation": "portrait",
+  "scope": "/",
+  "theme_color": "#242328"
+}
