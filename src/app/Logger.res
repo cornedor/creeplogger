@@ -1,5 +1,4 @@
 @@directive("'use client';")
-@module external styles: {..} = "./logger.module.css"
 type nextFont = {className: string}
 @module("../helpers/fonts") external inter: nextFont = "inter"
 
@@ -43,5 +42,8 @@ let make = () => {
   | Confirmation => <ConfirmationStep winners={winners} score={earnedPoints} reset players />
   }
 
-  <div className={styles["page"] ++ " " ++ inter.className}> stepComponent </div>
+  <div
+    className="bg-blobs bg-darkbg bg-no-repeat bg-left text-white flex flex-col min-h-screen w-full">
+    stepComponent
+  </div>
 }
