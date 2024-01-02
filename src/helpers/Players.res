@@ -126,7 +126,7 @@ let useAllPlayers = (~orderBy: playersOrder=#games, ~asc=true) => {
     Some(unsubscribe)
   }, [setPlayers])
 
-  let players = React.useMemo(() => players->sortFunction, (players, sortFunction))
+  let players = React.useMemo(() => players->sortFunction, (players, asc))
 
   players
 }

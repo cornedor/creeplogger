@@ -3,6 +3,9 @@ let make = (~show, ~setShow) => {
   let (order, setOrder) = React.useState(_ => true)
   let players = Players.useAllPlayers(~orderBy=#elo, ~asc=order)
 
+  let position = ref(0)
+  let previousScore = ref(0)
+
   <div
     className="modal"
     style={ReactDOM.Style.make(~transform=show ? "translateX(0)" : "translateX(-100%)", ())}>
@@ -24,16 +27,22 @@ let make = (~show, ~setShow) => {
       </thead>
       <tbody>
         {players
-        ->Array.mapWithIndex((player, index) =>
+        ->Array.mapWithIndex((player, index) => {
+          if player.elo->Float.toInt != previousScore.contents {
+            position := position.contents + 1
+          }
+
+          previousScore := player.elo->Float.toInt
+
           <tr key={player.key}>
-            <td> {React.string(`#${Int.toString(index + 1)}`)} </td>
+            <td> {React.string(`#${position.contents->Int.toString}`)} </td>
             <td> {React.string(player.name)} </td>
             <td> {React.float(Math.round(player.elo))} </td>
             <td className={player.lastEloChange > 0.0 ? "text-green-400" : "text-red-400"}>
               {React.float(Math.round(player.lastEloChange))}
             </td>
           </tr>
-        )
+        })
         ->React.array}
       </tbody>
     </table>

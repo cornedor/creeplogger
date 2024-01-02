@@ -5,6 +5,7 @@ let kFactor = 32.0
 let getTotalEloFromTeam = (team: team) =>
   Array.reduce(team, 0.0, (acc, creeper) => acc +. creeper.elo)
 
+@inline
 let getCombinedTeamScores = (teamA: team, teamB: team) => {
   let totalEloA = getTotalEloFromTeam(teamA)
   let totalEloB = getTotalEloFromTeam(teamB)
@@ -18,9 +19,11 @@ let getCombinedTeamScores = (teamA: team, teamB: team) => {
   (avgA, avgB)
 }
 
+@inline
 let getExpected = (scoreA, scoreB) =>
   1.0 /. (1.0 +. Math.pow(10.0, ~exp=(scoreB -. scoreA) /. 400.0))
 
+@inline
 let getRatingChange = (expected, actual) => kFactor *. (actual -. expected)
 
 let calculateScore = (winners: team, losers: team) => {
