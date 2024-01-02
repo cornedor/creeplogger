@@ -88,6 +88,11 @@ let addPlayer = async name => {
 }
 
 type playersOrder = [#games | #elo]
+
+// let sortPlayersBy(orderBy: playersOrder)
+
+external snapshotToArray: dataSnapshot => array<dataSnapshot> = "%identity"
+
 let useAllPlayers = (~orderBy: playersOrder=#games) => {
   let (players, setPlayers) = React.useState(_ => [])
   let playersRef = Firebase.Database.query1(
@@ -99,18 +104,19 @@ let useAllPlayers = (~orderBy: playersOrder=#games) => {
     let unsubscribe = Firebase.Database.onValue(
       playersRef,
       snapshot => {
-        let data = Firebase.Database.Snapshot.val(snapshot)
-        switch data->Js.toOption {
-        | Some(data) =>
-          switch data->S.parseWith(playersSchema) {
-          | Ok(players) => setPlayers(_ => Dict.valuesToArray(players))
-          | Error(e) => {
-              Console.error(e)
-              setPlayers(_ => [])
+        let newPlayers = []
+        Array.forEach(snapshotToArray(snapshot), snap => {
+          let data = Firebase.Database.Snapshot.val(snap)
+          switch data->Js.toOption {
+          | Some(data) =>
+            switch data->S.parseWith(playerSchema) {
+            | Ok(player) => Array.push(newPlayers, player)
+            | Error(e) => Console.error(e)
             }
+          | None => ()
           }
-        | None => setPlayers(_ => [])
-        }
+        })
+        setPlayers(_ => newPlayers->Array.toReversed)
       },
       (),
     )

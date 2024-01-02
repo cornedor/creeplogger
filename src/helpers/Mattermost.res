@@ -53,8 +53,8 @@ let sendCreepsUpdate = async (
     )
     ->Array.joinWith(", ")
 
-  let bluePoints = blueScore > redScore ? 0 - points : points
-  let redPoints = blueScore < redScore ? 0 - points : points
+  let bluePoints = blueScore < redScore ? 0 - points : points
+  let redPoints = blueScore > redScore ? 0 - points : points
 
   let message = `### Nieuw potje geregistreerd!
 
