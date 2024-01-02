@@ -27,17 +27,17 @@ let make = (~show, ~setShow) => {
       </thead>
       <tbody>
         {players
-        ->Array.mapWithIndex((player, index) => {
-          if player.elo->Float.toInt != previousScore.contents {
+        ->Array.map(player => {
+          let roundedElo = player.elo->Math.round->Float.toInt
+          if roundedElo != previousScore.contents {
             position := position.contents + 1
           }
-
-          previousScore := player.elo->Float.toInt
+          previousScore := roundedElo
 
           <tr key={player.key}>
             <td> {React.string(`#${position.contents->Int.toString}`)} </td>
             <td> {React.string(player.name)} </td>
-            <td> {React.float(Math.round(player.elo))} </td>
+            <td> {React.int(roundedElo)} </td>
             <td className={player.lastEloChange > 0.0 ? "text-green-400" : "text-red-400"}>
               {React.float(Math.round(player.lastEloChange))}
             </td>
