@@ -128,14 +128,14 @@ let make = (
     />
     <div className="flex flex-wrap content-padding gap-20">
       <div>
-        <h2 className="font-bold text-xl"> {React.string("Team Rood")} </h2>
-        <ol className="pl-5 pt-4 pb-8 list-decimal"> {React.array(redUsers)} </ol>
-        <div className="grid gap-5 grid-cols-4"> {React.array(redButtons)} </div>
-      </div>
-      <div>
         <h2 className="font-bold text-xl"> {React.string("Team Blauw")} </h2>
         <ol className="pl-5 pt-4 pb-8 list-decimal"> {React.array(blueUsers)} </ol>
         <div className="grid gap-5 grid-cols-4"> {React.array(blueButtons)} </div>
+      </div>
+      <div>
+        <h2 className="font-bold text-xl"> {React.string("Team Rood")} </h2>
+        <ol className="pl-5 pt-4 pb-8 list-decimal"> {React.array(redUsers)} </ol>
+        <div className="grid gap-5 grid-cols-4"> {React.array(redButtons)} </div>
       </div>
     </div>
   </>

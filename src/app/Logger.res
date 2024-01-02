@@ -20,7 +20,7 @@ let make = () => {
     setEarnedPoints(_ => 0)
   }
 
-  let winnerTeam = redState > blueState ? Players.Blue : Players.Red
+  let winnerTeam = redState > blueState ? Players.Red : Players.Blue
   let winners =
     Belt.Map.String.keep(selectedUsers, (_, value) =>
       value == winnerTeam
