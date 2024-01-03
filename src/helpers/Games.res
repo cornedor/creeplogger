@@ -1,5 +1,4 @@
 open Firebase
-open RescriptSchema
 
 type modifier = Handicap(int, int) | OneVOne
 
@@ -14,39 +13,39 @@ type game = {
   modifiers: option<array<modifier>>,
 }
 
-let modifierSchema = S.union([
-  S.object(s => {
+let modifierSchema = Schema.union([
+  Schema.object(s => {
     s.tag("kind", "handicap")
-    Handicap(s.field("blue", S.int), s.field("red", S.int))
+    Handicap(s.field("blue", Schema.int), s.field("red", Schema.int))
   }),
-  S.object(s => {
+  Schema.object(s => {
     s.tag("kind", "one-v-one")
     OneVOne
   }),
 ])
 
-let gameSchema = S.object(s => {
-  blueScore: s.field("blueScore", S.int->S.Int.min(0)),
-  redScore: s.field("redScore", S.int->S.Int.min(0)),
-  redTeam: s.field("redTeam", S.array(S.string)),
-  blueTeam: s.field("blueTeam", S.array(S.string)),
+let gameSchema = Schema.object(s => {
+  blueScore: s.field("blueScore", Schema.int->Schema.Int.min(0)),
+  redScore: s.field("redScore", Schema.int->Schema.Int.min(0)),
+  redTeam: s.field("redTeam", Schema.array(Schema.string)),
+  blueTeam: s.field("blueTeam", Schema.array(Schema.string)),
   date: s.field(
     "date",
-    S.float->S.transform(_ => {
+    Schema.float->Schema.transform(_ => {
       parser: Date.fromTime,
       serializer: Date.getTime,
     }),
   ),
   modifiers: s.field(
     "modifiers",
-    S.option(S.array(modifierSchema))->FirebaseSchema.nullableTransform,
+    Schema.option(Schema.array(modifierSchema))->FirebaseSchema.nullableTransform,
   ),
 })
 
 let addGame = game => {
   let gamesRef = Firebase.Database.refPath(Database.database, "games")
 
-  switch S.serializeWith(game, gameSchema) {
+  switch Schema.serializeWith(game, gameSchema) {
   | Ok(data) => Firebase.Database.pushValue(gamesRef, data)
   | Error(_) => panic("Could not create game")
   }
@@ -76,7 +75,7 @@ let getTimePeriod = async period => {
 
   switch games->Firebase.Database.Snapshot.val->Nullable.toOption {
   | Some(val) =>
-    switch val->S.parseWith(S.dict(gameSchema)) {
+    switch val->Schema.parseWith(Schema.dict(gameSchema)) {
     | Ok(val) => val
     | Error(e) => {
         Js.log(e)

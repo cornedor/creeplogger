@@ -1,7 +1,5 @@
-open RescriptSchema
-
 let nullableTransform = t =>
-  S.transform(t, _ => {
+  Schema.transform(t, _ => {
     parser: value => value,
     serializer: value =>
       switch value {

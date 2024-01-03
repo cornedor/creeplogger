@@ -1,5 +1,4 @@
 open Firebase
-open RescriptSchema
 
 type player = {
   name: string,
@@ -23,25 +22,25 @@ type team = Blue | Red
 
 let bucket = "players"
 
-let playerSchema = S.object(s => {
-  name: s.field("name", S.string),
-  wins: s.fieldOr("wins", S.int, 0),
-  losses: s.fieldOr("losses", S.int, 0),
-  absoluteWins: s.fieldOr("absoluteWins", S.int, 0),
-  absoluteLosses: s.fieldOr("absoluteLosses", S.int, 0),
-  games: s.fieldOr("games", S.int, 0),
-  teamGoals: s.fieldOr("teamGoals", S.int, 0),
-  redGames: s.fieldOr("redGames", S.int, 0),
-  blueGames: s.fieldOr("blueGames", S.int, 0),
-  redWins: s.fieldOr("redWins", S.int, 0),
-  blueWins: s.fieldOr("blueWins", S.int, 0),
-  elo: s.fieldOr("elo", S.float, 1000.0),
-  lastEloChange: s.fieldOr("change", S.float, 0.0),
-  key: s.field("key", S.string),
-  mattermostHandle: s.field("mh", S.option(S.string)->FirebaseSchema.nullableTransform),
+let playerSchema = Schema.object(s => {
+  name: s.field("name", Schema.string),
+  wins: s.fieldOr("wins", Schema.int, 0),
+  losses: s.fieldOr("losses", Schema.int, 0),
+  absoluteWins: s.fieldOr("absoluteWins", Schema.int, 0),
+  absoluteLosses: s.fieldOr("absoluteLosses", Schema.int, 0),
+  games: s.fieldOr("games", Schema.int, 0),
+  teamGoals: s.fieldOr("teamGoals", Schema.int, 0),
+  redGames: s.fieldOr("redGames", Schema.int, 0),
+  blueGames: s.fieldOr("blueGames", Schema.int, 0),
+  redWins: s.fieldOr("redWins", Schema.int, 0),
+  blueWins: s.fieldOr("blueWins", Schema.int, 0),
+  elo: s.fieldOr("elo", Schema.float, 1000.0),
+  lastEloChange: s.fieldOr("change", Schema.float, 0.0),
+  key: s.field("key", Schema.string),
+  mattermostHandle: s.field("mh", Schema.option(Schema.string)->FirebaseSchema.nullableTransform),
 })
 
-let playersSchema = S.dict(playerSchema)
+let playersSchema = Schema.dict(playerSchema)
 
 let addPlayer = async name => {
   let playersRef = Firebase.Database.refPath(Database.database, bucket)
@@ -61,7 +60,7 @@ let addPlayer = async name => {
     lastEloChange: 0.0,
     key: "",
     mattermostHandle: None,
-  }->S.serializeWith(playerSchema) {
+  }->Schema.serializeWith(playerSchema) {
   | Ok(data) => data
   | Error(_error) => panic("Could not serialize player")
   }
@@ -101,7 +100,7 @@ let useAllPlayers = (~orderBy: playersOrder=#games, ~asc=true) => {
           let data = Firebase.Database.Snapshot.val(snap)
           switch data->Js.toOption {
           | Some(data) =>
-            switch data->S.parseWith(playerSchema) {
+            switch data->Schema.parseWith(playerSchema) {
             | Ok(player) => Array.push(newPlayers, player)
             | Error(e) => Console.error(e)
             }
@@ -129,7 +128,7 @@ let fetchAllPlayers = async () => {
 
   switch Firebase.Database.Snapshot.val(data)->Js.toOption {
   | Some(data) =>
-    switch data->S.parseWith(playersSchema) {
+    switch data->Schema.parseWith(playersSchema) {
     | Ok(players) => players
     | Error(_) => empty
     }
@@ -142,7 +141,7 @@ let fetchPlayerByKey = async key => {
   let data = await Firebase.Database.get(playerRef)
   switch Firebase.Database.Snapshot.val(data)->Js.toOption {
   | Some(player) =>
-    switch player->S.parseWith(playerSchema) {
+    switch player->Schema.parseWith(playerSchema) {
     | Ok(player) => Some(player)
     | Error(error) => {
         Console.error(error)
@@ -168,9 +167,9 @@ let updateGameStats = (key, myTeamPoints, opponentTeamPoints, team: team, elo) =
 
   let playerRef = Firebase.Database.refPath(Database.database, bucket ++ "/" ++ key)
   Firebase.Database.runTransaction(playerRef, data => {
-    switch data->S.parseWith(playerSchema) {
+    switch data->Schema.parseWith(playerSchema) {
     | Ok(player) =>
-      switch S.serializeWith(
+      switch Schema.serializeWith(
         {
           ...player,
           games: player.games + 1,
