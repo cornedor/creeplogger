@@ -8,7 +8,7 @@ type game = {
   blueTeam: array<string>,
   redTeam: array<string>,
   date: Date.t,
-  modifiers: string,
+  modifiers: option<array<modifier>>,
 }
 
 let addGame: game => Js.Promise.t<Firebase.databaseReference>

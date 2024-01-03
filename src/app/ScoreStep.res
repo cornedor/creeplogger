@@ -76,7 +76,9 @@ let make = (
       redTeam: selectedRedUsers,
       blueTeam: selectedBlueUsers,
       date: Date.make(),
-      modifiers: "",
+      modifiers: redPlayers->Array.length == 1 && bluePlayers->Array.length == 1
+        ? Some([Games.OneVOne])
+        : Some([]),
     })
 
     let winningTeam = switch (blueState, redState) {

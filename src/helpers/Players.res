@@ -38,17 +38,7 @@ let playerSchema = S.object(s => {
   elo: s.fieldOr("elo", S.float, 1000.0),
   lastEloChange: s.fieldOr("change", S.float, 0.0),
   key: s.field("key", S.string),
-  mattermostHandle: s.field(
-    "mh",
-    S.option(S.string)->S.transform(_ => {
-      parser: value => value,
-      serializer: value =>
-        switch value {
-        | None => %raw(`null`)
-        | Some(value) => Some(value)
-        },
-    }),
-  ),
+  mattermostHandle: s.field("mh", S.option(S.string)->FirebaseSchema.nullableTransform),
 })
 
 let playersSchema = S.dict(playerSchema)

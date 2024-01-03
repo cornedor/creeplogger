@@ -11,7 +11,7 @@ type game = {
   blueTeam: array<string>,
   redTeam: array<string>,
   date: Date.t,
-  modifiers: string,
+  modifiers: option<array<modifier>>,
 }
 
 let modifierSchema = S.union([
@@ -37,7 +37,10 @@ let gameSchema = S.object(s => {
       serializer: Date.getTime,
     }),
   ),
-  modifiers: s.fieldOr("modifiers", S.string, ""),
+  modifiers: s.field(
+    "modifiers",
+    S.option(S.array(modifierSchema))->FirebaseSchema.nullableTransform,
+  ),
 })
 
 let addGame = game => {
