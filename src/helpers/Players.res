@@ -20,6 +20,7 @@ type player = {
 
 type team = Blue | Red
 
+@inline
 let bucket = "players"
 
 let playerSchema = Schema.object(s => {
@@ -154,7 +155,6 @@ let fetchPlayerByKey = async key => {
 
 let playerByKey = (players, key) => players->Array.find(c => c.key == key)
 
-type winResult = Win | Lose | AbsoluteWin | AbsoluteLose
 let updateGameStats = (key, myTeamPoints, opponentTeamPoints, team: team, elo) => {
   let isAbsolute = abs(myTeamPoints - opponentTeamPoints) == 7
 
