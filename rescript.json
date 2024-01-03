@@ -30,6 +30,15 @@
     "-open RescriptCore"
   ],
   "gentypeconfig": {
-    "path": ""
+    "language": "typescript",
+    "module": "es6",
+    "importPath": "relative",
+    "shims": {
+      "Map": "Map"
+    },
+    "debug": {
+      "all": false
+    },
+    "exportInterfaces": false
   }
 }

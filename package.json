@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "concurrently \"npm run res:start\" \"npm run next:dev\"",
+    "tsc": "tsc",
     "build": "rescript && next build",
     "next:dev": "next dev",
     "next:build": "next build",
@@ -29,6 +30,7 @@
     "rescript-schema": "^6.3.0"
   },
   "devDependencies": {
+    "@next/bundle-analyzer": "^14.0.4",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",

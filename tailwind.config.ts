@@ -17,6 +17,16 @@ const config: Config = {
           "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
         blobs: "url(/BG.png)",
       },
+      gridTemplateRows: {
+        user: "66% auto",
+      },
+      ringColor: {
+        blue: "#6ca2ee",
+        red: "#ee6c6c",
+      },
+      ringWidth: {
+        6: "6px",
+      },
     },
   },
   plugins: [],

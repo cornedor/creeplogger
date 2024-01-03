@@ -131,6 +131,22 @@ let useAllPlayers = (~orderBy: playersOrder=#games, ~asc=true) => {
   players
 }
 
+let fetchAllPlayers = async () => {
+  let playersRef = Firebase.Database.refPath(Database.database, bucket)
+
+  let data = await Firebase.Database.get(playersRef)
+  let empty: Js.Dict.t<player> = Js.Dict.empty()
+
+  switch Firebase.Database.Snapshot.val(data)->Js.toOption {
+  | Some(data) =>
+    switch data->S.parseWith(playersSchema) {
+    | Ok(players) => players
+    | Error(_) => empty
+    }
+  | None => empty
+  }
+}
+
 let fetchPlayerByKey = async key => {
   let playerRef = Firebase.Database.refPath(Database.database, bucket ++ "/" ++ key)
   let data = await Firebase.Database.get(playerRef)

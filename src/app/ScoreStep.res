@@ -76,7 +76,7 @@ let make = (
       redTeam: selectedRedUsers,
       blueTeam: selectedBlueUsers,
       date: Date.make(),
-      modifiers: [],
+      modifiers: "",
     })
 
     let winningTeam = switch (blueState, redState) {

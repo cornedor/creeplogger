@@ -3,13 +3,15 @@ open RescriptSchema
 
 type modifier = Handicap(int, int) | OneVOne
 
+type peroid = Daily | Weekly | Monthly
+
 type game = {
   blueScore: int,
   redScore: int,
   blueTeam: array<string>,
   redTeam: array<string>,
   date: Date.t,
-  modifiers: array<modifier>,
+  modifiers: string,
 }
 
 let modifierSchema = S.union([
@@ -35,14 +37,49 @@ let gameSchema = S.object(s => {
       serializer: Date.getTime,
     }),
   ),
-  modifiers: s.field("modifiers", S.array(modifierSchema)),
+  modifiers: s.fieldOr("modifiers", S.string, ""),
 })
 
-let addGame = async game => {
+let addGame = game => {
   let gamesRef = Firebase.Database.refPath(Database.database, "games")
 
   switch S.serializeWith(game, gameSchema) {
   | Ok(data) => Firebase.Database.pushValue(gamesRef, data)
   | Error(_) => panic("Could not create game")
+  }
+}
+
+let getTimePeriod = async period => {
+  let date = Date.make()
+  Date.setHoursMSMs(date, ~hours=0, ~minutes=0, ~seconds=0, ~milliseconds=0)
+
+  switch period {
+  | Daily => ()
+  | Weekly => {
+      let x = Date.getDay(date)
+      let newDate = Date.getDate(date) - (x == 0 ? 7 : x) + 1
+      Date.setDate(date, newDate)
+    }
+
+  | Monthly => Date.setDate(date, 0)
+  }
+
+  let games =
+    await Firebase.Database.query2(
+      Firebase.Database.refPath(Database.database, "games"),
+      Firebase.Database.orderByChild("date"),
+      Firebase.Database.startAt(Date.getTime(date)),
+    )->Firebase.Database.get
+
+  switch games->Firebase.Database.Snapshot.val->Nullable.toOption {
+  | Some(val) =>
+    switch val->S.parseWith(S.dict(gameSchema)) {
+    | Ok(val) => val
+    | Error(e) => {
+        Js.log(e)
+        Js.Dict.empty()
+      }
+    }
+  | None => Js.Dict.empty()
   }
 }

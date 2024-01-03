@@ -19,6 +19,8 @@ let make = () => {
     setEarnedPoints(_ => 0)
   }
 
+  let _ = Games.getTimePeriod(Daily)
+
   let winnerTeam = redState > blueState ? Players.Red : Players.Blue
   let winners =
     Belt.Map.String.keep(selectedUsers, (_, value) =>
