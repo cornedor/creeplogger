@@ -10,6 +10,7 @@ const config: Config = {
     extend: {
       colors: {
         darkbg: "#242328",
+        overlay: "rgba(36, 35, 40, 0.7)",
       },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
@@ -26,6 +27,12 @@ const config: Config = {
       },
       ringWidth: {
         6: "6px",
+      },
+      backdropBlur: {
+        overlay: "20px",
+      },
+      backdropSaturate: {
+        overlay: "180%",
       },
     },
   },

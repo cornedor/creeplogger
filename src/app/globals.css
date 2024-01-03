@@ -13,7 +13,7 @@
   top: 0;
   height: 100vh;
   width: min(calc(600px + var(--overflow)), calc(100vw + var(--overflow)));
-  background-color: rgba(36, 35, 40, 0.7);
+  background-color: theme(colors.overlay);
   backdrop-filter: saturate(180%) blur(20px);
   -webkit-backdrop-filter: saturate(180%) blur(20px);
   z-index: 200;

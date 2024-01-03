@@ -1,0 +1,32 @@
+.connected,
+.disconnected {
+  width: 16px;
+  height: 6px;
+  border-radius: 6px;
+  display: block;
+  /* position: relative; */
+}
+.connected {
+  background: #77d875;
+  box-shadow: 0 0 3px #77d875;
+}
+.disconnected {
+  background: #ee6c6c;
+  box-shadow: 0 0 3px #ee6c6c;
+}
+
+.disconnected::after {
+  content: "Reconnecting...";
+  position: fixed;
+  background: rgb(36, 35, 40, 0.7);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  backdrop-filter: saturate(180%) blur(20px);
+  padding: 20px;
+  border-radius: 6px;
+  border: solid thin white;
+  right: 12px;
+  top: 12px;
+  width: 220px;
+  text-align: center;
+  z-index: 2;
+}
