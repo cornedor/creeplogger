@@ -100,7 +100,7 @@ let make = (
       }
     }
 
-    setEarnedPoints(_ => points->Float.toInt)
+    setEarnedPoints(_ => points->Math.round->Float.toInt)
 
     let _ = await Promise.all(
       Array.map(bluePlayers, async player => {
