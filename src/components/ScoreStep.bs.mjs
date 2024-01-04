@@ -118,7 +118,7 @@ function ScoreStep(props) {
     }
     var points = match[2];
     setEarnedPoints(function (param) {
-          return points | 0;
+          return Math.round(points) | 0;
         });
     await Promise.all(match[0].map(async function (player) {
               return Players.updateGameStats(player.key, blueState, redState, "Blue", player.elo);
