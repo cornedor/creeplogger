@@ -28,7 +28,7 @@ let make = (~show, ~setShow) => {
       <tbody>
         {players
         ->Array.map(player => {
-          let roundedElo = player.elo->Math.round->Float.toInt
+          let roundedElo = Elo.roundScore(player.elo)
           if roundedElo != previousScore.contents {
             position := position.contents + 1
           }
@@ -39,7 +39,7 @@ let make = (~show, ~setShow) => {
             <td> {React.string(player.name)} </td>
             <td> {React.int(roundedElo)} </td>
             <td className={player.lastEloChange > 0.0 ? "text-green-400" : "text-red-400"}>
-              {React.float(Math.round(player.lastEloChange))}
+              {React.int(Elo.roundScore(player.lastEloChange))}
             </td>
           </tr>
         })

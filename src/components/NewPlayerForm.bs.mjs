@@ -16,7 +16,9 @@ function NewPlayerForm(props) {
         return "Hidden";
       });
   var setFormState = match[1];
+  var formState = match[0];
   var match$1 = ReactHookForm.useForm(undefined);
+  var reset = match$1.reset;
   var addCreeper = async function (name) {
     setFormState(function (param) {
           return "Loading";
@@ -29,13 +31,27 @@ function NewPlayerForm(props) {
   var onSubmit = function (data) {
     addCreeper(data.name);
   };
+  React.useEffect((function () {
+          if (formState !== "Finished") {
+            return ;
+          }
+          reset(undefined);
+          var timeoutId = setTimeout((function () {
+                  setFormState(function (param) {
+                        return "Hidden";
+                      });
+                }), 4000);
+          return (function () {
+                    clearTimeout(timeoutId);
+                  });
+        }), formState);
   var showForm = function (param) {
     setFormState(function (param) {
           return "Visible";
         });
   };
   var content;
-  switch (match[0]) {
+  switch (formState) {
     case "Hidden" :
         content = JsxRuntime.jsx("button", {
               children: "+",

@@ -8,7 +8,7 @@ type formState = Hidden | Visible | Loading | Finished
 @react.component
 let make = () => {
   let (formState, setFormState) = React.useState(() => Hidden)
-  let {register, handleSubmit} = useFormOfInputs()
+  let {register, handleSubmit, reset} = useFormOfInputs()
 
   let addCreeper = async name => {
     setFormState(_ => Loading)
@@ -19,6 +19,19 @@ let make = () => {
   let onSubmit = (data: inputs) => {
     let _ = addCreeper(data.name)
   }
+
+  React.useEffect(() => {
+    switch formState {
+    | Finished => {
+        reset()
+        let timeoutId = setTimeout(() => {
+          setFormState(_ => Hidden)
+        }, 4000)
+        Some(() => clearTimeout(timeoutId))
+      }
+    | _ => None
+    }
+  }, formState)
 
   let showForm = _ => setFormState(_ => Visible)
 

@@ -100,7 +100,9 @@ let make = (
       }
     }
 
-    setEarnedPoints(_ => points->Math.round->Float.toInt)
+    let roundedPoints = Elo.roundScore(points)
+
+    setEarnedPoints(_ => roundedPoints)
 
     let _ = await Promise.all(
       Array.map(bluePlayers, async player => {
@@ -113,7 +115,7 @@ let make = (
       }),
     )
 
-    let _ = await sendCreepsUpdate(blueState, redState, points->Int.fromFloat)
+    let _ = await sendCreepsUpdate(blueState, redState, roundedPoints)
 
     setIsSaving(_ => false)
     setStep(step => LoggerStep.getNextStep(step))

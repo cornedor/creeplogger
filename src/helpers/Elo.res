@@ -49,3 +49,5 @@ let calculateScore = (winners: team, losers: team) => {
 
   (winners, losers, getRatingChange(expectedScoreWinners, 1.0))
 }
+
+let roundScore = score => Math.round(score)->Float.toInt

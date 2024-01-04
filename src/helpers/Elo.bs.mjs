@@ -64,7 +64,12 @@ function calculateScore(winners, losers) {
         ];
 }
 
+function roundScore(score) {
+  return Math.round(score) | 0;
+}
+
 export {
   calculateScore ,
+  roundScore ,
 }
 /* No side effect */

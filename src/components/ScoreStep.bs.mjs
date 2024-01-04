@@ -116,9 +116,9 @@ function ScoreStep(props) {
         match$1[2]
       ];
     }
-    var points = match[2];
+    var roundedPoints = Elo.roundScore(match[2]);
     setEarnedPoints(function (param) {
-          return Math.round(points) | 0;
+          return roundedPoints;
         });
     await Promise.all(match[0].map(async function (player) {
               return Players.updateGameStats(player.key, blueState, redState, "Blue", player.elo);
@@ -126,7 +126,7 @@ function ScoreStep(props) {
     await Promise.all(match[1].map(async function (player) {
               return Players.updateGameStats(player.key, redState, blueState, "Red", player.elo);
             }));
-    await sendCreepsUpdate(blueState, redState, points | 0);
+    await sendCreepsUpdate(blueState, redState, roundedPoints);
     setIsSaving(function (param) {
           return false;
         });
