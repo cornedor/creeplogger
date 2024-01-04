@@ -11,6 +11,7 @@ let make = () => {
   let {register, handleSubmit} = useFormOfInputs()
 
   let addCreeper = async name => {
+    setFormState(_ => Loading)
     let _ = await Players.addPlayer(name)
     setFormState(_ => Finished)
   }

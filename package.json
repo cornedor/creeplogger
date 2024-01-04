@@ -12,7 +12,8 @@
     "next:lint": "next lint",
     "res:build": "rescript",
     "res:clean": "rescript clean",
-    "res:start": "rescript build -w"
+    "res:start": "rescript build -w",
+    "rescript": "rescript"
   },
   "dependencies": {
     "@glennsl/rescript-fetch": "^0.2.0",

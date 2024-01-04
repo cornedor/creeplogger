@@ -1,12 +1,3 @@
-let mapPlayer = (players, key) => {
-  let player = Players.playerByKey(players, key)
-
-  switch player {
-  | Some(player) => <li> {React.string(player.name)} </li>
-  | None => <li> {React.string("...")} </li>
-  }
-}
-
 @react.component
 let make = (
   ~selectedUsers,

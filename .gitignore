@@ -39,4 +39,3 @@ next-env.d.ts
 /lib/
 .bsb.lock
 .merlin
-*.bs.mjs
