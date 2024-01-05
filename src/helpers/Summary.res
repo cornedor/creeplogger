@@ -62,3 +62,7 @@ let getDailyOverview = async period => {
 
   creepsMap
 }
+
+let toAPIObject = data => {
+  Map.entries(data)->Dict.fromIterator
+}

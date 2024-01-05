@@ -1,5 +1,5 @@
 import { sendDailyUpdate } from "@/helpers/Mattermost.bs.mjs";
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 
 export async function GET(request: NextRequest) {
   const authHeader = request.headers.get("authorization");
@@ -11,9 +11,8 @@ export async function GET(request: NextRequest) {
 
   if (request.nextUrl.searchParams.get("send")) {
     await sendDailyUpdate();
-    return NextResponse.json({ ok: true });
+    return Response.json({ success: true });
   }
 
-  // @ts-ignore
-  return NextResponse.json({ ok: false });
+  return Response.json({ success: true });
 }

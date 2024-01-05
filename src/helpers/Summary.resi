@@ -1,5 +1,3 @@
-open RescriptCore
-
 type dailyLine = {
   name: string,
   creeps: int,
@@ -7,3 +5,5 @@ type dailyLine = {
 }
 
 let getDailyOverview: Games.peroid => promise<RescriptCore.Map.t<string, dailyLine>>
+
+let toAPIObject: RescriptCore.Map.t<string, dailyLine> => Js.Dict.t<dailyLine>

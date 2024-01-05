@@ -72,7 +72,7 @@ let sendCreepsUpdate = async (
 }
 
 let sendDailyUpdate = async () => {
-  let overview = await Daily.getDailyOverview(Daily)
+  let overview = await Summary.getDailyOverview(Daily)
   let overviewArray =
     overview
     ->Map.values

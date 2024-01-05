@@ -70,7 +70,12 @@ async function getDailyOverview(period) {
   return creepsMap;
 }
 
+function toAPIObject(data) {
+  return Object.fromEntries(data.entries());
+}
+
 export {
   getDailyOverview ,
+  toAPIObject ,
 }
 /* Games Not a pure module */
