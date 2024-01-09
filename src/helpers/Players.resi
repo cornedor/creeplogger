@@ -16,6 +16,7 @@ type player = {
   lastEloChange: float,
   key: string,
   mattermostHandle: option<string>,
+  lastGames: array<int>,
 }
 
 type playersOrder = [#games | #elo]

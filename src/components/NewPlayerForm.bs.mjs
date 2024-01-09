@@ -44,7 +44,7 @@ function NewPlayerForm(props) {
           return (function () {
                     clearTimeout(timeoutId);
                   });
-        }), formState);
+        }), [formState]);
   var showForm = function (param) {
     setFormState(function (param) {
           return "Visible";

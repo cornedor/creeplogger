@@ -3,6 +3,8 @@
 import * as React from "react";
 import * as Button from "./Button.bs.mjs";
 import * as ListIcon from "./ListIcon.bs.mjs";
+import * as StatsModal from "./StatsModal.bs.mjs";
+import * as PieChartIcon from "./PieChartIcon.bs.mjs";
 import * as FirebaseStatus from "../helpers/FirebaseStatus.bs.mjs";
 import * as LeaderboardModal from "./LeaderboardModal.bs.mjs";
 import * as JsxRuntime from "react/jsx-runtime";
@@ -19,6 +21,10 @@ function Header(props) {
         return false;
       });
   var setShowScores = match[1];
+  var match$1 = React.useState(function () {
+        return false;
+      });
+  var setShowStats = match$1[1];
   var isConnected = FirebaseStatus.useFirebaseStatus();
   var nextLabel;
   switch (props.step) {
@@ -37,19 +43,34 @@ function Header(props) {
                       show: match[0],
                       setShow: setShowScores
                     }),
+                JsxRuntime.jsx(StatsModal.make, {
+                      show: match$1[0],
+                      setShow: setShowStats
+                    }),
                 JsxRuntime.jsx("div", {
                       children: JsxRuntime.jsxs("div", {
                             children: [
-                              JsxRuntime.jsx("div", {
-                                    children: JsxRuntime.jsx("button", {
-                                          children: JsxRuntime.jsx(ListIcon.make, {}),
-                                          className: "text-white w-[44px] aspect-square text-[26px] flex justify-center items-center -ml-3 rounded-full bg-black/0 transition-all ease-in-out duration-200 shadow-none hover:bg-black/20 hover:shadow-icon-button hover:ring-8 ring-black/20 active:bg-black/20 active:shadow-icon-button active:ring-8 ",
-                                          onClick: (function (param) {
-                                              setShowScores(function (param) {
-                                                    return true;
-                                                  });
-                                            })
-                                        }),
+                              JsxRuntime.jsxs("div", {
+                                    children: [
+                                      JsxRuntime.jsx("button", {
+                                            children: JsxRuntime.jsx(ListIcon.make, {}),
+                                            className: "text-white w-[44px] aspect-square text-[26px] flex justify-center items-center -ml-3 rounded-full bg-black/0 transition-all ease-in-out duration-200 shadow-none hover:bg-black/20 hover:shadow-icon-button hover:ring-8 ring-black/20 active:bg-black/20 active:shadow-icon-button active:ring-8 ",
+                                            onClick: (function (param) {
+                                                setShowScores(function (param) {
+                                                      return true;
+                                                    });
+                                              })
+                                          }),
+                                      JsxRuntime.jsx("button", {
+                                            children: JsxRuntime.jsx(PieChartIcon.make, {}),
+                                            className: "text-white w-[44px] aspect-square text-[26px] flex justify-center items-center -ml-3 rounded-full bg-black/0 transition-all ease-in-out duration-200 shadow-none hover:bg-black/20 hover:shadow-icon-button hover:ring-8 ring-black/20 active:bg-black/20 active:shadow-icon-button active:ring-8 ",
+                                            onClick: (function (param) {
+                                                setShowStats(function (param) {
+                                                      return true;
+                                                    });
+                                              })
+                                          })
+                                    ],
                                     className: "flex items-center gap-5"
                                   }),
                               JsxRuntime.jsxs("div", {

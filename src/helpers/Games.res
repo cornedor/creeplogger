@@ -85,3 +85,27 @@ let getTimePeriod = async period => {
   | None => Js.Dict.empty()
   }
 }
+
+external snapshotToArray: dataSnapshot => array<dataSnapshot> = "%identity"
+
+let fetchAllGames = async () => {
+  let games =
+    await Firebase.Database.query1(
+      Firebase.Database.refPath(Database.database, "games"),
+      Firebase.Database.orderByChild("date"),
+    )->Firebase.Database.get
+
+  let orderedGames = []
+  Array.forEach(snapshotToArray(games), snap => {
+    switch snap->Firebase.Database.Snapshot.val->Nullable.toOption {
+    | Some(val) =>
+      switch val->Schema.parseWith(gameSchema) {
+      | Ok(val) => orderedGames->Array.push(val)
+      | Error(e) => Js.log(e)
+      }
+    | None => ()
+    }
+  })
+
+  orderedGames
+}

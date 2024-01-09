@@ -24,7 +24,8 @@ var playerSchema = Schema.object(function (s) {
               elo: s.o("elo", Schema.$$float, 1000.0),
               lastEloChange: s.o("change", Schema.$$float, 0.0),
               key: s.f("key", Schema.string),
-              mattermostHandle: s.f("mh", FirebaseSchema.nullableTransform(Schema.option(Schema.string)))
+              mattermostHandle: s.f("mh", FirebaseSchema.nullableTransform(Schema.option(Schema.string))),
+              lastGames: s.o("lastGames", Schema.array(Schema.$$int), [])
             };
     });
 
@@ -47,7 +48,8 @@ async function addPlayer(name) {
         elo: 1000.0,
         lastEloChange: 0.0,
         key: "",
-        mattermostHandle: undefined
+        mattermostHandle: undefined,
+        lastGames: []
       }, playerSchema);
   var data$1;
   data$1 = data.TAG === "Ok" ? data._0 : RescriptCore.panic("Could not serialize player");
@@ -167,7 +169,8 @@ function updateGameStats(key, myTeamPoints, opponentTeamPoints, team, elo) {
                       elo: elo,
                       lastEloChange: elo - player$1.elo,
                       key: player$1.key,
-                      mattermostHandle: player$1.mattermostHandle
+                      mattermostHandle: player$1.mattermostHandle,
+                      lastGames: player$1.lastGames
                     }, playerSchema);
                 if (res.TAG === "Ok") {
                   return res._0;

@@ -31,7 +31,7 @@ let make = () => {
       }
     | _ => None
     }
-  }, formState)
+  }, [formState])
 
   let showForm = _ => setFormState(_ => Visible)
 

@@ -83,8 +83,27 @@ async function getTimePeriod(period) {
   return {};
 }
 
+async function fetchAllGames() {
+  var games = await Database$1.get(Database$1.query(Database$1.ref(Database.database, "games"), Database$1.orderByChild("date")));
+  var orderedGames = [];
+  games.forEach(function (snap) {
+        var val = snap.val();
+        if (val == null) {
+          return ;
+        }
+        var val$1 = Schema.parseWith(val, gameSchema);
+        if (val$1.TAG === "Ok") {
+          orderedGames.push(val$1._0);
+          return ;
+        }
+        console.log(val$1._0);
+      });
+  return orderedGames;
+}
+
 export {
   addGame ,
   getTimePeriod ,
+  fetchAllGames ,
 }
 /* modifierSchema Not a pure module */

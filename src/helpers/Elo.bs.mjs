@@ -34,7 +34,8 @@ function calculateScore(winners, losers) {
                 elo: elo,
                 lastEloChange: creeper.lastEloChange,
                 key: creeper.key,
-                mattermostHandle: creeper.mattermostHandle
+                mattermostHandle: creeper.mattermostHandle,
+                lastGames: creeper.lastGames
               };
       });
   var losers$1 = losers.map(function (creeper) {
@@ -54,7 +55,8 @@ function calculateScore(winners, losers) {
                 elo: elo,
                 lastEloChange: creeper.lastEloChange,
                 key: creeper.key,
-                mattermostHandle: creeper.mattermostHandle
+                mattermostHandle: creeper.mattermostHandle,
+                lastGames: creeper.lastGames
               };
       });
   return [
