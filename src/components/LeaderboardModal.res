@@ -23,6 +23,7 @@ let make = (~show, ~setShow) => {
             </button>
           </th>
           <th className="text-lg text-left"> {React.string("Groei")} </th>
+          <th className="text-lg text-left"> {React.string("G/W")} </th>
         </tr>
       </thead>
       <tbody>
@@ -40,6 +41,11 @@ let make = (~show, ~setShow) => {
             <td> {React.int(roundedElo)} </td>
             <td className={player.lastEloChange > 0.0 ? "text-green-400" : "text-red-400"}>
               {React.int(Elo.roundScore(player.lastEloChange))}
+            </td>
+            <td>
+              {React.int(player.games)}
+              {React.string(":")}
+              {React.int(player.wins)}
             </td>
           </tr>
         })

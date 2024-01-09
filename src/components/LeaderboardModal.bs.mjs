@@ -62,6 +62,10 @@ function LeaderboardModal(props) {
                                       JsxRuntime.jsx("th", {
                                             children: "Groei",
                                             className: "text-lg text-left"
+                                          }),
+                                      JsxRuntime.jsx("th", {
+                                            children: "G/W",
+                                            className: "text-lg text-left"
                                           })
                                     ]
                                   })
@@ -87,6 +91,13 @@ function LeaderboardModal(props) {
                                                   JsxRuntime.jsx("td", {
                                                         children: Elo.roundScore(player.lastEloChange),
                                                         className: player.lastEloChange > 0.0 ? "text-green-400" : "text-red-400"
+                                                      }),
+                                                  JsxRuntime.jsxs("td", {
+                                                        children: [
+                                                          player.games,
+                                                          ":",
+                                                          player.wins
+                                                        ]
                                                       })
                                                 ]
                                               }, player.key);
