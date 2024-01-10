@@ -158,6 +158,11 @@ let fetchPlayerByKey = async key => {
 
 let playerByKey = (players, key) => players->Array.find(c => c.key == key)
 
+let writePlayer = (player: player) => {
+  let playerRef = Firebase.Database.refPath(Database.database, bucket ++ "/" ++ player.key)
+  Firebase.Database.set(playerRef, Schema.serializeOrRaiseWith(player, playerSchema))
+}
+
 let updateGameStats = (key, myTeamPoints, opponentTeamPoints, team: team, elo) => {
   let isAbsolute = abs(myTeamPoints - opponentTeamPoints) == 7
 

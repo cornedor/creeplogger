@@ -139,6 +139,11 @@ function playerByKey(players, key) {
             });
 }
 
+function writePlayer(player) {
+  var playerRef = Database$1.ref(Database.database, "players/" + player.key);
+  return Database$1.set(playerRef, Schema.serializeOrRaiseWith(player, playerSchema));
+}
+
 function updateGameStats(key, myTeamPoints, opponentTeamPoints, team, elo) {
   var isAbsolute = PervasivesU.abs(myTeamPoints - opponentTeamPoints | 0) === 7;
   var isWin = myTeamPoints > opponentTeamPoints;
@@ -187,5 +192,6 @@ export {
   fetchPlayerByKey ,
   playerByKey ,
   updateGameStats ,
+  writePlayer ,
 }
 /* playerSchema Not a pure module */

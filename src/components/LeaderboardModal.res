@@ -15,7 +15,9 @@ let make = (~show, ~setShow) => {
     <table className="table-fixed w-full mt-8">
       <thead>
         <tr>
-          <th className="text-lg text-left"> {React.string("#")} </th>
+          <th className="text-lg text-left" style={ReactDOM.Style.make(~width="40px", ())}>
+            {React.string("#")}
+          </th>
           <th className="text-lg text-left"> {React.string("Speler")} </th>
           <th className="text-lg text-left">
             <button onClick={_ => setOrder(order => !order)}>
@@ -36,7 +38,9 @@ let make = (~show, ~setShow) => {
           previousScore := roundedElo
 
           <tr key={player.key}>
-            <td> {React.string(`#${position.contents->Int.toString}`)} </td>
+            <td className="font-semibold">
+              {React.string(`${position.contents->Int.toString}`)}
+            </td>
             <td> {React.string(player.name)} </td>
             <td> {React.int(roundedElo)} </td>
             <td className={player.lastEloChange > 0.0 ? "text-green-400" : "text-red-400"}>

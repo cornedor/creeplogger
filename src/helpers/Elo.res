@@ -33,17 +33,21 @@ let calculateScore = (winners: team, losers: team) => {
   let expectedScoreLosers = getExpected(losersScore, winnersScore)
 
   let winners = Array.map(winners, creeper => {
-    let elo = creeper.elo +. getRatingChange(expectedScoreWinners, 1.0)
+    let change = getRatingChange(expectedScoreWinners, 1.0)
+    let elo = creeper.elo +. change
     {
       ...creeper,
       elo,
+      lastEloChange: change,
     }
   })
   let losers = Array.map(losers, creeper => {
-    let elo = creeper.elo +. getRatingChange(expectedScoreLosers, 0.0)
+    let change = getRatingChange(expectedScoreLosers, 0.0)
+    let elo = creeper.elo +. change
     {
       ...creeper,
       elo,
+      lastEloChange: change,
     }
   })
 

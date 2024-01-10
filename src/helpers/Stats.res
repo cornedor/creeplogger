@@ -100,16 +100,42 @@ let recalculateStats = async () => {
     let redWin = game.redScore > game.blueScore
     let isAbsolute = abs(game.redScore - game.blueScore) == 7
 
-    // let redPlayers = game.redTeam->Array.map(key => Dict.get(players, key)->Option.getExn)
-    // let bluePlayers = game.blueTeam->Array.map(key => Dict.get(players, key)->Option.getExn)
+    let redPlayers = game.redTeam->Array.map(key => Dict.get(players, key)->Option.getExn)
+    let bluePlayers = game.blueTeam->Array.map(key => Dict.get(players, key)->Option.getExn)
 
-    // let (bluePlayers, redPlayers, points) = switch blueWin {
-    // | true => Elo.calculateScore(bluePlayers, redPlayers)
-    // | false => {
-    //     let (red, blue, points) = Elo.calculateScore(redPlayers, bluePlayers)
-    //     (blue, red, points)
-    //   }
-    // }
+    let (bluePlayers, redPlayers, _) = switch blueWin {
+    | true => Elo.calculateScore(bluePlayers, redPlayers)
+    | false => {
+        let (red, blue, points) = Elo.calculateScore(redPlayers, bluePlayers)
+        (blue, red, points)
+      }
+    }
+    Array.forEach(bluePlayers, player => {
+      let lastGames = player.lastGames
+      Array.push(lastGames, blueWin ? 1 : 0)
+      let lastGames = Array.sliceToEnd(lastGames, ~start=-5)
+      Dict.set(
+        players,
+        player.key,
+        {
+          ...player,
+          lastGames,
+        },
+      )
+    })
+    Array.forEach(redPlayers, player => {
+      let lastGames = player.lastGames
+      Array.push(lastGames, redWin ? 1 : 0)
+      let lastGames = Array.sliceToEnd(lastGames, ~start=-5)
+      Dict.set(
+        players,
+        player.key,
+        {
+          ...player,
+          lastGames,
+        },
+      )
+    })
 
     // Js.log(points)
 
@@ -122,6 +148,14 @@ let recalculateStats = async () => {
   })
 
   Js.log(stats)
+  Js.log(players)
+
+  let _ = await Promise.all(
+    Array.map(playerKeys, key => {
+      let player = Dict.get(players, key)->Option.getExn
+      Players.writePlayer(player)
+    }),
+  )
 
   await writeStats(stats)
 

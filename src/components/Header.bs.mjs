@@ -2,7 +2,10 @@
 
 import * as React from "react";
 import * as Button from "./Button.bs.mjs";
+import * as Database from "../helpers/Database.bs.mjs";
 import * as ListIcon from "./ListIcon.bs.mjs";
+import * as AdminIcon from "./AdminIcon.bs.mjs";
+import Link from "next/link";
 import * as StatsModal from "./StatsModal.bs.mjs";
 import * as PieChartIcon from "./PieChartIcon.bs.mjs";
 import * as FirebaseStatus from "../helpers/FirebaseStatus.bs.mjs";
@@ -17,6 +20,7 @@ function Header(props) {
   var onReset = props.onReset;
   var onNextStep = props.onNextStep;
   var disabled = __disabled !== undefined ? __disabled : false;
+  var user = Database.useUser();
   var match = React.useState(function () {
         return false;
       });
@@ -37,6 +41,12 @@ function Header(props) {
         break;
     
   }
+  var tmp;
+  tmp = user === null || user === undefined ? JsxRuntime.jsx(JsxRuntime.Fragment, {}) : JsxRuntime.jsx(Link, {
+          href: "/admin",
+          children: JsxRuntime.jsx(AdminIcon.make, {}),
+          className: "text-white w-[44px] aspect-square text-[26px] flex justify-center items-center -ml-3 rounded-full bg-black/0 transition-all ease-in-out duration-200 shadow-none hover:bg-black/20 hover:shadow-icon-button hover:ring-8 ring-black/20 active:bg-black/20 active:shadow-icon-button active:ring-8 "
+        });
   return JsxRuntime.jsxs(JsxRuntime.Fragment, {
               children: [
                 JsxRuntime.jsx(LeaderboardModal.make, {
@@ -69,7 +79,8 @@ function Header(props) {
                                                       return true;
                                                     });
                                               })
-                                          })
+                                          }),
+                                      tmp
                                     ],
                                     className: "flex items-center gap-5"
                                   }),

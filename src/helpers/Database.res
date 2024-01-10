@@ -14,3 +14,23 @@ let config: firebaseOptions = {
 let app = Firebase.initializeApp(config)
 
 let database = Firebase.Database.getDatabase1(app)
+
+let auth = Firebase.Auth.getAuth()
+
+let useUser = () => {
+  let (user, setUser) = React.useState(_ => auth["currentUser"])
+
+  React.useEffect(() => {
+    let unsubscribe = Firebase.Auth.onAuthStateChanged(
+      auth,
+      user => {
+        setUser(_ => user)
+      },
+      (),
+    )
+
+    Some(unsubscribe)
+  }, [])
+
+  user
+}

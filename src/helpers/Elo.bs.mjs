@@ -18,7 +18,8 @@ function calculateScore(winners, losers) {
   var expectedScoreWinners = 1.0 / (1.0 + Math.pow(10.0, (losersScore - winnersScore) / 400.0));
   var expectedScoreLosers = 1.0 / (1.0 + Math.pow(10.0, (winnersScore - losersScore) / 400.0));
   var winners$1 = winners.map(function (creeper) {
-        var elo = creeper.elo + 32.0 * (1.0 - expectedScoreWinners);
+        var change = 32.0 * (1.0 - expectedScoreWinners);
+        var elo = creeper.elo + change;
         return {
                 name: creeper.name,
                 wins: creeper.wins,
@@ -32,14 +33,15 @@ function calculateScore(winners, losers) {
                 blueWins: creeper.blueWins,
                 redWins: creeper.redWins,
                 elo: elo,
-                lastEloChange: creeper.lastEloChange,
+                lastEloChange: change,
                 key: creeper.key,
                 mattermostHandle: creeper.mattermostHandle,
                 lastGames: creeper.lastGames
               };
       });
   var losers$1 = losers.map(function (creeper) {
-        var elo = creeper.elo + 32.0 * (0.0 - expectedScoreLosers);
+        var change = 32.0 * (0.0 - expectedScoreLosers);
+        var elo = creeper.elo + change;
         return {
                 name: creeper.name,
                 wins: creeper.wins,
@@ -53,7 +55,7 @@ function calculateScore(winners, losers) {
                 blueWins: creeper.blueWins,
                 redWins: creeper.redWins,
                 elo: elo,
-                lastEloChange: creeper.lastEloChange,
+                lastEloChange: change,
                 key: creeper.key,
                 mattermostHandle: creeper.mattermostHandle,
                 lastGames: creeper.lastGames

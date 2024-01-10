@@ -40,7 +40,10 @@ function LeaderboardModal(props) {
                                     children: [
                                       JsxRuntime.jsx("th", {
                                             children: "#",
-                                            className: "text-lg text-left"
+                                            className: "text-lg text-left",
+                                            style: {
+                                              width: "40px"
+                                            }
                                           }),
                                       JsxRuntime.jsx("th", {
                                             children: "Speler",
@@ -80,7 +83,8 @@ function LeaderboardModal(props) {
                                     return JsxRuntime.jsxs("tr", {
                                                 children: [
                                                   JsxRuntime.jsx("td", {
-                                                        children: "#" + position.contents.toString()
+                                                        children: position.contents.toString(),
+                                                        className: "font-semibold"
                                                       }),
                                                   JsxRuntime.jsx("td", {
                                                         children: player.name
