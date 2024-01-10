@@ -89,6 +89,7 @@ let recalculateStats = async () => {
         ...player,
         elo: 1000.0,
         lastEloChange: 0.0,
+        lastGames: [],
       },
     )
   })
