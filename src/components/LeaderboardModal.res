@@ -47,9 +47,23 @@ let make = (~show, ~setShow) => {
               {React.int(Elo.roundScore(player.lastEloChange))}
             </td>
             <td>
-              {React.int(player.games)}
-              {React.string(":")}
-              {React.int(player.wins)}
+              <div className="flex items-center gap-2">
+                <div className="inline-flex gap-1 w-9">
+                  {player.lastGames
+                  ->Array.mapWithIndex((win, i) =>
+                    <span
+                      className={"w-1 h-1 rounded block " ++ (
+                        win == 1 ? "bg-green-400" : "bg-red-400"
+                      )}
+                      key={i->Int.toString}
+                    />
+                  )
+                  ->React.array}
+                </div>
+                {React.int(player.games)}
+                {React.string(":")}
+                {React.int(player.wins)}
+              </div>
             </td>
           </tr>
         })

@@ -96,12 +96,25 @@ function LeaderboardModal(props) {
                                                         children: Elo.roundScore(player.lastEloChange),
                                                         className: player.lastEloChange > 0.0 ? "text-green-400" : "text-red-400"
                                                       }),
-                                                  JsxRuntime.jsxs("td", {
-                                                        children: [
-                                                          player.games,
-                                                          ":",
-                                                          player.wins
-                                                        ]
+                                                  JsxRuntime.jsx("td", {
+                                                        children: JsxRuntime.jsxs("div", {
+                                                              children: [
+                                                                JsxRuntime.jsx("div", {
+                                                                      children: player.lastGames.map(function (win, i) {
+                                                                            return JsxRuntime.jsx("span", {
+                                                                                        className: "w-1 h-1 rounded block " + (
+                                                                                          win === 1 ? "bg-green-400" : "bg-red-400"
+                                                                                        )
+                                                                                      }, i.toString());
+                                                                          }),
+                                                                      className: "inline-flex gap-1 w-9"
+                                                                    }),
+                                                                player.games,
+                                                                ":",
+                                                                player.wins
+                                                              ],
+                                                              className: "flex items-center gap-2"
+                                                            })
                                                       })
                                                 ]
                                               }, player.key);
