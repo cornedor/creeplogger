@@ -7,6 +7,7 @@ import * as PervasivesU from "rescript/lib/es6/pervasivesU.js";
 import * as RescriptCore from "@rescript/core/src/RescriptCore.bs.mjs";
 import * as FirebaseSchema from "./FirebaseSchema.bs.mjs";
 import * as Database$1 from "firebase/database";
+import * as FaroWebSdk from "@grafana/faro-web-sdk";
 
 var playerSchema = Schema.object(function (s) {
       return {
@@ -32,6 +33,10 @@ var playerSchema = Schema.object(function (s) {
 var playersSchema = Schema.dict(playerSchema);
 
 async function addPlayer(name) {
+  FaroWebSdk.faro.api.pushLog([
+        "add_player",
+        name
+      ]);
   var playersRef = Database$1.ref(Database.database, "players");
   var data = Schema.serializeWith({
         name: name,
