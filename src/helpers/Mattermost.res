@@ -104,7 +104,7 @@ let sendDailyUpdate = async () => {
 
       let intro = `### De kruip statistieken van vandaag zijn bekend!
 
-Feliciteer direct onze top kruiper van de dag: ${topCreeper.name} met maarliefst ${topCreeper.creeps->Int.toString} kruipjes!
+Feliciteer direct onze top kruiper van de dag: ${topCreeper.name} met maar liefst ${topCreeper.creeps->Int.toString} kruipjes!
 
 | # | Naam | Kruipjes | Potjes |
 | - | ---- | -------- | ------ | 
