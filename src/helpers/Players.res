@@ -46,6 +46,7 @@ let playerSchema = Schema.object(s => {
 let playersSchema = Schema.dict(playerSchema)
 
 let addPlayer = async name => {
+  Faro.pushLog(["add_player", name])
   let playersRef = Firebase.Database.refPath(Database.database, bucket)
   let data = switch {
     name,
