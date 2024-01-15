@@ -24,8 +24,9 @@ let make = (~show, ~setShow) => {
               {React.string("Score " ++ (order ? "↑" : "↓"))}
             </button>
           </th>
-          <th className="text-lg text-left"> {React.string("Groei")} </th>
+          <th className="text-lg text-left"> {React.string("Last 5")} </th>
           <th className="text-lg text-left"> {React.string("G/W")} </th>
+          <th className="text-lg text-left"> {React.string("Win%")} </th>
         </tr>
       </thead>
       <tbody>
@@ -42,28 +43,37 @@ let make = (~show, ~setShow) => {
               {React.string(`${position.contents->Int.toString}`)}
             </td>
             <td> {React.string(player.name)} </td>
-            <td> {React.int(roundedElo)} </td>
-            <td className={player.lastEloChange > 0.0 ? "text-green-400" : "text-red-400"}>
-              {React.int(Elo.roundScore(player.lastEloChange))}
+            <td>
+              {React.int(roundedElo)}
+              {React.string(" ")}
+              <small className={player.lastEloChange > 0.0 ? "text-green-400" : "text-red-400"}>
+                {React.int(Elo.roundScore(player.lastEloChange))}
+              </small>
             </td>
             <td>
-              <div className="flex items-center gap-2">
-                <div className="inline-flex gap-1 w-9">
-                  {player.lastGames
-                  ->Array.mapWithIndex((win, i) =>
-                    <span
-                      className={"w-1 h-1 rounded block " ++ (
-                        win == 1 ? "bg-green-400" : "bg-red-400"
-                      )}
-                      key={i->Int.toString}
-                    />
-                  )
-                  ->React.array}
-                </div>
-                {React.int(player.games)}
-                {React.string(":")}
-                {React.int(player.wins)}
+              <div className="inline-flex gap-1 w-9">
+                {player.lastGames
+                ->Array.mapWithIndex((win, i) =>
+                  <span
+                    className={"w-1 h-1 rounded block " ++ (
+                      win == 1 ? "bg-green-400" : "bg-red-400"
+                    )}
+                    key={i->Int.toString}
+                  />
+                )
+                ->React.array}
               </div>
+            </td>
+            <td>
+              {React.int(player.games)}
+              {React.string(":")}
+              {React.int(player.wins)}
+            </td>
+            <td>
+              {React.float(
+                (Float.fromInt(player.wins) /. Float.fromInt(player.games) *. 100.)->Math.round,
+              )}
+              {React.string("%")}
             </td>
           </tr>
         })
