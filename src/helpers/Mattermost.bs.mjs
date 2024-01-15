@@ -71,7 +71,7 @@ async function sendDailyUpdate() {
           return "| " + (index + 1 | 0).toString() + " | " + creeper.name + " | " + creeper.creeps.toString() + " | " + creeper.games.toString() + " |";
         }).join("\n");
   var topCreeper = Core__Option.getExn(overviewArray[0]);
-  var intro = "### De kruip statistieken van vandaag zijn bekend!\n\nFeliciteer direct onze top kruiper van de dag: " + topCreeper.name + " met maarliefst " + topCreeper.creeps.toString() + " kruipjes!\n\n| # | Naam | Kruipjes | Potjes |\n| - | ---- | -------- | ------ | \n" + table + "\n\n";
+  var intro = "### De kruip statistieken van vandaag zijn bekend!\n\nFeliciteer direct onze top kruiper van de dag: " + topCreeper.name + " met maar liefst " + topCreeper.creeps.toString() + " kruipjes!\n\n| # | Naam | Kruipjes | Potjes |\n| - | ---- | -------- | ------ | \n" + table + "\n\n";
   var prom = publishMessage(intro);
   if (prom !== undefined) {
     await Caml_option.valFromOption(prom);

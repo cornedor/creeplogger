@@ -163,8 +163,13 @@ let writePlayer = (player: player) => {
   Firebase.Database.set(playerRef, Schema.serializeOrRaiseWith(player, playerSchema))
 }
 
+let getLastGames = (lastGames, win) => {
+  Array.push(lastGames, win ? 1 : 0)
+  lastGames->Array.sliceToEnd(~start=-5)
+}
+
 let updateGameStats = (key, myTeamPoints, opponentTeamPoints, team: team, elo) => {
-  let isAbsolute = abs(myTeamPoints - opponentTeamPoints) == 7
+  let isAbsolute = Rules.isAbsolute(myTeamPoints, opponentTeamPoints)
 
   let isWin = myTeamPoints > opponentTeamPoints
   let isAbsoluteWin = isAbsolute && isWin
@@ -192,6 +197,7 @@ let updateGameStats = (key, myTeamPoints, opponentTeamPoints, team: team, elo) =
           blueWins: isBlueWin ? player.blueWins + 1 : player.blueWins,
           lastEloChange: elo -. player.elo,
           elo,
+          lastGames: getLastGames(player.lastGames, isWin),
         },
         playerSchema,
       ) {

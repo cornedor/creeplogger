@@ -63,6 +63,30 @@ let useStats = () => {
   stats
 }
 
+let updateStats = async (redScore, blueScore) => {
+  let blueWin = Rules.isBlueWin(redScore, blueScore)
+  let redWin = Rules.isRedWin(redScore, blueScore)
+  let isAbsolute = Rules.isAbsolute(redScore, blueScore)
+  let statsRef = Firebase.Database.refPath(Database.database, bucket)
+  Firebase.Database.runTransaction(statsRef, data => {
+    switch data->Schema.parseWith(statsSchema) {
+    | Ok(data) => {
+        let newData = Schema.serializeOrRaiseWith(
+          {
+            totalGames: data.totalGames + 1,
+            totalRedWins: data.totalRedWins + (redWin ? 1 : 0),
+            totalBlueWins: data.totalBlueWins + (blueWin ? 1 : 0),
+            totalAbsoluteWins: data.totalAbsoluteWins + (isAbsolute ? 1 : 0),
+          },
+          statsSchema,
+        )
+        newData
+      }
+    | Error(_) => panic("Failed parsing stats")
+    }
+  })
+}
+
 let writeStats = async stats => {
   let statsRef = Firebase.Database.refPath(Database.database, bucket)
   let data = switch stats->Schema.serializeWith(statsSchema) {
@@ -97,9 +121,9 @@ let recalculateStats = async () => {
   let stats: stats = empty
 
   let stats = games->Array.reduce(stats, (stats, game) => {
-    let blueWin = game.blueScore > game.redScore
-    let redWin = game.redScore > game.blueScore
-    let isAbsolute = abs(game.redScore - game.blueScore) == 7
+    let blueWin = Rules.isBlueWin(game.redScore, game.blueScore)
+    let redWin = Rules.isRedWin(game.redScore, game.blueScore)
+    let isAbsolute = Rules.isAbsolute(game.redScore, game.blueScore)
 
     let redPlayers = game.redTeam->Array.map(key => Dict.get(players, key)->Option.getExn)
     let bluePlayers = game.blueTeam->Array.map(key => Dict.get(players, key)->Option.getExn)
@@ -112,9 +136,7 @@ let recalculateStats = async () => {
       }
     }
     Array.forEach(bluePlayers, player => {
-      let lastGames = player.lastGames
-      Array.push(lastGames, blueWin ? 1 : 0)
-      let lastGames = Array.sliceToEnd(lastGames, ~start=-5)
+      let lastGames = Players.getLastGames(player.lastGames, blueWin)
       Dict.set(
         players,
         player.key,
@@ -125,9 +147,7 @@ let recalculateStats = async () => {
       )
     })
     Array.forEach(redPlayers, player => {
-      let lastGames = player.lastGames
-      Array.push(lastGames, redWin ? 1 : 0)
-      let lastGames = Array.sliceToEnd(lastGames, ~start=-5)
+      let lastGames = Players.getLastGames(player.lastGames, redWin)
       Dict.set(
         players,
         player.key,

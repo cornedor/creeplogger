@@ -33,3 +33,5 @@ let playerByKey: (array<player>, string) => option<player>
 let updateGameStats: (string, int, int, team, float) => Js.Json.t => Js.Json.t
 
 let writePlayer: player => promise<unit>
+
+let getLastGames: (array<int>, bool) => array<int>

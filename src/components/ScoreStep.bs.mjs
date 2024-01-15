@@ -2,6 +2,7 @@
 
 import * as Elo from "../helpers/Elo.bs.mjs";
 import * as Games from "../helpers/Games.bs.mjs";
+import * as Stats from "../helpers/Stats.bs.mjs";
 import * as React from "react";
 import * as Button from "./Button.bs.mjs";
 import * as Header from "./Header.bs.mjs";
@@ -126,6 +127,7 @@ function ScoreStep(props) {
     await Promise.all(match[1].map(async function (player) {
               return Players.updateGameStats(player.key, redState, blueState, "Red", player.elo);
             }));
+    await Stats.updateStats(redState, blueState);
     await sendCreepsUpdate(blueState, redState, roundedPoints);
     setIsSaving(function (param) {
           return false;

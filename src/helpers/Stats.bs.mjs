@@ -2,12 +2,12 @@
 
 import * as Elo from "./Elo.bs.mjs";
 import * as Games from "./Games.bs.mjs";
+import * as Rules from "./Rules.bs.mjs";
 import * as React from "react";
 import * as Schema from "./Schema.bs.mjs";
 import * as Players from "./Players.bs.mjs";
 import * as Database from "./Database.bs.mjs";
 import * as Core__Array from "@rescript/core/src/Core__Array.bs.mjs";
-import * as PervasivesU from "rescript/lib/es6/pervasivesU.js";
 import * as Core__Option from "@rescript/core/src/Core__Option.bs.mjs";
 import * as RescriptCore from "@rescript/core/src/RescriptCore.bs.mjs";
 import * as Database$1 from "firebase/database";
@@ -68,6 +68,32 @@ function useStats() {
   return match[0];
 }
 
+async function updateStats(redScore, blueScore) {
+  var blueWin = Rules.isBlueWin(redScore, blueScore);
+  var redWin = Rules.isRedWin(redScore, blueScore);
+  var isAbsolute = Rules.isAbsolute(redScore, blueScore);
+  var statsRef = Database$1.ref(Database.database, bucket);
+  return Database$1.runTransaction(statsRef, (function (data) {
+                var data$1 = Schema.parseWith(data, statsSchema);
+                if (data$1.TAG !== "Ok") {
+                  return RescriptCore.panic("Failed parsing stats");
+                }
+                var data$2 = data$1._0;
+                return Schema.serializeOrRaiseWith({
+                            totalGames: data$2.totalGames + 1 | 0,
+                            totalRedWins: data$2.totalRedWins + (
+                              redWin ? 1 : 0
+                            ) | 0,
+                            totalBlueWins: data$2.totalBlueWins + (
+                              blueWin ? 1 : 0
+                            ) | 0,
+                            totalAbsoluteWins: data$2.totalAbsoluteWins + (
+                              isAbsolute ? 1 : 0
+                            ) | 0
+                          }, statsSchema);
+              }));
+}
+
 async function writeStats(stats) {
   var statsRef = Database$1.ref(Database.database, bucket);
   var data = Schema.serializeWith(stats, statsSchema);
@@ -108,9 +134,9 @@ async function recalculateStats() {
         };
       });
   var stats = Core__Array.reduce(games, empty, (function (stats, game) {
-          var blueWin = game.blueScore > game.redScore;
-          var redWin = game.redScore > game.blueScore;
-          var isAbsolute = PervasivesU.abs(game.redScore - game.blueScore | 0) === 7;
+          var blueWin = Rules.isBlueWin(game.redScore, game.blueScore);
+          var redWin = Rules.isRedWin(game.redScore, game.blueScore);
+          var isAbsolute = Rules.isAbsolute(game.redScore, game.blueScore);
           var redPlayers = game.redTeam.map(function (key) {
                 return Core__Option.getExn(players[key]);
               });
@@ -129,9 +155,7 @@ async function recalculateStats() {
             ];
           }
           match[0].forEach(function (player) {
-                var lastGames = player.lastGames;
-                lastGames.push(blueWin ? 1 : 0);
-                var lastGames$1 = lastGames.slice(-5);
+                var lastGames = Players.getLastGames(player.lastGames, blueWin);
                 players[player.key] = {
                   name: player.name,
                   wins: player.wins,
@@ -148,13 +172,11 @@ async function recalculateStats() {
                   lastEloChange: player.lastEloChange,
                   key: player.key,
                   mattermostHandle: player.mattermostHandle,
-                  lastGames: lastGames$1
+                  lastGames: lastGames
                 };
               });
           match[1].forEach(function (player) {
-                var lastGames = player.lastGames;
-                lastGames.push(redWin ? 1 : 0);
-                var lastGames$1 = lastGames.slice(-5);
+                var lastGames = Players.getLastGames(player.lastGames, redWin);
                 players[player.key] = {
                   name: player.name,
                   wins: player.wins,
@@ -171,7 +193,7 @@ async function recalculateStats() {
                   lastEloChange: player.lastEloChange,
                   key: player.key,
                   mattermostHandle: player.mattermostHandle,
-                  lastGames: lastGames$1
+                  lastGames: lastGames
                 };
               });
           return {
@@ -203,6 +225,7 @@ export {
   bucket ,
   fetchStats ,
   useStats ,
+  updateStats ,
   writeStats ,
   recalculateStats ,
 }

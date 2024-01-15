@@ -115,6 +115,8 @@ let make = (
       }),
     )
 
+    let _ = await Stats.updateStats(redState, blueState)
+
     let _ = await sendCreepsUpdate(blueState, redState, roundedPoints)
 
     setIsSaving(_ => false)
