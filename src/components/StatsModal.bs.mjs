@@ -7,6 +7,9 @@ import * as JsxRuntime from "react/jsx-runtime";
 function StatsModal(props) {
   var setShow = props.setShow;
   var stats = Stats.useStats();
+  var blue = stats.totalBlueWins;
+  var red = stats.totalRedWins;
+  var bluePercentages = (blue / (blue + red) * 100).toString();
   return JsxRuntime.jsxs("div", {
               children: [
                 JsxRuntime.jsx("header", {
@@ -72,6 +75,14 @@ function StatsModal(props) {
                             })
                       ],
                       className: "grid grid-cols-2 gap-2"
+                    }),
+                JsxRuntime.jsx("div", {
+                      children: JsxRuntime.jsx("div", {
+                            className: "rounded-full aspect-square w-[300px] my-4 mx-auto shadow-inner shadow-orange-50",
+                            style: {
+                              background: "conic-gradient(#86b7ff, #1c77ff " + bluePercentages + "%, #ff3e6e " + bluePercentages + "%, #ff0055)"
+                            }
+                          })
                     })
               ],
               className: "modal",

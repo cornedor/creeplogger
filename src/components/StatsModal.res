@@ -2,6 +2,11 @@
 let make = (~show, ~setShow) => {
   let stats = Stats.useStats()
 
+  let blue = Float.fromInt(stats.totalBlueWins)
+  let red = Float.fromInt(stats.totalRedWins)
+
+  let bluePercentages = (blue /. (blue +. red) *. 100.)->Float.toString
+
   <div
     className="modal"
     style={ReactDOM.Style.make(~transform=show ? "translateX(0)" : "translateX(-100%)", ())}>
@@ -29,5 +34,14 @@ let make = (~show, ~setShow) => {
         <span> {React.int(stats.totalAbsoluteWins)} </span>
       </li>
     </ul>
+    <div>
+      <div
+        className="rounded-full aspect-square w-[300px] my-4 mx-auto shadow-inner shadow-orange-50"
+        style={ReactDOM.Style.make(
+          ~background=`conic-gradient(#86b7ff, #1c77ff ${bluePercentages}%, #ff3e6e ${bluePercentages}%, #ff0055)`,
+          (),
+        )}
+      />
+    </div>
   </div>
 }
