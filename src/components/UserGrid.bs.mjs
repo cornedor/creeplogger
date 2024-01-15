@@ -23,9 +23,10 @@ function UserGrid(props) {
                     children: [
                       JsxRuntime.jsx("button", {
                             children: JsxRuntime.jsx("b", {
-                                  children: item.name
+                                  children: item.name,
+                                  className: "text-ellipsis max-w-full overflow-hidden inline-block p-2"
                                 }),
-                            className: "text-black text-3xl",
+                            className: "text-black text-3xl min-w-0 max-w-full",
                             onClick: (function (param) {
                                 setSelectedUsers(function (s) {
                                       return Belt_MapString.remove(s, item.key);

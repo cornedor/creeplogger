@@ -20,8 +20,10 @@ let make = (
       ])}>
       <button
         onClick={_ => setSelectedUsers(s => Belt.Map.String.remove(s, item.key))}
-        className="text-black text-3xl">
-        <b> {React.string(item.name)} </b>
+        className="text-black text-3xl min-w-0 max-w-full">
+        <b className="text-ellipsis max-w-full overflow-hidden inline-block p-2">
+          {React.string(item.name)}
+        </b>
       </button>
       <div className="grid grid-cols-2">
         <button
