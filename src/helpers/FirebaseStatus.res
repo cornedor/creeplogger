@@ -1,7 +1,12 @@
 open Firebase
 
+@module("./firebase-network-fix")
+external useFirebaseNetworkFix: unit => unit = "useFirebaseNetworkFix"
+
 let useFirebaseStatus = () => {
   let (status, setStatus) = React.useState(_ => false)
+
+  useFirebaseNetworkFix()
 
   React.useEffect(() => {
     let ref = Firebase.Database.refPath(Database.database, ".info/connected")
