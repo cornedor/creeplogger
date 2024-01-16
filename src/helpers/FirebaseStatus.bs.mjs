@@ -4,12 +4,14 @@ import * as React from "react";
 import * as Js_json from "rescript/lib/es6/js_json.js";
 import * as Database from "./Database.bs.mjs";
 import * as Database$1 from "firebase/database";
+import * as FirebaseNetworkFix from "./firebase-network-fix";
 
 function useFirebaseStatus() {
   var match = React.useState(function () {
         return false;
       });
   var setStatus = match[1];
+  FirebaseNetworkFix.useFirebaseNetworkFix();
   React.useEffect((function () {
           var ref = Database$1.ref(Database.database, ".info/connected");
           return Database$1.onValue(ref, (function (snap) {
