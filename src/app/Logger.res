@@ -3,8 +3,12 @@ type nextFont = {className: string}
 @module("../helpers/fonts") external inter: nextFont = "inter"
 
 @react.component
-let make = () => {
-  let players = Players.useAllPlayers()
+let make = (~players: array<Players.player>) => {
+  let livePlayers = Players.useAllPlayers()
+  let players = switch Array.length(livePlayers) {
+  | 0 => players
+  | _ => livePlayers
+  }
   let (selectedUsers, setSelectedUsers) = React.useState(_ => Belt.Map.String.empty)
   let (step, setStep) = React.useState(_ => LoggerStep.UserSelection)
   let (redState, setRedState) = React.useState(_ => -1)

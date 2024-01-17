@@ -1,3 +1,3 @@
-import { make } from "./Logger.bs.mjs";
+import { make } from "./LoggerS.bs.mjs";
 
 export default make;

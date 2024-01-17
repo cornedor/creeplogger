@@ -1,2 +1,2 @@
 @react.component
-let make: unit => Jsx.element
+let make: (~players: array<Players.player>) => Jsx.element

@@ -190,7 +190,10 @@ function updateGameStats(key, myTeamPoints, opponentTeamPoints, team, elo) {
               }));
 }
 
+var bucket = "players";
+
 export {
+  bucket ,
   addPlayer ,
   useAllPlayers ,
   fetchAllPlayers ,
@@ -199,5 +202,6 @@ export {
   updateGameStats ,
   writePlayer ,
   getLastGames ,
+  playersSchema ,
 }
 /* playerSchema Not a pure module */

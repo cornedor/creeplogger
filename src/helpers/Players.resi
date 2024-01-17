@@ -21,6 +21,9 @@ type player = {
 
 type playersOrder = [#games | #elo]
 
+@inline
+let bucket: string
+
 let addPlayer: string => promise<Firebase.databaseReference>
 
 let useAllPlayers: (~orderBy: playersOrder=?, ~asc: bool=?) => array<player>
@@ -35,3 +38,5 @@ let updateGameStats: (string, int, int, team, float) => Js.Json.t => Js.Json.t
 let writePlayer: player => promise<unit>
 
 let getLastGames: (array<int>, bool) => array<int>
+
+let playersSchema: Schema.t<Js.Dict.t<player>>

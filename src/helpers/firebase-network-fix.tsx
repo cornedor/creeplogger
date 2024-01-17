@@ -13,6 +13,9 @@ function onNetworkBack() {
 }
 
 export function useFirebaseNetworkFix() {
+  if (typeof window === "undefined") {
+    return () => {};
+  }
   window.addEventListener("offline", onNetworkGone);
   window.addEventListener("online", onNetworkBack);
 

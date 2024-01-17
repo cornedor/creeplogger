@@ -12,30 +12,32 @@ import * as ConfirmationStep from "../components/ConfirmationStep.bs.mjs";
 import * as JsxRuntime from "react/jsx-runtime";
 
 function Logger(props) {
-  var players = Players.useAllPlayers(undefined, undefined);
-  var match = React.useState(function () {
+  var livePlayers = Players.useAllPlayers(undefined, undefined);
+  var match = livePlayers.length;
+  var players = match !== 0 ? livePlayers : props.players;
+  var match$1 = React.useState(function () {
         
       });
-  var setSelectedUsers = match[1];
-  var selectedUsers = match[0];
-  var match$1 = React.useState(function () {
+  var setSelectedUsers = match$1[1];
+  var selectedUsers = match$1[0];
+  var match$2 = React.useState(function () {
         return "UserSelection";
       });
-  var setStep = match$1[1];
-  var match$2 = React.useState(function () {
-        return -1;
-      });
-  var setRedState = match$2[1];
-  var redState = match$2[0];
+  var setStep = match$2[1];
   var match$3 = React.useState(function () {
         return -1;
       });
-  var setBlueState = match$3[1];
-  var blueState = match$3[0];
+  var setRedState = match$3[1];
+  var redState = match$3[0];
   var match$4 = React.useState(function () {
+        return -1;
+      });
+  var setBlueState = match$4[1];
+  var blueState = match$4[0];
+  var match$5 = React.useState(function () {
         return 0;
       });
-  var setEarnedPoints = match$4[1];
+  var setEarnedPoints = match$5[1];
   var reset = function () {
     setStep(function (param) {
           return "UserSelection";
@@ -59,7 +61,7 @@ function Logger(props) {
               return value === winnerTeam;
             })));
   var stepComponent;
-  switch (match$1[0]) {
+  switch (match$2[0]) {
     case "UserSelection" :
         stepComponent = JsxRuntime.jsx(UserGrid.make, {
               selectedUsers: selectedUsers,
@@ -84,7 +86,7 @@ function Logger(props) {
         break;
     case "Confirmation" :
         stepComponent = JsxRuntime.jsx(ConfirmationStep.make, {
-              score: match$4[0],
+              score: match$5[0],
               winners: winners,
               reset: reset,
               players: players
