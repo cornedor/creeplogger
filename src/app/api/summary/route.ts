@@ -6,12 +6,12 @@ let periodOptions = {
   daily: "Daily",
   weekly: "Weekly",
   monthly: "Monthly",
+  all: "All",
 };
 
 export async function GET(request: NextRequest) {
   let period = request.nextUrl.searchParams.get("period") ?? "daily";
   if (!(period in periodOptions)) {
-    await sendDailyUpdate();
     return Response.json({ success: false, message: "Invalid period param" });
   }
 

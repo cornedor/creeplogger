@@ -1,6 +1,6 @@
 type modifier = Handicap(int, int) | OneVOne
 
-type peroid = Daily | Weekly | Monthly
+type peroid = Daily | Weekly | Monthly | All
 
 type game = {
   blueScore: int,

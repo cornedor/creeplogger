@@ -68,6 +68,9 @@ async function getTimePeriod(period) {
     case "Monthly" :
         date.setDate(0);
         break;
+    case "All" :
+        date.setFullYear(2000);
+        break;
     
   }
   var games = await Database$1.get(Database$1.query(Database$1.ref(Database.database, "games"), Database$1.orderByChild("date"), Database$1.startAt(date.getTime())));

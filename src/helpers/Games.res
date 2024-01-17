@@ -2,7 +2,7 @@ open Firebase
 
 type modifier = Handicap(int, int) | OneVOne
 
-type peroid = Daily | Weekly | Monthly
+type peroid = Daily | Weekly | Monthly | All
 
 type game = {
   blueScore: int,
@@ -64,6 +64,7 @@ let getTimePeriod = async period => {
     }
 
   | Monthly => Date.setDate(date, 0)
+  | All => Date.setFullYear(date, 2000)
   }
 
   let games =
