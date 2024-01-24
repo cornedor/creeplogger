@@ -11,8 +11,13 @@ function getTotalEloFromTeam(team) {
 function calculateScore(winners, losers) {
   var totalEloA = getTotalEloFromTeam(winners);
   var totalEloB = getTotalEloFromTeam(losers);
-  var avgA = totalEloA / losers.length;
-  var avgB = totalEloB / winners.length;
+  var countA = winners.length;
+  var countB = losers.length;
+  var max = countA > countB ? countA : countB;
+  var mulA = countA === max ? max : 1.5;
+  var mulB = countB === max ? max : 1.5;
+  var avgA = totalEloA / mulA;
+  var avgB = totalEloB / mulB;
   var losersScore = avgB;
   var winnersScore = avgA;
   var expectedScoreWinners = 1.0 / (1.0 + Math.pow(10.0, (losersScore - winnersScore) / 400.0));

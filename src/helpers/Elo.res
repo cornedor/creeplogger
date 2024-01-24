@@ -10,11 +10,19 @@ let getCombinedTeamScores = (teamA: team, teamB: team) => {
   let totalEloA = getTotalEloFromTeam(teamA)
   let totalEloB = getTotalEloFromTeam(teamB)
 
+  let countA = Array.length(teamA)
+  let countB = Array.length(teamB)
+  let max = max(countA, countB)
+
+  let mulA = countA == max ? max->Int.toFloat : 1.5
+  let mulB = countB == max ? max->Int.toFloat : 1.5
+
   // Avg using the opposite team amount of players. For example:
   // Team 1: [1200] = 1200 / 2 = 600
-  // Team 2: [850, 700] = (850 + 700) / 2 = 775
-  let avgA = totalEloA /. Array.length(teamB)->Int.toFloat
-  let avgB = totalEloB /. Array.length(teamA)->Int.toFloat
+  // Team 2: [850, 700] = (850 + 700) / 1 = 775
+
+  let avgA = totalEloA /. mulA
+  let avgB = totalEloB /. mulB
 
   (avgA, avgB)
 }
