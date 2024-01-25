@@ -83,9 +83,22 @@ function StatsModal(props) {
                               background: "conic-gradient(#86b7ff, #1c77ff " + bluePercentages + "%, #ff3e6e " + bluePercentages + "%, #ff0055)"
                             }
                           })
+                    }),
+                JsxRuntime.jsx("div", {
+                      className: "flex-1"
+                    }),
+                JsxRuntime.jsxs("div", {
+                      children: [
+                        "Anti-cheat by:",
+                        JsxRuntime.jsx("img", {
+                              src: "https://www.easy.ac/static/img/logo-easy.png",
+                              width: "150px"
+                            })
+                      ],
+                      className: "opacity-50"
                     })
               ],
-              className: "modal",
+              className: "modal flex flex-col",
               style: {
                 transform: props.show ? "translateX(0)" : "translateX(-100%)"
               }

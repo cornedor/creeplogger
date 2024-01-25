@@ -8,7 +8,7 @@ let make = (~show, ~setShow) => {
   let bluePercentages = (blue /. (blue +. red) *. 100.)->Float.toString
 
   <div
-    className="modal"
+    className="modal flex flex-col"
     style={ReactDOM.Style.make(~transform=show ? "translateX(0)" : "translateX(-100%)", ())}>
     <header>
       <Button onClick={_ => setShow(s => !s)} variant={Blue}> {React.string("Terug")} </Button>
@@ -42,6 +42,11 @@ let make = (~show, ~setShow) => {
           (),
         )}
       />
+    </div>
+    <div className="flex-1" />
+    <div className="opacity-50">
+      {React.string("Anti-cheat by:")}
+      <img src="https://www.easy.ac/static/img/logo-easy.png" width="150px" />
     </div>
   </div>
 }
