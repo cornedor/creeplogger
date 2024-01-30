@@ -8,6 +8,7 @@ type player = {
   absoluteLosses: int,
   games: int,
   teamGoals: int,
+  teamGoalsAgainst: int,
   blueGames: int,
   redGames: int,
   blueWins: int,

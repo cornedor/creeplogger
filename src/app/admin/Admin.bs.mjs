@@ -110,6 +110,7 @@ function Admin(props) {
                                                                             absoluteLosses: player.absoluteLosses,
                                                                             games: player.games,
                                                                             teamGoals: player.teamGoals,
+                                                                            teamGoalsAgainst: player.teamGoalsAgainst,
                                                                             blueGames: player.blueGames,
                                                                             redGames: player.redGames,
                                                                             blueWins: player.blueWins,
