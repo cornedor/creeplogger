@@ -78,7 +78,9 @@ function LeaderboardModal(props) {
                                   })
                             }),
                         JsxRuntime.jsx("tbody", {
-                              children: players.map(function (player) {
+                              children: players.filter(function (player) {
+                                      return player.elo >= 800.0;
+                                    }).map(function (player) {
                                     var roundedElo = Elo.roundScore(player.elo);
                                     if (roundedElo !== previousScore.contents) {
                                       position.contents = position.contents + 1 | 0;

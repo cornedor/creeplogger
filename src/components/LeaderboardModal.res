@@ -31,6 +31,7 @@ let make = (~show, ~setShow) => {
       </thead>
       <tbody>
         {players
+        ->Array.filter(player => player.elo >= 800.0)
         ->Array.map(player => {
           let roundedElo = Elo.roundScore(player.elo)
           if roundedElo != previousScore.contents {
