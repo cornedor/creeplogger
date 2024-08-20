@@ -86,16 +86,6 @@ function StatsModal(props) {
                     }),
                 JsxRuntime.jsx("div", {
                       className: "flex-1"
-                    }),
-                JsxRuntime.jsxs("div", {
-                      children: [
-                        "Anti-cheat by:",
-                        JsxRuntime.jsx("img", {
-                              src: "https://www.easy.ac/static/img/logo-easy.png",
-                              width: "150px"
-                            })
-                      ],
-                      className: "opacity-50"
                     })
               ],
               className: "modal flex flex-col",
