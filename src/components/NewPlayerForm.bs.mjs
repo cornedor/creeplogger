@@ -17,7 +17,7 @@ function NewPlayerForm(props) {
       });
   var setFormState = match[1];
   var formState = match[0];
-  var match$1 = ReactHookForm.useForm(undefined);
+  var match$1 = ReactHookForm.useForm();
   var reset = match$1.reset;
   var addCreeper = async function (name) {
     setFormState(function (param) {

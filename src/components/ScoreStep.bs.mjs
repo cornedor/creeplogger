@@ -144,7 +144,10 @@ function ScoreStep(props) {
                           saveGame();
                         }),
                       onReset: props.reset,
-                      disabled: match[0]
+                      disabled: match[0],
+                      setShowQueueButtons: (function (param) {
+                          
+                        })
                     }),
                 JsxRuntime.jsxs("div", {
                       children: [

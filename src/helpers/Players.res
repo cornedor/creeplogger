@@ -18,6 +18,7 @@ type player = {
   key: string,
   mattermostHandle: option<string>,
   lastGames: array<int>,
+  hidden: option<bool>,
 }
 
 type team = Blue | Red
@@ -43,6 +44,7 @@ let playerSchema = Schema.object(s => {
   key: s.field("key", Schema.string),
   mattermostHandle: s.field("mh", Schema.option(Schema.string)->FirebaseSchema.nullableTransform),
   lastGames: s.fieldOr("lastGames", Schema.array(Schema.int), []),
+  hidden: s.field("hidden", Schema.option(Schema.bool)->FirebaseSchema.nullableTransform),
 })
 
 let playersSchema = Schema.dict(playerSchema)
@@ -67,6 +69,7 @@ let addPlayer = async name => {
     key: "",
     mattermostHandle: None,
     lastGames: [],
+    hidden: None,
   }->Schema.serializeWith(playerSchema) {
   | Ok(data) => data
   | Error(_error) => panic("Could not serialize player")

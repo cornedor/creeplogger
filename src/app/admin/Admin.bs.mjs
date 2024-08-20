@@ -119,7 +119,8 @@ function Admin(props) {
                                                                             lastEloChange: player.lastEloChange,
                                                                             key: player.key,
                                                                             mattermostHandle: (handle == null) ? undefined : Caml_option.some(handle),
-                                                                            lastGames: player.lastGames
+                                                                            lastGames: player.lastGames,
+                                                                            hidden: player.hidden
                                                                           });
                                                                     })
                                                                 }),
