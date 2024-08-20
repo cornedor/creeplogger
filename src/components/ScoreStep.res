@@ -131,6 +131,7 @@ let make = (
       }}
       onReset={reset}
       disabled={isSaving}
+      setShowQueueButtons={_ => ()}
     />
     <div className="flex flex-wrap content-padding gap-20">
       <div>

@@ -13,9 +13,8 @@ function calculateScore(winners, losers) {
   var totalEloB = getTotalEloFromTeam(losers);
   var countA = winners.length;
   var countB = losers.length;
-  var max = countA > countB ? countA : countB;
-  var mulA = countA === max ? max : 1.5;
-  var mulB = countB === max ? max : 1.5;
+  var mulA = countA === 1 ? 1.5 : countA;
+  var mulB = countB === 1 ? 1.5 : countB;
   var avgA = totalEloA / mulA;
   var avgB = totalEloB / mulB;
   var losersScore = avgB;
@@ -42,7 +41,8 @@ function calculateScore(winners, losers) {
                 lastEloChange: change,
                 key: creeper.key,
                 mattermostHandle: creeper.mattermostHandle,
-                lastGames: creeper.lastGames
+                lastGames: creeper.lastGames,
+                hidden: creeper.hidden
               };
       });
   var losers$1 = losers.map(function (creeper) {
@@ -65,7 +65,8 @@ function calculateScore(winners, losers) {
                 lastEloChange: change,
                 key: creeper.key,
                 mattermostHandle: creeper.mattermostHandle,
-                lastGames: creeper.lastGames
+                lastGames: creeper.lastGames,
+                hidden: creeper.hidden
               };
       });
   return [

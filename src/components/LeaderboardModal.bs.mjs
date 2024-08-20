@@ -20,6 +20,9 @@ function LeaderboardModal(props) {
   var previousScore = {
     contents: 0
   };
+  var skipped = {
+    contents: 0
+  };
   return JsxRuntime.jsxs("div", {
               children: [
                 JsxRuntime.jsx("header", {
@@ -79,10 +82,25 @@ function LeaderboardModal(props) {
                             }),
                         JsxRuntime.jsx("tbody", {
                               children: players.filter(function (player) {
-                                      return player.elo >= 800.0;
+                                      var match = player.hidden;
+                                      var isHidden = match !== undefined && match ? false : true;
+                                      var isLowGameCount = player.games > 5;
+                                      var isLowElo = player.elo > 500.0;
+                                      if (isHidden && isLowGameCount) {
+                                        return isLowElo;
+                                      } else {
+                                        return false;
+                                      }
                                     }).map(function (player) {
                                     var roundedElo = Elo.roundScore(player.elo);
-                                    if (roundedElo !== previousScore.contents) {
+                                    var match = previousScore.contents;
+                                    var match$1 = skipped.contents;
+                                    if (roundedElo === match) {
+                                      skipped.contents = skipped.contents + 1 | 0;
+                                    } else if (match$1 > 0) {
+                                      position.contents = (position.contents + skipped.contents | 0) + 1 | 0;
+                                      skipped.contents = 0;
+                                    } else {
                                       position.contents = position.contents + 1 | 0;
                                     }
                                     previousScore.contents = roundedElo;

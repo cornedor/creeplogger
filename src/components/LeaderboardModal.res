@@ -5,6 +5,7 @@ let make = (~show, ~setShow) => {
 
   let position = ref(0)
   let previousScore = ref(0)
+  let skipped = ref(0)
 
   <div
     className="modal"
@@ -31,11 +32,32 @@ let make = (~show, ~setShow) => {
       </thead>
       <tbody>
         {players
-        ->Array.filter(player => player.elo >= 800.0)
+        ->Array.filter(player => {
+          let isHidden = switch player.hidden {
+          | Some(true) => false
+          | Some(false) => true
+          | None => true
+          }
+
+          let isLowGameCount = player.games > 5
+          let isLowElo = player.elo > 500.0
+
+          isHidden && isLowGameCount && isLowElo
+        })
         ->Array.map(player => {
           let roundedElo = Elo.roundScore(player.elo)
-          if roundedElo != previousScore.contents {
-            position := position.contents + 1
+
+          // When the scores are the same, both players get the same position
+          // The next player will continue the count as if no position was skipped.
+          switch (roundedElo, previousScore.contents, skipped.contents) {
+          | (a, b, _) if a == b =>
+            // Previous score was the same as the current score, so we skip the position
+            skipped := skipped.contents + 1
+          | (_, _, s) if s > 0 =>
+            // We skipped a position, so we continue the count
+            position := position.contents + skipped.contents + 1
+            skipped := 0
+          | (_, _, _) => position := position.contents + 1
           }
           previousScore := roundedElo
 

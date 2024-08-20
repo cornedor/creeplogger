@@ -7,6 +7,7 @@ import * as ListIcon from "./ListIcon.bs.mjs";
 import * as AdminIcon from "./AdminIcon.bs.mjs";
 import Link from "next/link";
 import * as StatsModal from "./StatsModal.bs.mjs";
+import * as TicketIcon from "./TicketIcon.bs.mjs";
 import * as PieChartIcon from "./PieChartIcon.bs.mjs";
 import * as FirebaseStatus from "../helpers/FirebaseStatus.bs.mjs";
 import * as LeaderboardModal from "./LeaderboardModal.bs.mjs";
@@ -16,6 +17,7 @@ import * as HeaderModuleCss from "./header.module.css";
 var styles = HeaderModuleCss;
 
 function Header(props) {
+  var setShowQueueButtons = props.setShowQueueButtons;
   var __disabled = props.disabled;
   var onReset = props.onReset;
   var onNextStep = props.onNextStep;
@@ -77,6 +79,15 @@ function Header(props) {
                                             onClick: (function (param) {
                                                 setShowStats(function (param) {
                                                       return true;
+                                                    });
+                                              })
+                                          }),
+                                      JsxRuntime.jsx("button", {
+                                            children: JsxRuntime.jsx(TicketIcon.make, {}),
+                                            className: "text-white w-[44px] aspect-square text-[26px] hidden justify-center items-center -ml-3 rounded-full bg-black/0 transition-all ease-in-out duration-200 shadow-none hover:bg-black/20 hover:shadow-icon-button hover:ring-8 ring-black/20 active:bg-black/20 active:shadow-icon-button active:ring-8",
+                                            onClick: (function (param) {
+                                                setShowQueueButtons(function (show) {
+                                                      return !show;
                                                     });
                                               })
                                           }),

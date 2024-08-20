@@ -131,7 +131,8 @@ async function recalculateStats() {
           lastEloChange: 0.0,
           key: player.key,
           mattermostHandle: player.mattermostHandle,
-          lastGames: []
+          lastGames: [],
+          hidden: player.hidden
         };
       });
   var stats = Core__Array.reduce(games, empty, (function (stats, game) {
@@ -174,7 +175,8 @@ async function recalculateStats() {
                   lastEloChange: player.lastEloChange,
                   key: player.key,
                   mattermostHandle: player.mattermostHandle,
-                  lastGames: lastGames
+                  lastGames: lastGames,
+                  hidden: player.hidden
                 };
               });
           match[1].forEach(function (player) {
@@ -196,7 +198,8 @@ async function recalculateStats() {
                   lastEloChange: player.lastEloChange,
                   key: player.key,
                   mattermostHandle: player.mattermostHandle,
-                  lastGames: lastGames
+                  lastGames: lastGames,
+                  hidden: player.hidden
                 };
               });
           return {

@@ -8,7 +8,7 @@ import * as ReactHookForm from "react-hook-form";
 import * as JsxRuntime from "react/jsx-runtime";
 
 function LoginForm(props) {
-  var match = ReactHookForm.useForm(undefined);
+  var match = ReactHookForm.useForm();
   var register = match.register;
   var onSubmit = function (data) {
     Auth.signInWithEmailAndPassword(Database.auth, data.email, data.password);
