@@ -44,9 +44,5 @@ let make = (~show, ~setShow) => {
       />
     </div>
     <div className="flex-1" />
-    <div className="opacity-50">
-      {React.string("Anti-cheat by:")}
-      <img src="https://www.easy.ac/static/img/logo-easy.png" width="150px" />
-    </div>
   </div>
 }
