@@ -21,7 +21,7 @@ function UserGrid(props) {
         var match = Belt_MapString.get(selectedUsers, item.key);
         var tmp;
         tmp = match !== undefined ? (
-            match === "Blue" ? "ring-6 ring-blue" : "ring-6 ring-red"
+            match === "Blue" ? "ring-6 ring-green" : "ring-6 ring-red"
           ) : "ring-0";
         return JsxRuntime.jsxs(GridItem.make, {
                     active: Belt_MapString.has(selectedUsers, item.key),
@@ -81,8 +81,8 @@ function UserGrid(props) {
                             }) : JsxRuntime.jsxs("div", {
                               children: [
                                 JsxRuntime.jsx("button", {
-                                      children: "Blauw",
-                                      className: "bg-[#86b7ff] border-none cursor-pointer text-3xl rounded-bl text-black",
+                                      children: "Winnaar",
+                                      className: "bg-[#76e19d] border-none cursor-pointer text-3xl rounded-bl text-black",
                                       onClick: (function (param) {
                                           setSelectedUsers(function (s) {
                                                 return Belt_MapString.set(s, item.key, "Blue");
@@ -90,7 +90,7 @@ function UserGrid(props) {
                                         })
                                     }),
                                 JsxRuntime.jsx("button", {
-                                      children: "Rood",
+                                      children: "Verliezer",
                                       className: "bg-[#ff8686] border-none cursor-pointer text-3xl rounded-br text-black",
                                       onClick: (function (param) {
                                           setSelectedUsers(function (s) {
@@ -129,7 +129,7 @@ function UserGrid(props) {
                               children: JsxRuntime.jsx(NewPlayerForm.make, {})
                             })
                       ],
-                      className: "grid 2xl:grid-cols-5 xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-3 grid-cols-2 gap-10 mt-8 content-padding"
+                      className: "grid 2xl:grid-cols-5 xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-3 grid-cols-1 gap-10 mt-8 content-padding"
                     })
               ]
             });

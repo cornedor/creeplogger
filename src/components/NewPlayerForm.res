@@ -46,7 +46,7 @@ let make = () => {
         className={styles["input"] ++ " text-black rounded"}
       />
       <Button className={styles["submit"]} type_="submit" variant={Grey}>
-        {React.string("Kruiper toevoegen")}
+        {React.string("Speler toevoegen")}
       </Button>
     </form>
   | Loading => <div className={styles["status"]}> {React.string("...")} </div>

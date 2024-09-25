@@ -7,14 +7,17 @@ import * as React from "react";
 import * as Button from "./Button.bs.mjs";
 import * as Header from "./Header.bs.mjs";
 import * as Players from "../helpers/Players.bs.mjs";
+import * as Caml_obj from "rescript/lib/es6/caml_obj.js";
+import * as GameTypes from "../helpers/GameTypes.bs.mjs";
 import * as LoggerStep from "../helpers/LoggerStep.bs.mjs";
 import * as Mattermost from "../helpers/Mattermost.bs.mjs";
 import * as Core__Option from "@rescript/core/src/Core__Option.bs.mjs";
-import * as RescriptCore from "@rescript/core/src/RescriptCore.bs.mjs";
 import * as Belt_MapString from "rescript/lib/es6/belt_MapString.js";
 import * as JsxRuntime from "react/jsx-runtime";
 
 function ScoreStep(props) {
+  var setSelectedGame = props.setSelectedGame;
+  var selectedGame = props.selectedGame;
   var players = props.players;
   var setEarnedPoints = props.setEarnedPoints;
   var setRedState = props.setRedState;
@@ -56,26 +59,20 @@ function ScoreStep(props) {
               children: str
             }, str));
   }
-  var mapUser = function (extra) {
-    var player = Players.playerByKey(players, extra);
-    if (player !== undefined) {
-      return JsxRuntime.jsx("li", {
-                  children: player.name
-                }, extra);
-    } else {
-      return JsxRuntime.jsx("li", {
-                  children: "..."
-                }, extra);
-    }
-  };
+  var winner = Belt_MapString.findFirstBy(selectedUsers, (function (param, value) {
+          return value === "Blue";
+        }));
+  var winner$1 = winner !== undefined ? Core__Option.getExn(Players.playerByKey(players, winner[0])).name : "";
+  var loser = Belt_MapString.findFirstBy(selectedUsers, (function (param, value) {
+          return value === "Red";
+        }));
+  var loser$1 = loser !== undefined ? Core__Option.getExn(Players.playerByKey(players, loser[0])).name : "";
   var selectedBlueUsers = Belt_MapString.keysToArray(Belt_MapString.keep(selectedUsers, (function (param, value) {
               return value === "Blue";
             })));
   var selectedRedUsers = Belt_MapString.keysToArray(Belt_MapString.keep(selectedUsers, (function (param, value) {
               return value === "Red";
             })));
-  var blueUsers = selectedBlueUsers.map(mapUser);
-  var redUsers = selectedRedUsers.map(mapUser);
   var redPlayers = selectedRedUsers.map(function (key) {
         return Core__Option.getExn(Players.playerByKey(players, key));
       });
@@ -85,21 +82,20 @@ function ScoreStep(props) {
   var sendCreepsUpdate = function (extra, extra$1, extra$2) {
     return Mattermost.sendCreepsUpdate(bluePlayers, redPlayers, extra, extra$1, extra$2);
   };
-  var saveGame = async function () {
+  var saveGame = async function (selectedGame) {
     setIsSaving(function (param) {
           return true;
         });
     await Games.addGame({
-          blueScore: blueState,
-          redScore: redState,
+          blueScore: 1,
+          redScore: 0,
           blueTeam: selectedBlueUsers,
           redTeam: selectedRedUsers,
+          game: selectedGame,
           date: new Date(),
           modifiers: redPlayers.length === 1 && bluePlayers.length === 1 ? ["OneVOne"] : []
         });
-    var winningTeam = blueState > redState ? "Blue" : (
-        redState > blueState ? "Red" : RescriptCore.panic("Tie not implemented")
-      );
+    var winningTeam = "Blue";
     var redPlayers$1 = selectedRedUsers.map(function (key) {
           return Core__Option.getExn(Players.playerByKey(players, key));
         });
@@ -122,13 +118,13 @@ function ScoreStep(props) {
           return roundedPoints;
         });
     await Promise.all(match[0].map(async function (player) {
-              return Players.updateGameStats(player.key, blueState, redState, "Blue", player.elo);
+              return Players.updateGameStats(player.key, 1, 0, "Blue", player.elo);
             }));
     await Promise.all(match[1].map(async function (player) {
-              return Players.updateGameStats(player.key, redState, blueState, "Red", player.elo);
+              return Players.updateGameStats(player.key, 0, 1, "Red", player.elo);
             }));
-    await Stats.updateStats(redState, blueState);
-    await sendCreepsUpdate(blueState, redState, roundedPoints);
+    await Stats.updateStats(0, 1);
+    await sendCreepsUpdate(1, 0, roundedPoints);
     setIsSaving(function (param) {
           return false;
         });
@@ -136,55 +132,58 @@ function ScoreStep(props) {
                 return LoggerStep.getNextStep(step);
               });
   };
+  var gameTypes = GameTypes.useGameTypes().map(function (gameType) {
+        return JsxRuntime.jsx(Button.make, {
+                    variant: Caml_obj.equal(selectedGame, gameType.name) ? "Blue" : "Grey",
+                    onClick: (function (param) {
+                        setSelectedGame(function (param) {
+                              return gameType.name;
+                            });
+                      }),
+                    children: gameType.name
+                  }, gameType.name);
+      });
   return JsxRuntime.jsxs(JsxRuntime.Fragment, {
               children: [
                 JsxRuntime.jsx(Header.make, {
                       step: "ScoreForm",
                       onNextStep: (function () {
-                          saveGame();
+                          if (selectedGame !== undefined) {
+                            saveGame(selectedGame);
+                            return ;
+                          }
+                          
                         }),
                       onReset: props.reset,
-                      disabled: match[0],
+                      disabled: match[0] || Core__Option.isNone(selectedGame),
                       setShowQueueButtons: (function (param) {
                           
                         })
                     }),
                 JsxRuntime.jsxs("div", {
                       children: [
-                        JsxRuntime.jsxs("div", {
+                        JsxRuntime.jsxs("h2", {
                               children: [
-                                JsxRuntime.jsx("h2", {
-                                      children: "Team Blauw",
-                                      className: "font-bold text-xl"
+                                "In welk spel heeft ",
+                                JsxRuntime.jsx("span", {
+                                      children: winner$1,
+                                      className: "font-bold"
                                     }),
-                                JsxRuntime.jsx("ol", {
-                                      children: blueUsers,
-                                      className: "pl-5 pt-4 pb-8 list-decimal"
+                                " van ",
+                                JsxRuntime.jsx("span", {
+                                      children: loser$1,
+                                      className: "font-bold"
                                     }),
-                                JsxRuntime.jsx("div", {
-                                      children: blueButtons,
-                                      className: "grid gap-5 grid-cols-4"
-                                    })
-                              ]
+                                " gewonnen?"
+                              ],
+                              className: "text-3xl"
                             }),
-                        JsxRuntime.jsxs("div", {
-                              children: [
-                                JsxRuntime.jsx("h2", {
-                                      children: "Team Rood",
-                                      className: "font-bold text-xl"
-                                    }),
-                                JsxRuntime.jsx("ol", {
-                                      children: redUsers,
-                                      className: "pl-5 pt-4 pb-8 list-decimal"
-                                    }),
-                                JsxRuntime.jsx("div", {
-                                      children: redButtons,
-                                      className: "grid gap-5 grid-cols-4"
-                                    })
-                              ]
+                        JsxRuntime.jsx("div", {
+                              children: gameTypes,
+                              className: "flex flex-col gap-5 max-w-80 mt-4"
                             })
                       ],
-                      className: "flex flex-wrap content-padding gap-20"
+                      className: "content-padding"
                     })
               ]
             });

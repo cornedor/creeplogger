@@ -1,11 +1,34 @@
 @react.component
 let make = (~show, ~setShow) => {
-  let stats = Stats.useStats()
+  let gameTypes = GameTypes.useGameTypes()
+  let players = Players.useAllPlayers()
 
-  let blue = Float.fromInt(stats.totalBlueWins)
-  let red = Float.fromInt(stats.totalRedWins)
+  let gameTypeHead = gameTypes->Array.map(gameType => {
+    <th key={gameType.name} className="text-center py-2 even:bg-slate-50/10 ">
+      <span className="vertical-lr"> {React.string(gameType.name)} </span>
+    </th>
+  })
 
-  let bluePercentages = (blue /. (blue +. red) *. 100.)->Float.toString
+  let playerRows = players->Array.map(player => {
+    let gamesPlayed = gameTypes->Array.map(gameType => {
+      let hasPlayed = player.gameTypes->Array.includes(gameType.name)
+      switch hasPlayed {
+      | true =>
+        <td key={gameType.name} className="text-center even:bg-slate-50/10">
+          {React.string("✅")}
+        </td>
+      | false =>
+        <td key={gameType.name} className="text-center even:bg-slate-50/10">
+          {React.string("❌")}
+        </td>
+      }
+    })
+
+    <tr key={player.key} className="odd:bg-slate-50/15">
+      <th className="p-2 text-left "> {React.string(player.name)} </th>
+      {React.array(gamesPlayed)}
+    </tr>
+  })
 
   <div
     className="modal flex flex-col"
@@ -13,36 +36,15 @@ let make = (~show, ~setShow) => {
     <header>
       <Button onClick={_ => setShow(s => !s)} variant={Blue}> {React.string("Terug")} </Button>
     </header>
-    <em className="py-2 inline-block">
-      {React.string("WIP: Misschien komt hier ooit wat mooiers voor, maar hier is alvast wat.")}
-    </em>
-    <ul className="grid grid-cols-2 gap-2">
-      <li className="p-2 rounded border-white/20 border bg-white/5 flex justify-between">
-        <strong> {React.string("Total games: ")} </strong>
-        <span> {React.int(stats.totalGames)} </span>
-      </li>
-      <li className="p-2 rounded border-white/20 border bg-white/5 flex justify-between">
-        <strong> {React.string("Blue wins: ")} </strong>
-        <span> {React.int(stats.totalBlueWins)} </span>
-      </li>
-      <li className="p-2 rounded border-white/20 border bg-white/5 flex justify-between">
-        <strong> {React.string("Red wins: ")} </strong>
-        <span> {React.int(stats.totalRedWins)} </span>
-      </li>
-      <li className="p-2 rounded border-white/20 border bg-white/5 flex justify-between">
-        <strong> {React.string("7-0's: ")} </strong>
-        <span> {React.int(stats.totalAbsoluteWins)} </span>
-      </li>
-    </ul>
-    <div>
-      <div
-        className="rounded-full aspect-square w-[300px] my-4 mx-auto shadow-inner shadow-orange-50"
-        style={ReactDOM.Style.make(
-          ~background=`conic-gradient(#86b7ff, #1c77ff ${bluePercentages}%, #ff3e6e ${bluePercentages}%, #ff0055)`,
-          (),
-        )}
-      />
-    </div>
+    <table className="table-auto">
+      <thead>
+        <tr>
+          <th className="vertical-lr"> {React.string("")} </th>
+          {React.array(gameTypeHead)}
+        </tr>
+      </thead>
+      <tbody> {React.array(playerRows)} </tbody>
+    </table>
     <div className="flex-1" />
   </div>
 }

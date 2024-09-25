@@ -50,6 +50,7 @@ let make = (
             </Link>
           | _ => <> </>
           }}
+          <h1 className="text-xl font-bold"> {React.string("Emico Game Night")} </h1>
         </div>
         <div className="flex items-center gap-5">
           <span className={isConnected ? styles["connected"] : styles["disconnected"]} />

@@ -28,6 +28,7 @@ var gameSchema = Schema.object(function (s) {
               redScore: s.f("redScore", S$RescriptSchema.Int.min(Schema.$$int, 0, undefined)),
               blueTeam: s.f("blueTeam", Schema.array(Schema.string)),
               redTeam: s.f("redTeam", Schema.array(Schema.string)),
+              game: s.f("game", Schema.string),
               date: s.f("date", Schema.transform(Schema.$$float, (function (param) {
                           return {
                                   p: (function (prim) {

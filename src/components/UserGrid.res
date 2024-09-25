@@ -14,7 +14,7 @@ let make = (
       className={Cn.make([
         "rounded bg-white grid grid-rows-user auto-rows-[1fr] h-[220px] transition-all relative",
         switch Belt.Map.String.get(selectedUsers, item.key) {
-        | Some(Players.Blue) => "ring-6 ring-blue"
+        | Some(Players.Blue) => "ring-6 ring-green"
         | Some(Players.Red) => "ring-6 ring-red"
         | _ => "ring-0"
         },
@@ -52,13 +52,13 @@ let make = (
         : <div className="grid grid-cols-2">
             <button
               onClick={_ => setSelectedUsers(s => Belt.Map.String.set(s, item.key, Players.Blue))}
-              className="bg-[#86b7ff] border-none cursor-pointer text-3xl rounded-bl text-black">
-              {React.string("Blauw")}
+              className="bg-[#76e19d] border-none cursor-pointer text-3xl rounded-bl text-black">
+              {React.string("Winnaar")}
             </button>
             <button
               onClick={_ => setSelectedUsers(s => Belt.Map.String.set(s, item.key, Players.Red))}
               className="bg-[#ff8686] border-none cursor-pointer text-3xl rounded-br text-black">
-              {React.string("Rood")}
+              {React.string("Verliezer")}
             </button>
           </div>}
     </GridItem>
@@ -73,7 +73,7 @@ let make = (
       setShowQueueButtons={setShowQueueButtons}
     />
     <div
-      className="grid 2xl:grid-cols-5 xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-3 grid-cols-2 gap-10 mt-8 content-padding">
+      className="grid 2xl:grid-cols-5 xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-3 grid-cols-1 gap-10 mt-8 content-padding">
       {React.array(players)}
       <GridItem active={false}>
         <NewPlayerForm />

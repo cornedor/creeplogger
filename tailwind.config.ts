@@ -9,7 +9,7 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        darkbg: "#242328",
+        darkbg: "rgb(0, 45, 79)",
         overlay: "rgba(36, 35, 40, 0.7)",
       },
       backgroundImage: {
@@ -24,6 +24,7 @@ const config: Config = {
       ringColor: {
         blue: "#6ca2ee",
         red: "#ee6c6c",
+        green: "#6cd7a7",
       },
       ringWidth: {
         6: "6px",

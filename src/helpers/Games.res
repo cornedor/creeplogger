@@ -9,6 +9,7 @@ type game = {
   redScore: int,
   blueTeam: array<string>,
   redTeam: array<string>,
+  game: string,
   date: Date.t,
   modifiers: option<array<modifier>>,
 }
@@ -29,6 +30,7 @@ let gameSchema = Schema.object(s => {
   redScore: s.field("redScore", Schema.int->Schema.Int.min(0)),
   redTeam: s.field("redTeam", Schema.array(Schema.string)),
   blueTeam: s.field("blueTeam", Schema.array(Schema.string)),
+  game: s.field("game", Schema.string),
   date: s.field(
     "date",
     Schema.float->Schema.transform(_ => {

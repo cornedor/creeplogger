@@ -25,6 +25,10 @@
   transition: transform 0.6s ease-in-out;
 }
 
+.vertical-lr {
+  writing-mode: vertical-lr;
+}
+
 @supports (animation-timing-function: linear(0, 1)) {
   .modal {
     transition: transform 0.6s

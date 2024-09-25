@@ -69,7 +69,7 @@ function NewPlayerForm(props) {
                 JsxRuntime.jsx(Button.make, {
                       className: styles.submit,
                       variant: "Grey",
-                      children: "Kruiper toevoegen",
+                      children: "Speler toevoegen",
                       type_: "submit"
                     })
               ],

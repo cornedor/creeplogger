@@ -84,8 +84,8 @@ function LeaderboardModal(props) {
                               children: players.filter(function (player) {
                                       var match = player.hidden;
                                       var isHidden = match !== undefined && match ? false : true;
-                                      var isLowGameCount = player.games > 5;
-                                      var isLowElo = player.elo > 500.0;
+                                      var isLowGameCount = player.games > 0;
+                                      var isLowElo = player.elo > 0.0;
                                       if (isHidden && isLowGameCount) {
                                         return isLowElo;
                                       } else {

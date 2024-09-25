@@ -38,6 +38,10 @@ function Logger(props) {
         return 0;
       });
   var setEarnedPoints = match$5[1];
+  var match$6 = React.useState(function () {
+        
+      });
+  var setSelectedGame = match$6[1];
   var reset = function () {
     setStep(function (param) {
           return "UserSelection";
@@ -53,6 +57,9 @@ function Logger(props) {
         });
     setEarnedPoints(function (param) {
           return 0;
+        });
+    setSelectedGame(function (param) {
+          
         });
   };
   Games.getTimePeriod("Daily");
@@ -81,7 +88,9 @@ function Logger(props) {
               redState: redState,
               setRedState: setRedState,
               setEarnedPoints: setEarnedPoints,
-              players: players
+              players: players,
+              selectedGame: match$6[0],
+              setSelectedGame: setSelectedGame
             });
         break;
     case "Confirmation" :

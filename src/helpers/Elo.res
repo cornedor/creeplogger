@@ -13,7 +13,7 @@ let getCombinedTeamScores = (teamA: team, teamB: team) => {
   let countA = Array.length(teamA)
   let countB = Array.length(teamB)
   let max = max(countA, countB)
-  let min = min(countA, countB)
+  // let min = min(countA, countB)
 
   let mulA = countA == max ? max->Int.toFloat : 1.5
   let mulB = countB == max ? max->Int.toFloat : 1.5

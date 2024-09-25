@@ -120,7 +120,8 @@ function Admin(props) {
                                                                             key: player.key,
                                                                             mattermostHandle: (handle == null) ? undefined : Caml_option.some(handle),
                                                                             lastGames: player.lastGames,
-                                                                            hidden: player.hidden
+                                                                            hidden: player.hidden,
+                                                                            gameTypes: player.gameTypes
                                                                           });
                                                                     })
                                                                 }),

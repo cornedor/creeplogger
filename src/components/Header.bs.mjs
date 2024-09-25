@@ -91,7 +91,11 @@ function Header(props) {
                                                     });
                                               })
                                           }),
-                                      tmp
+                                      tmp,
+                                      JsxRuntime.jsx("h1", {
+                                            children: "Emico Game Night",
+                                            className: "text-xl font-bold"
+                                          })
                                     ],
                                     className: "flex items-center gap-5"
                                   }),

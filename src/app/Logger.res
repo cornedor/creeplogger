@@ -14,6 +14,7 @@ let make = (~players: array<Players.player>) => {
   let (redState, setRedState) = React.useState(_ => -1)
   let (blueState, setBlueState) = React.useState(_ => -1)
   let (earnedPoints, setEarnedPoints) = React.useState(_ => 0)
+  let (selectedGame, setSelectedGame) = React.useState(_ => None)
 
   let reset = () => {
     setStep(_ => LoggerStep.UserSelection)
@@ -21,6 +22,7 @@ let make = (~players: array<Players.player>) => {
     setBlueState(_ => -1)
     setRedState(_ => -1)
     setEarnedPoints(_ => 0)
+    setSelectedGame(_ => None)
   }
 
   let _ = Games.getTimePeriod(Daily)
@@ -44,6 +46,8 @@ let make = (~players: array<Players.player>) => {
       setBlueState
       setEarnedPoints
       players
+      selectedGame
+      setSelectedGame
     />
   | Confirmation => <ConfirmationStep winners={winners} score={earnedPoints} reset players />
   }

@@ -5,8 +5,8 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Kruiplogger",
-  description: "Houd de score bij van je tafelvoetbalwedstrijden",
+  title: "Game Night",
+  description: "Houd de score bij van de game night bij",
   robots: "noindex",
   manifest: "/manifest.json",
 };

@@ -132,7 +132,8 @@ async function recalculateStats() {
           key: player.key,
           mattermostHandle: player.mattermostHandle,
           lastGames: [],
-          hidden: player.hidden
+          hidden: player.hidden,
+          gameTypes: []
         };
       });
   var stats = Core__Array.reduce(games, empty, (function (stats, game) {
@@ -176,7 +177,8 @@ async function recalculateStats() {
                   key: player.key,
                   mattermostHandle: player.mattermostHandle,
                   lastGames: lastGames,
-                  hidden: player.hidden
+                  hidden: player.hidden,
+                  gameTypes: player.gameTypes.includes(game.game) ? player.gameTypes : player.gameTypes.concat([game.game])
                 };
               });
           match[1].forEach(function (player) {
@@ -199,7 +201,8 @@ async function recalculateStats() {
                   key: player.key,
                   mattermostHandle: player.mattermostHandle,
                   lastGames: lastGames,
-                  hidden: player.hidden
+                  hidden: player.hidden,
+                  gameTypes: player.gameTypes.includes(game.game) ? player.gameTypes : player.gameTypes.concat([game.game])
                 };
               });
           return {

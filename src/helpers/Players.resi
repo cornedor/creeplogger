@@ -19,6 +19,7 @@ type player = {
   mattermostHandle: option<string>,
   lastGames: array<int>,
   hidden: option<bool>,
+  gameTypes: array<string>,
 }
 
 type playersOrder = [#games | #elo]

@@ -125,6 +125,7 @@ let recalculateStats = async () => {
         elo: 1000.0,
         lastEloChange: 0.0,
         lastGames: [],
+        gameTypes: [],
       },
     )
   })
@@ -163,6 +164,9 @@ let recalculateStats = async () => {
           absoluteWins: blueWin && isAbsolute ? player.absoluteWins + 1 : player.absoluteWins,
           blueWins: blueWin ? player.blueWins + 1 : player.blueWins,
           lastGames,
+          gameTypes: player.gameTypes->Array.includes(game.game)
+            ? player.gameTypes
+            : player.gameTypes->Array.concat([game.game]),
         },
       )
     })
@@ -183,6 +187,9 @@ let recalculateStats = async () => {
           absoluteWins: redWin && isAbsolute ? player.absoluteWins + 1 : player.absoluteWins,
           redWins: redWin ? player.redWins + 1 : player.redWins,
           lastGames,
+          gameTypes: player.gameTypes->Array.includes(game.game)
+            ? player.gameTypes
+            : player.gameTypes->Array.concat([game.game]),
         },
       )
     })

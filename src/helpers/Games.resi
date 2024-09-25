@@ -7,6 +7,7 @@ type game = {
   redScore: int,
   blueTeam: array<string>,
   redTeam: array<string>,
+  game: string,
   date: Date.t,
   modifiers: option<array<modifier>>,
 }

@@ -9,4 +9,6 @@ let make: (
   ~setRedState: (int => int) => unit,
   ~setEarnedPoints: (int => int) => unit,
   ~players: array<Players.player>,
+  ~selectedGame: option<string>,
+  ~setSelectedGame: (option<string> => option<string>) => unit,
 ) => React.element

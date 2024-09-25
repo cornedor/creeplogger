@@ -1,12 +1,3 @@
-let mapUser = (players, key) => {
-  let player = Players.playerByKey(players, key)
-
-  switch player {
-  | Some(player) => <li key={key}> {React.string(player.name)} </li>
-  | None => <li key={key}> {React.string("...")} </li>
-  }
-}
-
 @react.component
 let make = (
   ~selectedUsers,
@@ -18,6 +9,8 @@ let make = (
   ~setRedState,
   ~setEarnedPoints,
   ~players,
+  ~selectedGame,
+  ~setSelectedGame,
 ) => {
   let (isSaving, setIsSaving) = React.useState(_ => false)
   let redButtons = []
@@ -46,7 +39,22 @@ let make = (
     )
   }
 
-  let mapUser = mapUser(players, ...)
+  let winner = selectedUsers->Belt.Map.String.findFirstBy((_, value) => value == Players.Blue)
+  let winner = switch winner {
+  | Some((key, _)) => {
+      let p = Players.playerByKey(players, key)->Option.getExn
+      p.name
+    }
+  | None => ""
+  }
+  let loser = selectedUsers->Belt.Map.String.findFirstBy((_, value) => value == Players.Red)
+  let loser = switch loser {
+  | Some((key, _)) => {
+      let p = Players.playerByKey(players, key)->Option.getExn
+      p.name
+    }
+  | None => ""
+  }
 
   let selectedBlueUsers =
     Belt.Map.String.keep(selectedUsers, (_, value) =>
@@ -57,10 +65,6 @@ let make = (
       value == Players.Red
     )->Belt.Map.String.keysToArray
 
-  let blueUsers = selectedBlueUsers->Array.map(mapUser)
-
-  let redUsers = selectedRedUsers->Array.map(mapUser)
-
   let redPlayers =
     selectedRedUsers->Array.map(key => Players.playerByKey(players, key)->Option.getExn)
   let bluePlayers =
@@ -68,13 +72,16 @@ let make = (
 
   let sendCreepsUpdate = Mattermost.sendCreepsUpdate(bluePlayers, redPlayers, ...)
 
-  let saveGame = async () => {
+  let saveGame = async (selectedGame: string) => {
     setIsSaving(_ => true)
+    let blueState = 1
+    let redState = 0
     let _ = await Games.addGame({
       blueScore: blueState,
       redScore: redState,
       redTeam: selectedRedUsers,
       blueTeam: selectedBlueUsers,
+      game: selectedGame,
       date: Date.make(),
       modifiers: redPlayers->Array.length == 1 && bluePlayers->Array.length == 1
         ? Some([Games.OneVOne])
@@ -123,27 +130,39 @@ let make = (
     setStep(step => LoggerStep.getNextStep(step))
   }
 
+  let gameTypes = GameTypes.useGameTypes()->Array.map(gameType =>
+    <Button
+      // className="!rounded-full w-[100px] h-[100px] !text-5xl font-semibold"
+      key={gameType.name}
+      variant={selectedGame == Some(gameType.name) ? Blue : Grey}
+      onClick={_ => setSelectedGame(_ => Some(gameType.name))}>
+      {React.string(gameType.name)}
+    </Button>
+  )
+
   <>
     <Header
       step={LoggerStep.ScoreForm}
       onNextStep={() => {
-        let _ = saveGame()
+        switch selectedGame {
+        | Some(gameType) =>
+          let _ = saveGame(gameType)
+        | None => ()
+        }
       }}
       onReset={reset}
-      disabled={isSaving}
+      disabled={isSaving || Option.isNone(selectedGame)}
       setShowQueueButtons={_ => ()}
     />
-    <div className="flex flex-wrap content-padding gap-20">
-      <div>
-        <h2 className="font-bold text-xl"> {React.string("Team Blauw")} </h2>
-        <ol className="pl-5 pt-4 pb-8 list-decimal"> {React.array(blueUsers)} </ol>
-        <div className="grid gap-5 grid-cols-4"> {React.array(blueButtons)} </div>
-      </div>
-      <div>
-        <h2 className="font-bold text-xl"> {React.string("Team Rood")} </h2>
-        <ol className="pl-5 pt-4 pb-8 list-decimal"> {React.array(redUsers)} </ol>
-        <div className="grid gap-5 grid-cols-4"> {React.array(redButtons)} </div>
-      </div>
+    <div className="content-padding">
+      <h2 className="text-3xl">
+        {React.string("In welk spel heeft ")}
+        <span className="font-bold"> {winner->React.string} </span>
+        {React.string(" van ")}
+        <span className="font-bold"> {loser->React.string} </span>
+        {React.string(" gewonnen?")}
+      </h2>
+      <div className="flex flex-col gap-5 max-w-80 mt-4"> {React.array(gameTypes)} </div>
     </div>
   </>
 }
