@@ -13,7 +13,7 @@ function StatsModal(props) {
         return JsxRuntime.jsx("th", {
                     children: JsxRuntime.jsx("span", {
                           children: gameType.name,
-                          className: "vertical-lr"
+                          className: "vertical-lr whitespace-nowrap"
                         }),
                     className: "text-center py-2 even:bg-slate-50/10 "
                   }, gameType.name);

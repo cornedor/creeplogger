@@ -5,7 +5,7 @@ let make = (~show, ~setShow) => {
 
   let gameTypeHead = gameTypes->Array.map(gameType => {
     <th key={gameType.name} className="text-center py-2 even:bg-slate-50/10 ">
-      <span className="vertical-lr"> {React.string(gameType.name)} </span>
+      <span className="vertical-lr whitespace-nowrap"> {React.string(gameType.name)} </span>
     </th>
   })
 
