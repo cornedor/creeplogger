@@ -44,5 +44,8 @@ let make = (~show, ~setShow) => {
       />
     </div>
     <div className="flex-1" />
+    <div>
+      <a href="https://github.com/cornedor/creeplogger"> {React.string("Contribute on GitHub")} </a>
+    </div>
   </div>
 }

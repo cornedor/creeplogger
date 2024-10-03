@@ -86,6 +86,12 @@ function StatsModal(props) {
                     }),
                 JsxRuntime.jsx("div", {
                       className: "flex-1"
+                    }),
+                JsxRuntime.jsx("div", {
+                      children: JsxRuntime.jsx("a", {
+                            children: "Contribute on GitHub",
+                            href: "https://github.com/cornedor/creeplogger"
+                          })
                     })
               ],
               className: "modal flex flex-col",
