@@ -20,7 +20,7 @@
     "@greenlabs/ppx-rhf": "^0.0.1",
     "@rescript/core": "^0.6.0",
     "@rescript/react": "rescript-lang/rescript-react",
-    "@sentry/nextjs": "^7.93.0",
+    "@sentry/nextjs": "^8.33.0",
     "concurrently": "^8.2.2",
     "firebase": "^10.6.0",
     "next": "^14.2.14",
