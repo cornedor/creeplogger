@@ -77,10 +77,10 @@ function ScoreStep(props) {
   var blueUsers = selectedBlueUsers.map(mapUser);
   var redUsers = selectedRedUsers.map(mapUser);
   var redPlayers = selectedRedUsers.map(function (key) {
-        return Core__Option.getExn(Players.playerByKey(players, key));
+        return Core__Option.getExn(Players.playerByKey(players, key), undefined);
       });
   var bluePlayers = selectedBlueUsers.map(function (key) {
-        return Core__Option.getExn(Players.playerByKey(players, key));
+        return Core__Option.getExn(Players.playerByKey(players, key), undefined);
       });
   var sendCreepsUpdate = function (extra, extra$1, extra$2) {
     return Mattermost.sendCreepsUpdate(bluePlayers, redPlayers, extra, extra$1, extra$2);
@@ -101,10 +101,10 @@ function ScoreStep(props) {
         redState > blueState ? "Red" : RescriptCore.panic("Tie not implemented")
       );
     var redPlayers$1 = selectedRedUsers.map(function (key) {
-          return Core__Option.getExn(Players.playerByKey(players, key));
+          return Core__Option.getExn(Players.playerByKey(players, key), undefined);
         });
     var bluePlayers$1 = selectedBlueUsers.map(function (key) {
-          return Core__Option.getExn(Players.playerByKey(players, key));
+          return Core__Option.getExn(Players.playerByKey(players, key), undefined);
         });
     var match;
     if (winningTeam === "Blue") {

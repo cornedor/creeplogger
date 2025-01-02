@@ -1,12 +1,24 @@
 open Firebase
 
 external prompt: string => Nullable.t<string> = "prompt"
+external confirm: string => bool = "confirm"
 
 @react.component
 let make = () => {
   let user = Database.useUser()
   let (update, setUpdate) = React.useState(_ => "")
   let players = Players.useAllPlayers()
+  let games = Games.useLastGames()
+  // let (games, setGames) = React.useState(_ => empty)
+
+  // React.useEffect(() => {
+  //   let _ = Games.getTimePeriod(Games.Weekly)->Promise.then(games => {
+  //     Console.log(games)
+  //     setGames(_ => games)
+  //     Promise.resolve()
+  //   })
+  //   None
+  // }, [])
 
   let content = switch user {
   | Value(user) => {
@@ -51,9 +63,11 @@ let make = () => {
             <tbody>
               {Array.map(players, player =>
                 <tr key={player.key}>
-                  <td> {React.string(player.name)} </td>
-                  <td> {React.string(player.mattermostHandle->Option.getOr("Undefined"))} </td>
-                  <td className="flex gap-2">
+                  <td className="px-2 py-1"> {React.string(player.name)} </td>
+                  <td className="px-2 py-1">
+                    {React.string(player.mattermostHandle->Option.getOr("Undefined"))}
+                  </td>
+                  <td className="px-2 py-1 flex gap-2">
                     <button
                       className="bg-slate-300 rounded py-1 px-3 text-black"
                       onClick={_ => {
@@ -62,9 +76,79 @@ let make = () => {
                       }}>
                       {React.string("Set MH")}
                     </button>
+                    <button
+                      className="bg-slate-300 rounded py-1 px-3 text-black"
+                      onClick={_ => {
+                        if confirm("Are you sure you want to remove " ++ player.name ++ "?") {
+                          let _ = Players.removePlayer(player.key)
+                        }
+                      }}>
+                      {React.string("Remove")}
+                    </button>
                   </td>
                 </tr>
               )->React.array}
+            </tbody>
+          </table>
+        </details>
+        <details>
+          <summary className="p-2 bg-white/5 mt-2 hover:bg-white/10 select-none rounded">
+            {React.string("Last games")}
+          </summary>
+          <table>
+            <thead>
+              <tr>
+                <th> {React.string("Blue team")} </th>
+                <th> {React.string("Red team")} </th>
+                <th> {React.string("When")} </th>
+                <th> {React.string("Score")} </th>
+                <th> {React.string("Actions")} </th>
+              </tr>
+            </thead>
+            <tbody>
+              {games
+              ->Js.Dict.entries
+              ->Array.toReversed
+              ->Array.map(((key, game)) => {
+                let bluePlayers = Array.map(game.blueTeam, player => {
+                  switch Array.find(players, p => p.key == player) {
+                  | Some(player) => player.name
+                  | None => "..."
+                  }
+                })
+                let redPlayers = Array.map(game.redTeam, player => {
+                  switch Array.find(players, p => p.key == player) {
+                  | Some(player) => player.name
+                  | None => "..."
+                  }
+                })
+                <tr key={game.date->Date.toString}>
+                  <td className="px-2 py-1"> {React.string(Array.join(bluePlayers, ", "))} </td>
+                  <td className="px-2 py-1"> {React.string(Array.join(redPlayers, ", "))} </td>
+                  <td className="px-2 py-1"> {React.string(Date.toISOString(game.date))} </td>
+                  <td className="px-2 py-1">
+                    {React.string(
+                      "Blue " ++
+                      game.blueScore->Int.toString ++
+                      ":" ++
+                      game.redScore->Int.toString ++ " Red",
+                    )}
+                  </td>
+                  <td className="px-2 py-1 flex gap-2">
+                    <button
+                      className="bg-slate-300 rounded py-1 px-3 text-black"
+                      onClick={_ => {
+                        if confirm("Are you sure you want to remove this (" ++ key ++ ") game?") {
+                          Console.log("Ok")
+                          let _ = Games.removeGame(key)
+                        }
+                      }}>
+                      {React.string("Remove")}
+                    </button>
+                  </td>
+                </tr>
+              })
+              ->React.array}
             </tbody>
           </table>
         </details>

@@ -166,7 +166,7 @@ let playerByKey = (players, key) => players->Array.find(c => c.key == key)
 
 let writePlayer = (player: player) => {
   let playerRef = Firebase.Database.refPath(Database.database, bucket ++ "/" ++ player.key)
-  Firebase.Database.set(playerRef, Schema.serializeOrRaiseWith(player, playerSchema))
+  Firebase.Database.set(playerRef, Schema.reverseConvertToJsonWith(player, playerSchema))
 }
 
 let getLastGames = (lastGames, win) => {
@@ -214,4 +214,9 @@ let updateGameStats = (key, myTeamPoints, opponentTeamPoints, team: team, elo) =
     | Error(_) => data
     }
   })
+}
+
+let removePlayer = playerKey => {
+  let playerRef = Firebase.Database.refPath(Database.database, bucket ++ "/" ++ playerKey)
+  Firebase.Database.remove(playerRef)
 }

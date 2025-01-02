@@ -13,6 +13,10 @@ type game = {
 
 let addGame: game => promise<Firebase.databaseReference>
 
-let getTimePeriod: peroid => promise<Dict.t<game>>
+let getTimePeriod: peroid => promise<Js.Dict.t<game>>
 
 let fetchAllGames: unit => promise<array<game>>
+
+let removeGame: string => promise<unit>
+
+let useLastGames: unit => Js.Dict.t<game>

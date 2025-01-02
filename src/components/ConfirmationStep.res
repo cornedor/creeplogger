@@ -11,7 +11,7 @@ let mapPlayer = (users, key) => {
 let make = (~score, ~winners, ~reset, ~players) => {
   let winners = winners->Array.map(winner => mapPlayer(players, winner))
 
-  let winnerNames = Array.joinWith(winners, " & ")
+  let winnerNames = Array.join(winners, " & ")
 
   <div className="flex justify-center items-center h-screen flex-col">
     <h1 className="text-3xl"> {React.string("Gefeliciteerd, " ++ winnerNames ++ "!")} </h1>

@@ -71,7 +71,7 @@ let updateStats = async (redScore, blueScore) => {
   Firebase.Database.runTransaction(statsRef, data => {
     switch data->Schema.parseWith(statsSchema) {
     | Ok(data) => {
-        let newData = Schema.serializeOrRaiseWith(
+        let newData = Schema.reverseConvertToJsonWith(
           {
             totalGames: data.totalGames + 1,
             totalRedWins: data.totalRedWins + (redWin ? 1 : 0),

@@ -20,14 +20,16 @@
     "rescript-classnames"
   ],
   "ppx-flags": [
-    "@greenlabs/ppx-rhf/ppx"
+    "@greenlabs/ppx-rhf/ppx",
+    "rescript-schema-ppx/bin"
   ],
   "jsx": {
     "version": 4,
     "mode": "automatic"
   },
   "bsc-flags": [
-    "-open RescriptCore"
+    "-open RescriptCore",
+    "-open RescriptSchema"
   ],
   "gentypeconfig": {
     "language": "typescript",
