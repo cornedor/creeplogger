@@ -17,7 +17,7 @@ function publishMessage(message) {
                       method: "POST",
                       body: Caml_option.some(Core__Option.getExn(JSON.stringify({
                                     text: message
-                                  })))
+                                  }), undefined))
                     }));
     } else {
       return ;
@@ -70,7 +70,7 @@ async function sendDailyUpdate() {
   var table = overviewArray.map(function (creeper, index) {
           return "| " + (index + 1 | 0).toString() + " | " + creeper.name + " | " + creeper.creeps.toString() + " | " + creeper.games.toString() + " |";
         }).join("\n");
-  var topCreeper = Core__Option.getExn(overviewArray[0]);
+  var topCreeper = Core__Option.getExn(overviewArray[0], undefined);
   var intro = "### De kruip statistieken van vandaag zijn bekend!\n\nFeliciteer direct onze top kruiper van de dag: " + topCreeper.name + " met maar liefst " + topCreeper.creeps.toString() + " kruipjes!\n\n| # | Naam | Kruipjes | Potjes |\n| - | ---- | -------- | ------ | \n" + table + "\n\n";
   var prom = publishMessage(intro);
   if (prom !== undefined) {

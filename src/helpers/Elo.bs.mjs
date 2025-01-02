@@ -13,8 +13,9 @@ function calculateScore(winners, losers) {
   var totalEloB = getTotalEloFromTeam(losers);
   var countA = winners.length;
   var countB = losers.length;
-  var mulA = countA === 1 ? 1.5 : countA;
-  var mulB = countB === 1 ? 1.5 : countB;
+  var max = countA > countB ? countA : countB;
+  var mulA = countA === max ? max : 1.5;
+  var mulB = countB === max ? max : 1.5;
   var avgA = totalEloA / mulA;
   var avgB = totalEloB / mulB;
   var losersScore = avgB;

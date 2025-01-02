@@ -40,7 +40,7 @@ let sendCreepsUpdate = async (
       | None => player.name
       }
     )
-    ->Array.joinWith(", ")
+    ->Array.join(", ")
   let redNames =
     redPlayers
     ->Array.map(player =>
@@ -49,7 +49,7 @@ let sendCreepsUpdate = async (
       | None => player.name
       }
     )
-    ->Array.joinWith(", ")
+    ->Array.join(", ")
 
   let bluePoints = blueScore < redScore ? 0 - points : points
   let redPoints = blueScore > redScore ? 0 - points : points
@@ -98,7 +98,7 @@ let sendDailyUpdate = async () => {
           " | " ++
           creeper.games->Int.toString ++ " |"
         )
-        ->Array.joinWith("\n")
+        ->Array.join("\n")
 
       let topCreeper = overviewArray[0]->Option.getExn
 

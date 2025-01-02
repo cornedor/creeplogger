@@ -42,3 +42,5 @@ let writePlayer: player => promise<unit>
 let getLastGames: (array<int>, bool) => array<int>
 
 let playersSchema: Schema.t<Js.Dict.t<player>>
+
+let removePlayer: string => promise<unit>

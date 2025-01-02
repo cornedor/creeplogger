@@ -247,6 +247,8 @@ module Firebase = {
     @module("firebase/database")
     external set: (databaseReference, 'a) => Js.Promise.t<unit> = "set"
     @module("firebase/database")
+    external remove: databaseReference => Js.Promise.t<unit> = "remove"
+    @module("firebase/database")
     external get: databaseReference => Js.Promise.t<'a> = "get"
     @module("firebase/database")
     external runTransaction: (databaseReference, 'a) => 'a = "runTransaction"

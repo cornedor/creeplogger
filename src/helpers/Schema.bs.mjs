@@ -2,13 +2,13 @@
 
 import * as S$RescriptSchema from "rescript-schema/src/S.bs.mjs";
 
-var Literal = S$RescriptSchema.Literal;
-
 var Path = S$RescriptSchema.Path;
 
 var Raised = S$RescriptSchema.Raised;
 
 var $$Error = S$RescriptSchema.$$Error;
+
+var Literal = S$RescriptSchema.Literal;
 
 var never = S$RescriptSchema.never;
 
@@ -23,6 +23,8 @@ var bool = S$RescriptSchema.bool;
 var $$int = S$RescriptSchema.$$int;
 
 var $$float = S$RescriptSchema.$$float;
+
+var bigint = S$RescriptSchema.bigint;
 
 var json = S$RescriptSchema.json;
 
@@ -44,6 +46,10 @@ var jsonString = S$RescriptSchema.jsonString;
 
 var union = S$RescriptSchema.union;
 
+var $$enum = S$RescriptSchema.$$enum;
+
+var Catch = S$RescriptSchema.Catch;
+
 var $$catch = S$RescriptSchema.$$catch;
 
 var describe = S$RescriptSchema.describe;
@@ -64,6 +70,10 @@ var refine = S$RescriptSchema.refine;
 
 var variant = S$RescriptSchema.variant;
 
+var to = S$RescriptSchema.to;
+
+var compile = S$RescriptSchema.compile;
+
 var parseWith = S$RescriptSchema.parseWith;
 
 var parseAnyWith = S$RescriptSchema.parseAnyWith;
@@ -78,9 +88,19 @@ var parseAsyncWith = S$RescriptSchema.parseAsyncWith;
 
 var parseAnyAsyncWith = S$RescriptSchema.parseAnyAsyncWith;
 
-var parseAsyncInStepsWith = S$RescriptSchema.parseAsyncInStepsWith;
+var convertAnyWith = S$RescriptSchema.convertAnyWith;
 
-var parseAnyAsyncInStepsWith = S$RescriptSchema.parseAnyAsyncInStepsWith;
+var convertAnyToJsonWith = S$RescriptSchema.convertAnyToJsonWith;
+
+var convertAnyToJsonStringWith = S$RescriptSchema.convertAnyToJsonStringWith;
+
+var convertAnyAsyncWith = S$RescriptSchema.convertAnyAsyncWith;
+
+var reverseConvertWith = S$RescriptSchema.reverseConvertWith;
+
+var reverseConvertToJsonWith = S$RescriptSchema.reverseConvertToJsonWith;
+
+var reverseConvertToJsonStringWith = S$RescriptSchema.reverseConvertToJsonStringWith;
 
 var serializeWith = S$RescriptSchema.serializeWith;
 
@@ -92,13 +112,29 @@ var serializeOrRaiseWith = S$RescriptSchema.serializeOrRaiseWith;
 
 var serializeToUnknownOrRaiseWith = S$RescriptSchema.serializeToUnknownOrRaiseWith;
 
+var serializeToJsonStringOrRaiseWith = S$RescriptSchema.serializeToJsonStringOrRaiseWith;
+
+var assertOrRaiseWith = S$RescriptSchema.assertOrRaiseWith;
+
+var assertAnyWith = S$RescriptSchema.assertAnyWith;
+
+var assertWith = S$RescriptSchema.assertWith;
+
 var isAsyncParse = S$RescriptSchema.isAsyncParse;
+
+var isAsync = S$RescriptSchema.isAsync;
 
 var recursive = S$RescriptSchema.recursive;
 
 var classify = S$RescriptSchema.classify;
 
 var setName = S$RescriptSchema.setName;
+
+var removeTypeValidation = S$RescriptSchema.removeTypeValidation;
+
+var unwrap = S$RescriptSchema.unwrap;
+
+var Schema = S$RescriptSchema.Schema;
 
 var schema = S$RescriptSchema.schema;
 
@@ -130,11 +166,51 @@ var Metadata = S$RescriptSchema.Metadata;
 
 var inline = S$RescriptSchema.inline;
 
+var reverse = S$RescriptSchema.reverse;
+
+var intMin = S$RescriptSchema.intMin;
+
+var intMax = S$RescriptSchema.intMax;
+
+var port = S$RescriptSchema.port;
+
+var floatMin = S$RescriptSchema.floatMin;
+
+var floatMax = S$RescriptSchema.floatMax;
+
+var arrayMinLength = S$RescriptSchema.arrayMinLength;
+
+var arrayMaxLength = S$RescriptSchema.arrayMaxLength;
+
+var arrayLength = S$RescriptSchema.arrayLength;
+
+var stringMinLength = S$RescriptSchema.stringMinLength;
+
+var stringMaxLength = S$RescriptSchema.stringMaxLength;
+
+var stringLength = S$RescriptSchema.stringLength;
+
+var email = S$RescriptSchema.email;
+
+var uuid = S$RescriptSchema.uuid;
+
+var cuid = S$RescriptSchema.cuid;
+
+var url = S$RescriptSchema.url;
+
+var pattern = S$RescriptSchema.pattern;
+
+var datetime = S$RescriptSchema.datetime;
+
+var trim = S$RescriptSchema.trim;
+
+var setGlobalConfig = S$RescriptSchema.setGlobalConfig;
+
 export {
-  Literal ,
   Path ,
   Raised ,
   $$Error ,
+  Literal ,
   never ,
   unknown ,
   unit ,
@@ -142,6 +218,7 @@ export {
   bool ,
   $$int ,
   $$float ,
+  bigint ,
   json ,
   literal ,
   array ,
@@ -152,6 +229,8 @@ export {
   nullable ,
   jsonString ,
   union ,
+  $$enum ,
+  Catch ,
   $$catch ,
   describe ,
   description ,
@@ -162,6 +241,8 @@ export {
   custom ,
   refine ,
   variant ,
+  to ,
+  compile ,
   parseWith ,
   parseAnyWith ,
   parseJsonStringWith ,
@@ -169,17 +250,30 @@ export {
   parseAnyOrRaiseWith ,
   parseAsyncWith ,
   parseAnyAsyncWith ,
-  parseAsyncInStepsWith ,
-  parseAnyAsyncInStepsWith ,
+  convertAnyWith ,
+  convertAnyToJsonWith ,
+  convertAnyToJsonStringWith ,
+  convertAnyAsyncWith ,
+  reverseConvertWith ,
+  reverseConvertToJsonWith ,
+  reverseConvertToJsonStringWith ,
   serializeWith ,
   serializeToUnknownWith ,
   serializeToJsonStringWith ,
   serializeOrRaiseWith ,
   serializeToUnknownOrRaiseWith ,
+  serializeToJsonStringOrRaiseWith ,
+  assertOrRaiseWith ,
+  assertAnyWith ,
+  assertWith ,
   isAsyncParse ,
+  isAsync ,
   recursive ,
   classify ,
   setName ,
+  removeTypeValidation ,
+  unwrap ,
+  Schema ,
   schema ,
   $$Object ,
   object ,
@@ -195,5 +289,25 @@ export {
   $$Array ,
   Metadata ,
   inline ,
+  reverse ,
+  intMin ,
+  intMax ,
+  port ,
+  floatMin ,
+  floatMax ,
+  arrayMinLength ,
+  arrayMaxLength ,
+  arrayLength ,
+  stringMinLength ,
+  stringMaxLength ,
+  stringLength ,
+  email ,
+  uuid ,
+  cuid ,
+  url ,
+  pattern ,
+  datetime ,
+  trim ,
+  setGlobalConfig ,
 }
 /* S-RescriptSchema Not a pure module */

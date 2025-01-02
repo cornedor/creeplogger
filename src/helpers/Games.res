@@ -25,8 +25,8 @@ let modifierSchema = Schema.union([
 ])
 
 let gameSchema = Schema.object(s => {
-  blueScore: s.field("blueScore", Schema.int->Schema.Int.min(0)),
-  redScore: s.field("redScore", Schema.int->Schema.Int.min(0)),
+  blueScore: s.field("blueScore", Schema.int->Schema.intMin(0)),
+  redScore: s.field("redScore", Schema.int->Schema.intMin(0)),
   redTeam: s.field("redTeam", Schema.array(Schema.string)),
   blueTeam: s.field("blueTeam", Schema.array(Schema.string)),
   date: s.field(
@@ -87,6 +87,39 @@ let getTimePeriod = async period => {
   }
 }
 
+let empty: Js.Dict.t<game> = Js.Dict.empty()
+let useLastGames = () => {
+  let (games, setGames) = React.useState(_ => empty)
+  let gamesRef = Firebase.Database.query1(
+    Firebase.Database.refPath(Database.database, "games"),
+    Firebase.Database.orderByChild("date"),
+  )
+  React.useEffect(() => {
+    let unsubscribe = Firebase.Database.onValue(
+      gamesRef,
+      snapshot => {
+        let games = switch Firebase.Database.Snapshot.val(snapshot)->Nullable.toOption {
+        | Some(val) =>
+          switch val->Schema.parseWith(Schema.dict(gameSchema)) {
+          | Ok(val) => val
+          | Error(e) => {
+              Js.log(e)
+              Js.Dict.empty()
+            }
+          }
+        | None => empty
+        }
+        setGames(_ => games)
+      },
+      (),
+    )
+
+    Some(unsubscribe)
+  }, [setGames])
+
+  games
+}
+
 external snapshotToArray: dataSnapshot => array<dataSnapshot> = "%identity"
 
 let fetchAllGames = async () => {
@@ -109,4 +142,9 @@ let fetchAllGames = async () => {
   })
 
   orderedGames
+}
+
+let removeGame = gameKey => {
+  let gameRef = Firebase.Database.refPath(Database.database, "games/" ++ gameKey)
+  Firebase.Database.remove(gameRef)
 }

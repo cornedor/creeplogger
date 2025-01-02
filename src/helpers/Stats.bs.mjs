@@ -14,10 +14,10 @@ import * as Database$1 from "firebase/database";
 
 var statsSchema = Schema.object(function (s) {
       return {
-              totalGames: s.o("games", Schema.$$int, 0),
-              totalRedWins: s.o("redWins", Schema.$$int, 0),
-              totalBlueWins: s.o("blueWins", Schema.$$int, 0),
-              totalAbsoluteWins: s.o("absoluteWins", Schema.$$int, 0)
+              totalGames: s.fieldOr("games", Schema.$$int, 0),
+              totalRedWins: s.fieldOr("redWins", Schema.$$int, 0),
+              totalBlueWins: s.fieldOr("blueWins", Schema.$$int, 0),
+              totalAbsoluteWins: s.fieldOr("absoluteWins", Schema.$$int, 0)
             };
     });
 
@@ -79,7 +79,7 @@ async function updateStats(redScore, blueScore) {
                   return RescriptCore.panic("Failed parsing stats");
                 }
                 var data$2 = data$1._0;
-                return Schema.serializeOrRaiseWith({
+                return Schema.reverseConvertToJsonWith({
                             totalGames: data$2.totalGames + 1 | 0,
                             totalRedWins: data$2.totalRedWins + (
                               redWin ? 1 : 0
@@ -113,7 +113,7 @@ async function recalculateStats() {
   var players = await Players.fetchAllPlayers();
   var playerKeys = Object.keys(players);
   playerKeys.forEach(function (key) {
-        var player = Core__Option.getExn(players[key]);
+        var player = Core__Option.getExn(players[key], undefined);
         players[key] = {
           name: player.name,
           wins: 0,
@@ -140,10 +140,10 @@ async function recalculateStats() {
           var redWin = Rules.isRedWin(game.redScore, game.blueScore);
           var isAbsolute = Rules.isAbsolute(game.redScore, game.blueScore);
           var redPlayers = game.redTeam.map(function (key) {
-                return Core__Option.getExn(players[key]);
+                return Core__Option.getExn(players[key], undefined);
               });
           var bluePlayers = game.blueTeam.map(function (key) {
-                return Core__Option.getExn(players[key]);
+                return Core__Option.getExn(players[key], undefined);
               });
           var match;
           if (blueWin) {
@@ -218,7 +218,7 @@ async function recalculateStats() {
   console.log(stats);
   console.log(players);
   await Promise.all(playerKeys.map(function (key) {
-            var player = Core__Option.getExn(players[key]);
+            var player = Core__Option.getExn(players[key], undefined);
             return Players.writePlayer(player);
           }));
   await writeStats(stats);

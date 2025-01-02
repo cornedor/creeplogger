@@ -11,22 +11,22 @@ import * as Database$1 from "firebase/database";
 var playerSchema = Schema.object(function (s) {
       return {
               name: s.f("name", Schema.string),
-              wins: s.o("wins", Schema.$$int, 0),
-              losses: s.o("losses", Schema.$$int, 0),
-              absoluteWins: s.o("absoluteWins", Schema.$$int, 0),
-              absoluteLosses: s.o("absoluteLosses", Schema.$$int, 0),
-              games: s.o("games", Schema.$$int, 0),
-              teamGoals: s.o("teamGoals", Schema.$$int, 0),
-              teamGoalsAgainst: s.o("tga", Schema.$$int, 0),
-              blueGames: s.o("blueGames", Schema.$$int, 0),
-              redGames: s.o("redGames", Schema.$$int, 0),
-              blueWins: s.o("blueWins", Schema.$$int, 0),
-              redWins: s.o("redWins", Schema.$$int, 0),
-              elo: s.o("elo", Schema.$$float, 1000.0),
-              lastEloChange: s.o("change", Schema.$$float, 0.0),
+              wins: s.fieldOr("wins", Schema.$$int, 0),
+              losses: s.fieldOr("losses", Schema.$$int, 0),
+              absoluteWins: s.fieldOr("absoluteWins", Schema.$$int, 0),
+              absoluteLosses: s.fieldOr("absoluteLosses", Schema.$$int, 0),
+              games: s.fieldOr("games", Schema.$$int, 0),
+              teamGoals: s.fieldOr("teamGoals", Schema.$$int, 0),
+              teamGoalsAgainst: s.fieldOr("tga", Schema.$$int, 0),
+              blueGames: s.fieldOr("blueGames", Schema.$$int, 0),
+              redGames: s.fieldOr("redGames", Schema.$$int, 0),
+              blueWins: s.fieldOr("blueWins", Schema.$$int, 0),
+              redWins: s.fieldOr("redWins", Schema.$$int, 0),
+              elo: s.fieldOr("elo", Schema.$$float, 1000.0),
+              lastEloChange: s.fieldOr("change", Schema.$$float, 0.0),
               key: s.f("key", Schema.string),
               mattermostHandle: s.f("mh", FirebaseSchema.nullableTransform(Schema.option(Schema.string))),
-              lastGames: s.o("lastGames", Schema.array(Schema.$$int), []),
+              lastGames: s.fieldOr("lastGames", Schema.array(Schema.$$int), []),
               hidden: s.f("hidden", FirebaseSchema.nullableTransform(Schema.option(Schema.bool)))
             };
     });
@@ -145,7 +145,7 @@ function playerByKey(players, key) {
 
 function writePlayer(player) {
   var playerRef = Database$1.ref(Database.database, "players/" + player.key);
-  return Database$1.set(playerRef, Schema.serializeOrRaiseWith(player, playerSchema));
+  return Database$1.set(playerRef, Schema.reverseConvertToJsonWith(player, playerSchema));
 }
 
 function getLastGames(lastGames, win) {
@@ -196,6 +196,10 @@ function updateGameStats(key, myTeamPoints, opponentTeamPoints, team, elo) {
               }));
 }
 
+function removePlayer(playerKey) {
+  return Database$1.remove(Database$1.ref(Database.database, "players/" + playerKey));
+}
+
 var bucket = "players";
 
 export {
@@ -209,5 +213,6 @@ export {
   writePlayer ,
   getLastGames ,
   playersSchema ,
+  removePlayer ,
 }
 /* playerSchema Not a pure module */

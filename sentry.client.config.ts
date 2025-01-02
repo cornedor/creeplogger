@@ -21,12 +21,12 @@ Sentry.init({
 
   // You can remove this option if you're not planning to use the Sentry Session Replay feature:
   integrations: [
-    new Sentry.Replay({
-      maskAllText: true,
-      blockAllMedia: true,
-    }),
-    new Sentry.Feedback({
-      colorScheme: "dark",
-    }),
+    // new Sentry.Replay({
+    //   maskAllText: true,
+    //   blockAllMedia: true,
+    // }),
+    // new Sentry.Feedback({
+    //   colorScheme: "dark",
+    // }),
   ],
 });
