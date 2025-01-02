@@ -39,7 +39,7 @@ let make = (~show, ~setShow) => {
           | None => true
           }
 
-          let isLowGameCount = player.games > 5
+          let isLowGameCount = player.games > 0
           let isLowElo = player.elo > 500.0
 
           isHidden && isLowGameCount && isLowElo
