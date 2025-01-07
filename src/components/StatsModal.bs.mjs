@@ -2,11 +2,15 @@
 
 import * as Stats from "../helpers/Stats.bs.mjs";
 import * as Button from "./Button.bs.mjs";
+import * as DaysWithout from "../helpers/DaysWithout.bs.mjs";
 import * as JsxRuntime from "react/jsx-runtime";
+import * as DifferenceInDays from "date-fns/differenceInDays";
 
 function StatsModal(props) {
   var setShow = props.setShow;
   var stats = Stats.useStats();
+  var match = DaysWithout.useDaysWithout();
+  var daysSince = DifferenceInDays.differenceInDays(new Date(), match[1]);
   var blue = stats.totalBlueWins;
   var red = stats.totalRedWins;
   var bluePercentages = (blue / (blue + red) * 100).toString();
@@ -83,6 +87,27 @@ function StatsModal(props) {
                               background: "conic-gradient(#86b7ff, #1c77ff " + bluePercentages + "%, #ff3e6e " + bluePercentages + "%, #ff0055)"
                             }
                           })
+                    }),
+                JsxRuntime.jsx("hr", {}),
+                JsxRuntime.jsxs("div", {
+                      children: [
+                        JsxRuntime.jsx("h2", {
+                              children: match[0],
+                              className: "pt-5 text-3xl text-center"
+                            }),
+                        JsxRuntime.jsx("div", {
+                              children: daysSince.toString(),
+                              className: "text-[160px] font-handwritten"
+                            }),
+                        JsxRuntime.jsx(Button.make, {
+                              variant: "Blue",
+                              onClick: (function (param) {
+                                  DaysWithout.reset();
+                                }),
+                              children: "Reset"
+                            })
+                      ],
+                      className: "flex justify-center items-center flex-col gap-2"
                     }),
                 JsxRuntime.jsx("div", {
                       className: "flex-1"

@@ -1,6 +1,9 @@
 @react.component
 let make = (~show, ~setShow) => {
   let stats = Stats.useStats()
+  let (daysWithoutName, daysWithoutDate) = DaysWithout.useDaysWithout()
+
+  let daysSince = DateFns.differenceInDays(Date.make(), daysWithoutDate)
 
   let blue = Float.fromInt(stats.totalBlueWins)
   let red = Float.fromInt(stats.totalRedWins)
@@ -42,6 +45,18 @@ let make = (~show, ~setShow) => {
           (),
         )}
       />
+    </div>
+    <hr />
+    <div className="flex justify-center items-center flex-col gap-2">
+      <h2 className="pt-5 text-3xl text-center"> {React.string(daysWithoutName)} </h2>
+      <div className="text-[160px] font-handwritten"> {React.string(Int.toString(daysSince))} </div>
+      <Button
+        variant={Blue}
+        onClick={_ => {
+          let _ = DaysWithout.reset()
+        }}>
+        {React.string("Reset")}
+      </Button>
     </div>
     <div className="flex-1" />
     <div>

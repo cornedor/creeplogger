@@ -1,8 +1,15 @@
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Caveat } from "next/font/google";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
+
+const caveat = Caveat({
+  display: "swap",
+  subsets: ["latin"],
+  weight: "500",
+  variable: "--font-caveat",
+});
 
 export const metadata: Metadata = {
   title: "Kruiplogger",
@@ -28,7 +35,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="nl">
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className + " " + caveat.variable}>
+        {children}
+      </body>
     </html>
   );
 }
