@@ -17,7 +17,8 @@
     "@glennsl/rescript-fetch",
     "rescript-schema",
     "@greenlabs/ppx-rhf",
-    "rescript-classnames"
+    "rescript-classnames",
+    "@dck/rescript-date-fns"
   ],
   "ppx-flags": [
     "@greenlabs/ppx-rhf/ppx",

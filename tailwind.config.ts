@@ -12,6 +12,9 @@ const config: Config = {
         darkbg: "#242328",
         overlay: "rgba(36, 35, 40, 0.7)",
       },
+      fontFamily: {
+        handwritten: ["var(--font-caveat)"],
+      },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
         "gradient-conic":
