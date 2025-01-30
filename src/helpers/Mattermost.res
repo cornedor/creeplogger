@@ -124,3 +124,15 @@ ${table}
     }
   }
 }
+
+let sendDaysWithoutReset = async (name: string) => {
+  let message = `${name} is reset`
+
+  switch publishMessage(message) {
+  | Some(promise) =>
+    let _ = await promise
+  | None => ()
+  }
+
+  0
+}

@@ -96,7 +96,7 @@ function ScoreStep(props) {
           redTeam: selectedRedUsers,
           date: new Date(),
           modifiers: redPlayers.length === 1 && bluePlayers.length === 1 ? ["OneVOne"] : []
-        });
+        }, undefined);
     var winningTeam = blueState > redState ? "Blue" : (
         redState > blueState ? "Red" : RescriptCore.panic("Tie not implemented")
       );

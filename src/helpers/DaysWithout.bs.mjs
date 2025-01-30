@@ -3,6 +3,7 @@
 import * as React from "react";
 import * as Schema from "./Schema.bs.mjs";
 import * as Database from "./Database.bs.mjs";
+import * as Mattermost from "./Mattermost.bs.mjs";
 import * as Database$1 from "firebase/database";
 
 var daysWithoutSchema = Schema.object(function (s) {
@@ -60,6 +61,12 @@ function useDaysWithout() {
 async function reset() {
   var daysWithoutRef = Database$1.ref(Database.database, "daysWithout/date");
   await Database$1.set(daysWithoutRef, Date.now());
+  var daysWithoutRef$1 = Database$1.ref(Database.database, "daysWithout");
+  var daysWithoutVal = await Database$1.get(daysWithoutRef$1);
+  var daysWithout = Schema.parseWith(daysWithoutVal, daysWithoutSchema);
+  var name;
+  name = daysWithout.TAG === "Ok" ? daysWithout._0.name : "Days without an accident";
+  Mattermost.sendDaysWithoutReset(name);
 }
 
 export {
