@@ -82,9 +82,19 @@ async function sendDailyUpdate() {
   }
 }
 
+async function sendDaysWithoutReset(name) {
+  var message = name + " is reset";
+  var promise = publishMessage(message);
+  if (promise !== undefined) {
+    await Caml_option.valFromOption(promise);
+  }
+  return 0;
+}
+
 export {
   sendCreepsUpdate ,
   publishMessage ,
   sendDailyUpdate ,
+  sendDaysWithoutReset ,
 }
 /* url Not a pure module */
