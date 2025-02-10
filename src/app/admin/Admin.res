@@ -9,6 +9,7 @@ let make = () => {
   let (update, setUpdate) = React.useState(_ => "")
   let players = Players.useAllPlayers()
   let games = Games.useLastGames()
+  let dartsGames = DartsGames.useLastGames()
   // let (games, setGames) = React.useState(_ => empty)
 
   // React.useEffect(() => {
@@ -141,6 +142,61 @@ let make = () => {
                         if confirm("Are you sure you want to remove this (" ++ key ++ ") game?") {
                           Console.log("Ok")
                           let _ = Games.removeGame(key)
+                        }
+                      }}>
+                      {React.string("Remove")}
+                    </button>
+                  </td>
+                </tr>
+              })
+              ->React.array}
+            </tbody>
+          </table>
+        </details>
+        <details>
+          <summary className="p-2 bg-white/5 mt-2 hover:bg-white/10 select-none rounded">
+            {React.string("Last darts games")}
+          </summary>
+          <table>
+            <thead>
+              <tr>
+                <th> {React.string("Winners")} </th>
+                <th> {React.string("Losers")} </th>
+                <th> {React.string("When")} </th>
+                <th> {React.string("Mode")} </th>
+                <th> {React.string("Actions")} </th>
+              </tr>
+            </thead>
+            <tbody>
+              {dartsGames
+              ->Js.Dict.entries
+              ->Array.toReversed
+              ->Array.map(((key, game)) => {
+                let winners = Array.map(game.winners, player => {
+                  switch Array.find(players, p => p.key == player) {
+                  | Some(player) => player.name
+                  | None => "..."
+                  }
+                })
+                let losers = Array.map(game.losers, player => {
+                  switch Array.find(players, p => p.key == player) {
+                  | Some(player) => player.name
+                  | None => "..."
+                  }
+                })
+                <tr key={game.date->Date.toString}>
+                  <td className="px-2 py-1"> {React.string(Array.join(winners, ", "))} </td>
+                  <td className="px-2 py-1"> {React.string(Array.join(losers, ", "))} </td>
+                  <td className="px-2 py-1"> {React.string(Date.toISOString(game.date))} </td>
+                  <td className="px-2 py-1">
+                    {React.string(DartsGames.dartsModeToString(game.mode))}
+                  </td>
+                  <td className="px-2 py-1 flex gap-2">
+                    <button
+                      className="bg-slate-300 rounded py-1 px-3 text-black"
+                      onClick={_ => {
+                        if confirm("Are you sure you want to remove this (" ++ key ++ ") game?") {
+                          let _ = DartsGames.removeGame(key)
                         }
                       }}>
                       {React.string("Remove")}

@@ -16,9 +16,7 @@ let make = (~show, ~setShow) => {
     <header>
       <Button onClick={_ => setShow(s => !s)} variant={Blue}> {React.string("Terug")} </Button>
     </header>
-    <em className="py-2 inline-block">
-      {React.string("WIP: Misschien komt hier ooit wat mooiers voor, maar hier is alvast wat.")}
-    </em>
+    <h2 className="pt-5 mb-4 block text-2xl"> {React.string("Foosball")} </h2>
     <ul className="grid grid-cols-2 gap-2">
       <li className="p-2 rounded border-white/20 border bg-white/5 flex justify-between">
         <strong> {React.string("Total games: ")} </strong>
@@ -45,6 +43,17 @@ let make = (~show, ~setShow) => {
           (),
         )}
       />
+    </div>
+    <hr />
+    <div>
+      <h2 className="pt-5 mb-4 block text-2xl"> {React.string("Darts")} </h2>
+      <ul className="grid grid-cols-2 gap-2">
+        <li className="p-2 rounded border-white/20 border bg-white/5 flex justify-between">
+          <strong> {React.string("Total games: ")} </strong>
+          <span> {React.int(stats.totalDartsGames)} </span>
+        </li>
+      </ul>
+      <br />
     </div>
     <hr />
     <div className="flex justify-center items-center flex-col gap-2">

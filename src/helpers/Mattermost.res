@@ -71,6 +71,47 @@ let sendCreepsUpdate = async (
   0
 }
 
+let sendDartsUpdate = async (
+  winners: array<Players.player>,
+  losers: array<Players.player>,
+  points: int,
+  mode: string,
+) => {
+  let winnerNames =
+    winners
+    ->Array.map(player =>
+      switch player.mattermostHandle {
+      | Some(handle) => `@${handle}`
+      | None => player.name
+      }
+    )
+    ->Array.join(", ")
+  let loserNames =
+    losers
+    ->Array.map(player =>
+      switch player.mattermostHandle {
+      | Some(handle) => `@${handle}`
+      | None => player.name
+      }
+    )
+    ->Array.join(", ")
+
+  let message = `### Nieuw darts potje geregistreerd!
+
+Winnaar: ${winnerNames} (+${points->Int.toString})
+Verliezer: ${loserNames} (-${points->Int.toString})
+Game mode: ${mode}
+`
+
+  switch publishMessage(message) {
+  | Some(promise) =>
+    let _ = await promise
+  | None => ()
+  }
+
+  0
+}
+
 let sendDailyUpdate = async () => {
   let overview = await Summary.getDailyOverview(Daily)
   let overviewArray =

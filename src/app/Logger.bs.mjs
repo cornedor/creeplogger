@@ -9,6 +9,7 @@ import * as ScoreStep from "../components/ScoreStep.bs.mjs";
 import * as Belt_MapString from "rescript/lib/es6/belt_MapString.js";
 import * as Fonts from "../helpers/fonts";
 import * as ConfirmationStep from "../components/ConfirmationStep.bs.mjs";
+import * as DartsGameModeStep from "../components/DartsGameModeStep.bs.mjs";
 import * as JsxRuntime from "react/jsx-runtime";
 
 function Logger(props) {
@@ -38,6 +39,10 @@ function Logger(props) {
         return 0;
       });
   var setEarnedPoints = match$5[1];
+  var match$6 = React.useState(function () {
+        return "Foosball";
+      });
+  var gameMode = match$6[0];
   var reset = function () {
     setStep(function (param) {
           return "UserSelection";
@@ -68,21 +73,31 @@ function Logger(props) {
               setSelectedUsers: setSelectedUsers,
               reset: reset,
               setStep: setStep,
-              players: players
+              players: players,
+              gameMode: gameMode,
+              setGameMode: match$6[1]
             });
         break;
     case "ScoreForm" :
-        stepComponent = JsxRuntime.jsx(ScoreStep.make, {
-              selectedUsers: selectedUsers,
-              setStep: setStep,
-              reset: reset,
-              blueState: blueState,
-              setBlueState: setBlueState,
-              redState: redState,
-              setRedState: setRedState,
-              setEarnedPoints: setEarnedPoints,
-              players: players
-            });
+        stepComponent = gameMode === "Foosball" ? JsxRuntime.jsx(ScoreStep.make, {
+                selectedUsers: selectedUsers,
+                setStep: setStep,
+                reset: reset,
+                blueState: blueState,
+                setBlueState: setBlueState,
+                redState: redState,
+                setRedState: setRedState,
+                setEarnedPoints: setEarnedPoints,
+                players: players,
+                gameMode: gameMode
+              }) : JsxRuntime.jsx(DartsGameModeStep.make, {
+                selectedUsers: selectedUsers,
+                setStep: setStep,
+                reset: reset,
+                setEarnedPoints: setEarnedPoints,
+                players: players,
+                gameMode: gameMode
+              });
         break;
     case "Confirmation" :
         stepComponent = JsxRuntime.jsx(ConfirmationStep.make, {

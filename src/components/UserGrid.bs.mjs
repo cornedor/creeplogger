@@ -10,6 +10,8 @@ import * as Belt_MapString from "rescript/lib/es6/belt_MapString.js";
 import * as JsxRuntime from "react/jsx-runtime";
 
 function UserGrid(props) {
+  var gameMode = props.gameMode;
+  var players = props.players;
   var setStep = props.setStep;
   var setSelectedUsers = props.setSelectedUsers;
   var selectedUsers = props.selectedUsers;
@@ -17,11 +19,105 @@ function UserGrid(props) {
         return false;
       });
   var showQueueButtons = match[0];
-  var players = props.players.map(function (item) {
-        var match = Belt_MapString.get(selectedUsers, item.key);
+  var sorted;
+  sorted = gameMode === "Foosball" ? players : players.toSorted(function (a, b) {
+          return b.dartsGames - a.dartsGames | 0;
+        });
+  var players$1 = sorted.map(function (item) {
         var tmp;
-        tmp = match !== undefined ? (
-            match === "Blue" ? "ring-6 ring-blue" : "ring-6 ring-red"
+        tmp = showQueueButtons ? JsxRuntime.jsxs("div", {
+                children: [
+                  JsxRuntime.jsx("button", {
+                        children: "15m",
+                        className: "bg-gray-400 border-none cursor-pointer text-3xl text-black rounded-bl ring-inset ring-white hover:ring",
+                        onClick: (function (param) {
+                            setSelectedUsers(function (s) {
+                                  return Belt_MapString.set(s, item.key, "Blue");
+                                });
+                          })
+                      }),
+                  JsxRuntime.jsx("button", {
+                        children: "30m",
+                        className: "bg-gray-500 border-none cursor-pointer text-3xl text-black ring-inset ring-white hover:ring",
+                        onClick: (function (param) {
+                            setSelectedUsers(function (s) {
+                                  return Belt_MapString.set(s, item.key, "Blue");
+                                });
+                          })
+                      }),
+                  JsxRuntime.jsx("button", {
+                        children: "1h",
+                        className: "bg-gray-600 border-none cursor-pointer text-3xl text-white ring-inset ring-white hover:ring",
+                        onClick: (function (param) {
+                            setSelectedUsers(function (s) {
+                                  return Belt_MapString.set(s, item.key, "Blue");
+                                });
+                          })
+                      }),
+                  JsxRuntime.jsx("button", {
+                        children: "2h",
+                        className: "bg-gray-700 border-none cursor-pointer text-3xl text-white rounded-br ring-inset ring-white hover:ring",
+                        onClick: (function (param) {
+                            setSelectedUsers(function (s) {
+                                  return Belt_MapString.set(s, item.key, "Blue");
+                                });
+                          })
+                      })
+                ],
+                className: "grid grid-cols-4"
+              }) : (
+            gameMode === "Foosball" ? JsxRuntime.jsxs("div", {
+                    children: [
+                      JsxRuntime.jsx("button", {
+                            children: "Blauw",
+                            className: "bg-[#86b7ff] border-none cursor-pointer text-3xl rounded-bl text-black",
+                            onClick: (function (param) {
+                                setSelectedUsers(function (s) {
+                                      return Belt_MapString.set(s, item.key, "Blue");
+                                    });
+                              })
+                          }),
+                      JsxRuntime.jsx("button", {
+                            children: "Rood",
+                            className: "bg-[#ff8686] border-none cursor-pointer text-3xl rounded-br text-black",
+                            onClick: (function (param) {
+                                setSelectedUsers(function (s) {
+                                      return Belt_MapString.set(s, item.key, "Red");
+                                    });
+                              })
+                          })
+                    ],
+                    className: "grid grid-cols-2"
+                  }) : JsxRuntime.jsxs("div", {
+                    children: [
+                      JsxRuntime.jsx("button", {
+                            children: "Winner",
+                            className: "bg-green-400 border-none cursor-pointer text-3xl rounded-bl text-black",
+                            onClick: (function (param) {
+                                setSelectedUsers(function (s) {
+                                      return Belt_MapString.set(s, item.key, "Blue");
+                                    });
+                              })
+                          }),
+                      JsxRuntime.jsx("button", {
+                            children: "Loser",
+                            className: "bg-[#ff8686] border-none cursor-pointer text-3xl rounded-br text-black",
+                            onClick: (function (param) {
+                                setSelectedUsers(function (s) {
+                                      return Belt_MapString.set(s, item.key, "Red");
+                                    });
+                              })
+                          })
+                    ],
+                    className: "grid grid-cols-2"
+                  })
+          );
+        var match = Belt_MapString.get(selectedUsers, item.key);
+        var tmp$1;
+        tmp$1 = match !== undefined ? (
+            match === "Blue" ? (
+                gameMode === "Foosball" ? "ring-6 ring-blue" : "ring-6 ring-green-500"
+              ) : "ring-6 ring-red"
           ) : "ring-0";
         return JsxRuntime.jsxs(GridItem.make, {
                     active: Belt_MapString.has(selectedUsers, item.key),
@@ -38,73 +134,11 @@ function UserGrid(props) {
                                     });
                               })
                           }),
-                      showQueueButtons ? JsxRuntime.jsxs("div", {
-                              children: [
-                                JsxRuntime.jsx("button", {
-                                      children: "15m",
-                                      className: "bg-gray-400 border-none cursor-pointer text-3xl text-black rounded-bl ring-inset ring-white hover:ring",
-                                      onClick: (function (param) {
-                                          setSelectedUsers(function (s) {
-                                                return Belt_MapString.set(s, item.key, "Blue");
-                                              });
-                                        })
-                                    }),
-                                JsxRuntime.jsx("button", {
-                                      children: "30m",
-                                      className: "bg-gray-500 border-none cursor-pointer text-3xl text-black ring-inset ring-white hover:ring",
-                                      onClick: (function (param) {
-                                          setSelectedUsers(function (s) {
-                                                return Belt_MapString.set(s, item.key, "Blue");
-                                              });
-                                        })
-                                    }),
-                                JsxRuntime.jsx("button", {
-                                      children: "1h",
-                                      className: "bg-gray-600 border-none cursor-pointer text-3xl text-white ring-inset ring-white hover:ring",
-                                      onClick: (function (param) {
-                                          setSelectedUsers(function (s) {
-                                                return Belt_MapString.set(s, item.key, "Blue");
-                                              });
-                                        })
-                                    }),
-                                JsxRuntime.jsx("button", {
-                                      children: "2h",
-                                      className: "bg-gray-700 border-none cursor-pointer text-3xl text-white rounded-br ring-inset ring-white hover:ring",
-                                      onClick: (function (param) {
-                                          setSelectedUsers(function (s) {
-                                                return Belt_MapString.set(s, item.key, "Blue");
-                                              });
-                                        })
-                                    })
-                              ],
-                              className: "grid grid-cols-4"
-                            }) : JsxRuntime.jsxs("div", {
-                              children: [
-                                JsxRuntime.jsx("button", {
-                                      children: "Blauw",
-                                      className: "bg-[#86b7ff] border-none cursor-pointer text-3xl rounded-bl text-black",
-                                      onClick: (function (param) {
-                                          setSelectedUsers(function (s) {
-                                                return Belt_MapString.set(s, item.key, "Blue");
-                                              });
-                                        })
-                                    }),
-                                JsxRuntime.jsx("button", {
-                                      children: "Rood",
-                                      className: "bg-[#ff8686] border-none cursor-pointer text-3xl rounded-br text-black",
-                                      onClick: (function (param) {
-                                          setSelectedUsers(function (s) {
-                                                return Belt_MapString.set(s, item.key, "Red");
-                                              });
-                                        })
-                                    })
-                              ],
-                              className: "grid grid-cols-2"
-                            })
+                      tmp
                     ],
                     className: Cn.make([
                           "rounded bg-white grid grid-rows-user auto-rows-[1fr] h-[220px] transition-all relative",
-                          tmp
+                          tmp$1
                         ])
                   }, item.key);
       });
@@ -119,11 +153,13 @@ function UserGrid(props) {
                         }),
                       onReset: props.reset,
                       disabled: Belt_MapString.size(selectedUsers) <= 1,
-                      setShowQueueButtons: match[1]
+                      setShowQueueButtons: match[1],
+                      gameMode: gameMode,
+                      setGameMode: props.setGameMode
                     }),
                 JsxRuntime.jsxs("div", {
                       children: [
-                        players,
+                        players$1,
                         JsxRuntime.jsx(GridItem.make, {
                               active: false,
                               children: JsxRuntime.jsx(NewPlayerForm.make, {})

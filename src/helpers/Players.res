@@ -19,6 +19,12 @@ type player = {
   mattermostHandle: option<string>,
   lastGames: array<int>,
   hidden: option<bool>,
+  dartsElo: float,
+  dartsLastEloChange: float,
+  dartsGames: int,
+  dartsWins: int,
+  dartsLosses: int,
+  dartsLastGames: array<int>,
 }
 
 type team = Blue | Red
@@ -45,6 +51,12 @@ let playerSchema = Schema.object(s => {
   mattermostHandle: s.field("mh", Schema.option(Schema.string)->FirebaseSchema.nullableTransform),
   lastGames: s.fieldOr("lastGames", Schema.array(Schema.int), []),
   hidden: s.field("hidden", Schema.option(Schema.bool)->FirebaseSchema.nullableTransform),
+  dartsElo: s.fieldOr("dartsElo", Schema.float, 1000.0),
+  dartsLastEloChange: s.fieldOr("dartsChange", Schema.float, 0.0),
+  dartsGames: s.fieldOr("dartsGames", Schema.int, 0),
+  dartsWins: s.fieldOr("dartsWins", Schema.int, 0),
+  dartsLosses: s.fieldOr("dartsLosses", Schema.int, 0),
+  dartsLastGames: s.fieldOr("dartsLastGames", Schema.array(Schema.int), []),
 })
 
 let playersSchema = Schema.dict(playerSchema)
@@ -70,6 +82,12 @@ let addPlayer = async name => {
     mattermostHandle: None,
     lastGames: [],
     hidden: None,
+    dartsElo: 1000.0,
+    dartsLastEloChange: 0.0,
+    dartsGames: 0,
+    dartsWins: 0,
+    dartsLosses: 0,
+    dartsLastGames: [],
   }->Schema.serializeWith(playerSchema) {
   | Ok(data) => data
   | Error(_error) => panic("Could not serialize player")
@@ -205,6 +223,35 @@ let updateGameStats = (key, myTeamPoints, opponentTeamPoints, team: team, elo) =
           lastEloChange: elo -. player.elo,
           elo,
           lastGames: getLastGames(player.lastGames, isWin),
+        },
+        playerSchema,
+      ) {
+      | Ok(res) => res
+      | _ => data
+      }
+    | Error(_) => data
+    }
+  })
+}
+
+// In darts team points are 0 if the player lost, or 1 of the player won.
+let updateDartsGameStats = (key, myTeamPoints, elo) => {
+  let isWin = myTeamPoints == 1
+  let isLoss = myTeamPoints == 0
+
+  let playerRef = Firebase.Database.refPath(Database.database, bucket ++ "/" ++ key)
+  Firebase.Database.runTransaction(playerRef, data => {
+    switch data->Schema.parseWith(playerSchema) {
+    | Ok(player) =>
+      switch Schema.serializeWith(
+        {
+          ...player,
+          dartsGames: player.dartsGames + 1,
+          dartsWins: isWin ? player.dartsWins + 1 : player.dartsWins,
+          dartsLosses: isLoss ? player.dartsLosses + 1 : player.dartsLosses,
+          dartsLastGames: getLastGames(player.dartsLastGames, isWin),
+          dartsElo: elo,
+          dartsLastEloChange: elo -. player.dartsElo,
         },
         playerSchema,
       ) {

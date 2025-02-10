@@ -14,6 +14,7 @@ let make = (~players: array<Players.player>) => {
   let (redState, setRedState) = React.useState(_ => -1)
   let (blueState, setBlueState) = React.useState(_ => -1)
   let (earnedPoints, setEarnedPoints) = React.useState(_ => 0)
+  let (gameMode, setGameMode) = React.useState(_ => Games.Foosball)
 
   let reset = () => {
     setStep(_ => LoggerStep.UserSelection)
@@ -31,9 +32,12 @@ let make = (~players: array<Players.player>) => {
       value == winnerTeam
     )->Belt.Map.String.keysToArray
 
-  let stepComponent = switch step {
-  | UserSelection => <UserGrid selectedUsers setSelectedUsers reset setStep players />
-  | ScoreForm =>
+  let stepComponent = switch (step, gameMode) {
+  | (UserSelection, _) =>
+    <UserGrid selectedUsers setSelectedUsers reset setStep players gameMode setGameMode />
+  | (ScoreForm, Games.Darts) =>
+    <DartsGameModeStep selectedUsers setStep reset setEarnedPoints players gameMode />
+  | (ScoreForm, _) =>
     <ScoreStep
       selectedUsers
       setStep
@@ -44,8 +48,9 @@ let make = (~players: array<Players.player>) => {
       setBlueState
       setEarnedPoints
       players
+      gameMode
     />
-  | Confirmation => <ConfirmationStep winners={winners} score={earnedPoints} reset players />
+  | (Confirmation, _) => <ConfirmationStep winners={winners} score={earnedPoints} reset players />
   }
 
   <div

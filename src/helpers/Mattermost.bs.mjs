@@ -56,6 +56,31 @@ async function sendCreepsUpdate(bluePlayers, redPlayers, blueScore, redScore, po
   return 0;
 }
 
+async function sendDartsUpdate(winners, losers, points, mode) {
+  var winnerNames = winners.map(function (player) {
+          var handle = player.mattermostHandle;
+          if (handle !== undefined) {
+            return "@" + handle;
+          } else {
+            return player.name;
+          }
+        }).join(", ");
+  var loserNames = losers.map(function (player) {
+          var handle = player.mattermostHandle;
+          if (handle !== undefined) {
+            return "@" + handle;
+          } else {
+            return player.name;
+          }
+        }).join(", ");
+  var message = "### Nieuw darts potje geregistreerd!\n\nWinnaar: " + winnerNames + " (+" + points.toString() + ")\nVerliezer: " + loserNames + " (-" + points.toString() + ")\nGame mode: " + mode + "\n";
+  var promise = publishMessage(message);
+  if (promise !== undefined) {
+    await Caml_option.valFromOption(promise);
+  }
+  return 0;
+}
+
 async function sendDailyUpdate() {
   var overview = await Summary.getDailyOverview("Daily");
   var overviewArray = Array.from(overview.values()).toSorted(function (a, b) {
@@ -93,6 +118,7 @@ async function sendDaysWithoutReset(name) {
 
 export {
   sendCreepsUpdate ,
+  sendDartsUpdate ,
   publishMessage ,
   sendDailyUpdate ,
   sendDaysWithoutReset ,

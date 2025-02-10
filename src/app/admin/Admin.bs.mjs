@@ -6,9 +6,11 @@ import * as React from "react";
 import * as Button from "../../components/Button.bs.mjs";
 import * as Js_dict from "rescript/lib/es6/js_dict.js";
 import * as Players from "../../helpers/Players.bs.mjs";
+import * as Caml_obj from "rescript/lib/es6/caml_obj.js";
 import * as Database from "../../helpers/Database.bs.mjs";
 import * as LoginForm from "./LoginForm.bs.mjs";
 import Link from "next/link";
+import * as DartsGames from "../../helpers/DartsGames.bs.mjs";
 import * as Caml_option from "rescript/lib/es6/caml_option.js";
 import * as Core__Option from "@rescript/core/src/Core__Option.bs.mjs";
 import * as Auth from "firebase/auth";
@@ -22,6 +24,7 @@ function Admin(props) {
   var setUpdate = match[1];
   var players = Players.useAllPlayers(undefined, undefined);
   var games = Games.useLastGames();
+  var dartsGames = DartsGames.useLastGames();
   var content;
   if (user === null || user === undefined) {
     content = JsxRuntime.jsx(LoginForm.make, {});
@@ -108,26 +111,8 @@ function Admin(props) {
                                                                     className: "bg-slate-300 rounded py-1 px-3 text-black",
                                                                     onClick: (function (param) {
                                                                         var handle = prompt("New handle");
-                                                                        Players.writePlayer({
-                                                                              name: player.name,
-                                                                              wins: player.wins,
-                                                                              losses: player.losses,
-                                                                              absoluteWins: player.absoluteWins,
-                                                                              absoluteLosses: player.absoluteLosses,
-                                                                              games: player.games,
-                                                                              teamGoals: player.teamGoals,
-                                                                              teamGoalsAgainst: player.teamGoalsAgainst,
-                                                                              blueGames: player.blueGames,
-                                                                              redGames: player.redGames,
-                                                                              blueWins: player.blueWins,
-                                                                              redWins: player.redWins,
-                                                                              elo: player.elo,
-                                                                              lastEloChange: player.lastEloChange,
-                                                                              key: player.key,
-                                                                              mattermostHandle: (handle == null) ? undefined : Caml_option.some(handle),
-                                                                              lastGames: player.lastGames,
-                                                                              hidden: player.hidden
-                                                                            });
+                                                                        var newrecord = Caml_obj.obj_dup(player);
+                                                                        Players.writePlayer((newrecord.mattermostHandle = (handle == null) ? undefined : Caml_option.some(handle), newrecord));
                                                                       })
                                                                   }),
                                                               JsxRuntime.jsx("button", {
@@ -231,6 +216,99 @@ function Admin(props) {
                                                                       if (confirm("Are you sure you want to remove this (" + key + ") game?")) {
                                                                         console.log("Ok");
                                                                         Games.removeGame(key);
+                                                                        return ;
+                                                                      }
+                                                                      
+                                                                    })
+                                                                }),
+                                                            className: "px-2 py-1 flex gap-2"
+                                                          })
+                                                    ]
+                                                  }, game.date.toString());
+                                      })
+                                })
+                          ]
+                        })
+                  ]
+                }),
+            JsxRuntime.jsxs("details", {
+                  children: [
+                    JsxRuntime.jsx("summary", {
+                          children: "Last darts games",
+                          className: "p-2 bg-white/5 mt-2 hover:bg-white/10 select-none rounded"
+                        }),
+                    JsxRuntime.jsxs("table", {
+                          children: [
+                            JsxRuntime.jsx("thead", {
+                                  children: JsxRuntime.jsxs("tr", {
+                                        children: [
+                                          JsxRuntime.jsx("th", {
+                                                children: "Winners"
+                                              }),
+                                          JsxRuntime.jsx("th", {
+                                                children: "Losers"
+                                              }),
+                                          JsxRuntime.jsx("th", {
+                                                children: "When"
+                                              }),
+                                          JsxRuntime.jsx("th", {
+                                                children: "Mode"
+                                              }),
+                                          JsxRuntime.jsx("th", {
+                                                children: "Actions"
+                                              })
+                                        ]
+                                      })
+                                }),
+                            JsxRuntime.jsx("tbody", {
+                                  children: Js_dict.entries(dartsGames).toReversed().map(function (param) {
+                                        var game = param[1];
+                                        var key = param[0];
+                                        var winners = game.winners.map(function (player) {
+                                              var player$1 = players.find(function (p) {
+                                                    return p.key === player;
+                                                  });
+                                              if (player$1 !== undefined) {
+                                                return player$1.name;
+                                              } else {
+                                                return "...";
+                                              }
+                                            });
+                                        var losers = game.losers.map(function (player) {
+                                              var player$1 = players.find(function (p) {
+                                                    return p.key === player;
+                                                  });
+                                              if (player$1 !== undefined) {
+                                                return player$1.name;
+                                              } else {
+                                                return "...";
+                                              }
+                                            });
+                                        return JsxRuntime.jsxs("tr", {
+                                                    children: [
+                                                      JsxRuntime.jsx("td", {
+                                                            children: winners.join(", "),
+                                                            className: "px-2 py-1"
+                                                          }),
+                                                      JsxRuntime.jsx("td", {
+                                                            children: losers.join(", "),
+                                                            className: "px-2 py-1"
+                                                          }),
+                                                      JsxRuntime.jsx("td", {
+                                                            children: game.date.toISOString(),
+                                                            className: "px-2 py-1"
+                                                          }),
+                                                      JsxRuntime.jsx("td", {
+                                                            children: DartsGames.dartsModeToString(game.mode),
+                                                            className: "px-2 py-1"
+                                                          }),
+                                                      JsxRuntime.jsx("td", {
+                                                            children: JsxRuntime.jsx("button", {
+                                                                  children: "Remove",
+                                                                  className: "bg-slate-300 rounded py-1 px-3 text-black",
+                                                                  onClick: (function (param) {
+                                                                      if (confirm("Are you sure you want to remove this (" + key + ") game?")) {
+                                                                        DartsGames.removeGame(key);
                                                                         return ;
                                                                       }
                                                                       
