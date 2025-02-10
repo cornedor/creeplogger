@@ -38,8 +38,8 @@ export default function RootLayout({
       <head>
         <script
           defer
-          data-domain="creeplogger"
-          src="https://p.cd0.nl/js/script.js"
+          data-domain="creeplogger.vercel.app"
+          src="https://p.cd0.nl/js/script.pageview-props.tagged-events.js"
         ></script>
       </head>
       <body className={inter.className + " " + caveat.variable}>
