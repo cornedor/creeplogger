@@ -45,6 +45,13 @@ let make = (~selectedUsers, ~setStep, ~reset, ~setEarnedPoints, ~players, ~gameM
 
   let redUsers = selectedRedUsers->Array.map(mapUser)
 
+  let redPlayers =
+    selectedRedUsers->Array.map(key => Players.playerByKey(players, key)->Option.getExn)
+  let bluePlayers =
+    selectedBlueUsers->Array.map(key => Players.playerByKey(players, key)->Option.getExn)
+
+  let sendUpdate = Mattermost.sendDartsUpdate(bluePlayers, redPlayers, ...)
+
   let saveGame = async () => {
     setIsSaving(_ => true)
 
@@ -80,6 +87,11 @@ let make = (~selectedUsers, ~setStep, ~reset, ~setEarnedPoints, ~players, ~gameM
     )
 
     let _ = await Stats.updateDartsStats()
+
+    let _ = await sendUpdate(
+      roundedPoints,
+      DartsGames.dartsModeToString(dartMode->Option.getOr(DartsGames.Unknown)),
+    )
 
     setIsSaving(_ => false)
     setStep(step => LoggerStep.getNextStep(step))

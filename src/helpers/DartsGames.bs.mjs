@@ -41,6 +41,8 @@ function dartsModeToString(dartsMode) {
         return "501";
     case "M301" :
         return "301";
+    case "Unknown" :
+        return "Unknown";
     
   }
 }

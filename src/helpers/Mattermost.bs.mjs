@@ -73,7 +73,7 @@ async function sendDartsUpdate(winners, losers, points, mode) {
             return player.name;
           }
         }).join(", ");
-  var message = "### Nieuw darts potje geregistreerd!\n\nWinnaar: " + winnerNames + " (+" + points.toString() + ")\nVerliezer: " + loserNames + " (-" + points.toString() + ")\nGame mode: " + mode + "\n";
+  var message = "### 🎯 Nieuw darts potje geregistreerd!\n\nWinnaar: " + winnerNames + " (+" + points.toString() + ")\nVerliezer: " + loserNames + " (-" + points.toString() + ")\nGame mode: " + mode + "\n";
   var promise = publishMessage(message);
   if (promise !== undefined) {
     await Caml_option.valFromOption(promise);
