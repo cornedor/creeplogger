@@ -162,8 +162,8 @@ function writePlayer(player) {
 }
 
 function getLastGames(lastGames, win) {
-  lastGames.push(win ? 1 : 0);
-  return lastGames.slice(-5);
+  var newGames = lastGames.concat([win ? 1 : 0]);
+  return newGames.slice(-5);
 }
 
 function updateGameStats(key, myTeamPoints, opponentTeamPoints, team, elo) {
