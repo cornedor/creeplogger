@@ -35,6 +35,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="nl">
+      <head>
+        <script
+          defer
+          data-domain="creeplogger"
+          src="https://p.cd0.nl/js/script.js"
+        ></script>
+      </head>
       <body className={inter.className + " " + caveat.variable}>
         {children}
       </body>

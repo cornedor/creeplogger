@@ -31,12 +31,12 @@ let make = (
       <div className="flex justify-between flex-wrap text-white gap-5">
         <div className="flex items-center gap-5">
           <button
-            className="text-white w-[44px] aspect-square text-[26px] flex justify-center items-center -ml-3 rounded-full bg-black/0 transition-all ease-in-out duration-200 shadow-none hover:bg-black/20 hover:shadow-icon-button hover:ring-8 ring-black/20 active:bg-black/20 active:shadow-icon-button active:ring-8 "
+            className="text-white w-[44px] aspect-square text-[26px] flex justify-center items-center -ml-3 rounded-full bg-black/0 transition-all ease-in-out duration-200 shadow-none hover:bg-black/20 hover:shadow-icon-button hover:ring-8 ring-black/20 active:bg-black/20 active:shadow-icon-button active:ring-8 plausible-event-name=ShowScores"
             onClick={_ => setShowScores(_ => true)}>
             <ListIcon />
           </button>
           <button
-            className="text-white w-[44px] aspect-square text-[26px] flex justify-center items-center -ml-3 rounded-full bg-black/0 transition-all ease-in-out duration-200 shadow-none hover:bg-black/20 hover:shadow-icon-button hover:ring-8 ring-black/20 active:bg-black/20 active:shadow-icon-button active:ring-8 "
+            className="text-white w-[44px] aspect-square text-[26px] flex justify-center items-center -ml-3 rounded-full bg-black/0 transition-all ease-in-out duration-200 shadow-none hover:bg-black/20 hover:shadow-icon-button hover:ring-8 ring-black/20 active:bg-black/20 active:shadow-icon-button active:ring-8 plausible-event-name=ShowStats"
             onClick={_ => setShowStats(_ => true)}>
             <PieChartIcon />
           </button>
@@ -45,7 +45,7 @@ let make = (
             switch gameMode {
             | Games.Foosball =>
               <button
-                className="text-white w-[44px] aspect-square text-[26px] flex justify-center items-center -ml-3 rounded-full bg-black/0 transition-all ease-in-out duration-200 shadow-none hover:bg-black/20 hover:shadow-icon-button hover:ring-8 ring-black/20 active:bg-black/20 active:shadow-icon-button active:ring-8 "
+                className="text-white w-[44px] aspect-square text-[26px] flex justify-center items-center -ml-3 rounded-full bg-black/0 transition-all ease-in-out duration-200 shadow-none hover:bg-black/20 hover:shadow-icon-button hover:ring-8 ring-black/20 active:bg-black/20 active:shadow-icon-button active:ring-8  plausible-event-name=GameModeDarts"
                 onClick={_ => setGameMode(_ => Games.Darts)}>
                 <SoccerIcon />
               </button>
@@ -76,7 +76,11 @@ let make = (
         <div className="flex items-center gap-5">
           <span className={isConnected ? styles["connected"] : styles["disconnected"]} />
           <Button variant={Grey} onClick={_ => onReset()}> {React.string("Reset")} </Button>
-          <Button variant={Blue} onClick={_ => onNextStep()} disabled={!isConnected || disabled}>
+          <Button
+            variant={Blue}
+            onClick={_ => onNextStep()}
+            disabled={!isConnected || disabled}
+            className="plausible-event-name=NextStep">
             {React.string(nextLabel)}
           </Button>
         </div>
