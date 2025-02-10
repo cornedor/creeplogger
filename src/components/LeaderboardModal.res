@@ -1,5 +1,5 @@
 @react.component
-let make = (~show, ~setShow, ~gameMode) => {
+let make = (~show, ~setShow, ~gameMode, ~setGameMode) => {
   let (order, setOrder) = React.useState(_ => true)
   let players = Players.useAllPlayers(~orderBy=#elo, ~asc=order)
 
@@ -10,8 +10,26 @@ let make = (~show, ~setShow, ~gameMode) => {
   <div
     className="modal"
     style={ReactDOM.Style.make(~transform=show ? "translateX(0)" : "translateX(-100%)", ())}>
-    <header>
+    <header className="flex items-center gap-5">
       <Button onClick={_ => setShow(s => !s)} variant={Blue}> {React.string("Terug")} </Button>
+      {switch setGameMode {
+      | Some(setGameMode) =>
+        switch gameMode {
+        | Games.Foosball =>
+          <button
+            className="text-white w-[44px] aspect-square text-[26px] flex justify-center items-center rounded-full bg-black/0 transition-all ease-in-out duration-200 shadow-none hover:bg-black/20 hover:shadow-icon-button hover:ring-8 ring-black/20 active:bg-black/20 active:shadow-icon-button active:ring-8"
+            onClick={_ => setGameMode(_ => Games.Darts)}>
+            <SoccerIcon />
+          </button>
+        | Games.Darts =>
+          <button
+            className="text-white w-[44px] aspect-square text-[26px] flex justify-center items-center rounded-full bg-black/0 transition-all ease-in-out duration-200 shadow-none hover:bg-black/20 hover:shadow-icon-button hover:ring-8 ring-black/20 active:bg-black/20 active:shadow-icon-button active:ring-8"
+            onClick={_ => setGameMode(_ => Games.Foosball)}>
+            <DartsIcon />
+          </button>
+        }
+      | None => React.null
+      }}
     </header>
     <table className="table-fixed w-full mt-8">
       <thead>

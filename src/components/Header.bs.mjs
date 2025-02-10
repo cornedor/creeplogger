@@ -78,7 +78,8 @@ function Header(props) {
                 JsxRuntime.jsx(LeaderboardModal.make, {
                       show: match[0],
                       setShow: setShowScores,
-                      gameMode: gameMode
+                      gameMode: gameMode,
+                      setGameMode: setGameMode
                     }),
                 JsxRuntime.jsx(StatsModal.make, {
                       show: match$1[0],

@@ -22,7 +22,9 @@ let make = (
   }
 
   <>
-    <LeaderboardModal show={showScores} setShow={setShowScores} gameMode={gameMode} />
+    <LeaderboardModal
+      show={showScores} setShow={setShowScores} gameMode={gameMode} setGameMode={setGameMode}
+    />
     <StatsModal show={showStats} setShow={setShowStats} />
     <div
       className="px-10 py-5 sticky top-0 bg-overlay z-40 backdrop-blur-overlay backdrop-saturate-overlay">

@@ -4,9 +4,12 @@ import * as Elo from "../helpers/Elo.bs.mjs";
 import * as React from "react";
 import * as Button from "./Button.bs.mjs";
 import * as Players from "../helpers/Players.bs.mjs";
+import * as DartsIcon from "./DartsIcon.bs.mjs";
+import * as SoccerIcon from "./SoccerIcon.bs.mjs";
 import * as JsxRuntime from "react/jsx-runtime";
 
 function LeaderboardModal(props) {
+  var setGameMode = props.setGameMode;
   var gameMode = props.gameMode;
   var setShow = props.setShow;
   var match = React.useState(function () {
@@ -24,18 +27,42 @@ function LeaderboardModal(props) {
   var skipped = {
     contents: 0
   };
+  var tmp;
+  tmp = setGameMode !== undefined ? (
+      gameMode === "Foosball" ? JsxRuntime.jsx("button", {
+              children: JsxRuntime.jsx(SoccerIcon.make, {}),
+              className: "text-white w-[44px] aspect-square text-[26px] flex justify-center items-center rounded-full bg-black/0 transition-all ease-in-out duration-200 shadow-none hover:bg-black/20 hover:shadow-icon-button hover:ring-8 ring-black/20 active:bg-black/20 active:shadow-icon-button active:ring-8",
+              onClick: (function (param) {
+                  setGameMode(function (param) {
+                        return "Darts";
+                      });
+                })
+            }) : JsxRuntime.jsx("button", {
+              children: JsxRuntime.jsx(DartsIcon.make, {}),
+              className: "text-white w-[44px] aspect-square text-[26px] flex justify-center items-center rounded-full bg-black/0 transition-all ease-in-out duration-200 shadow-none hover:bg-black/20 hover:shadow-icon-button hover:ring-8 ring-black/20 active:bg-black/20 active:shadow-icon-button active:ring-8",
+              onClick: (function (param) {
+                  setGameMode(function (param) {
+                        return "Foosball";
+                      });
+                })
+            })
+    ) : null;
   return JsxRuntime.jsxs("div", {
               children: [
-                JsxRuntime.jsx("header", {
-                      children: JsxRuntime.jsx(Button.make, {
-                            variant: "Blue",
-                            onClick: (function (param) {
-                                setShow(function (s) {
-                                      return !s;
-                                    });
-                              }),
-                            children: "Terug"
-                          })
+                JsxRuntime.jsxs("header", {
+                      children: [
+                        JsxRuntime.jsx(Button.make, {
+                              variant: "Blue",
+                              onClick: (function (param) {
+                                  setShow(function (s) {
+                                        return !s;
+                                      });
+                                }),
+                              children: "Terug"
+                            }),
+                        tmp
+                      ],
+                      className: "flex items-center gap-5"
                     }),
                 JsxRuntime.jsxs("table", {
                       children: [
