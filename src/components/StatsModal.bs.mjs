@@ -27,9 +27,9 @@ function StatsModal(props) {
                             children: "Terug"
                           })
                     }),
-                JsxRuntime.jsx("em", {
-                      children: "WIP: Misschien komt hier ooit wat mooiers voor, maar hier is alvast wat.",
-                      className: "py-2 inline-block"
+                JsxRuntime.jsx("h2", {
+                      children: "Foosball",
+                      className: "pt-5 mb-4 block text-2xl"
                     }),
                 JsxRuntime.jsxs("ul", {
                       children: [
@@ -87,6 +87,30 @@ function StatsModal(props) {
                               background: "conic-gradient(#86b7ff, #1c77ff " + bluePercentages + "%, #ff3e6e " + bluePercentages + "%, #ff0055)"
                             }
                           })
+                    }),
+                JsxRuntime.jsx("hr", {}),
+                JsxRuntime.jsxs("div", {
+                      children: [
+                        JsxRuntime.jsx("h2", {
+                              children: "Darts",
+                              className: "pt-5 mb-4 block text-2xl"
+                            }),
+                        JsxRuntime.jsx("ul", {
+                              children: JsxRuntime.jsxs("li", {
+                                    children: [
+                                      JsxRuntime.jsx("strong", {
+                                            children: "Total games: "
+                                          }),
+                                      JsxRuntime.jsx("span", {
+                                            children: stats.totalDartsGames
+                                          })
+                                    ],
+                                    className: "p-2 rounded border-white/20 border bg-white/5 flex justify-between"
+                                  }),
+                              className: "grid grid-cols-2 gap-2"
+                            }),
+                        JsxRuntime.jsx("br", {})
+                      ]
                     }),
                 JsxRuntime.jsx("hr", {}),
                 JsxRuntime.jsxs("div", {

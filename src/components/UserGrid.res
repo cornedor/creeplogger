@@ -16,7 +16,7 @@ let make = (
       className={Cn.make([
         "rounded bg-white grid grid-rows-user auto-rows-[1fr] h-[220px] transition-all relative",
         switch (Belt.Map.String.get(selectedUsers, item.key), gameMode) {
-        | (Some(Players.Blue), Games.Fussball) => "ring-6 ring-blue"
+        | (Some(Players.Blue), Games.Foosball) => "ring-6 ring-blue"
         | (Some(Players.Blue), Games.Darts) => "ring-6 ring-green-500"
         | (Some(Players.Red), _) => "ring-6 ring-red"
         | _ => "ring-0"
@@ -66,7 +66,7 @@ let make = (
             {React.string("Loser")}
           </button>
         </div>
-      | (Games.Fussball, _) =>
+      | (Games.Foosball, _) =>
         <div className="grid grid-cols-2">
           <button
             onClick={_ => setSelectedUsers(s => Belt.Map.String.set(s, item.key, Players.Blue))}

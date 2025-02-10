@@ -40,7 +40,7 @@ function Logger(props) {
       });
   var setEarnedPoints = match$5[1];
   var match$6 = React.useState(function () {
-        return "Fussball";
+        return "Foosball";
       });
   var gameMode = match$6[0];
   var reset = function () {
@@ -79,7 +79,7 @@ function Logger(props) {
             });
         break;
     case "ScoreForm" :
-        stepComponent = gameMode === "Fussball" ? JsxRuntime.jsx(ScoreStep.make, {
+        stepComponent = gameMode === "Foosball" ? JsxRuntime.jsx(ScoreStep.make, {
                 selectedUsers: selectedUsers,
                 setStep: setStep,
                 reset: reset,

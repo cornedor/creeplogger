@@ -58,7 +58,7 @@ let make = (~show, ~setShow, ~gameMode) => {
               player.dartsWins,
               player.dartsGames,
             )
-          | Games.Fussball => (
+          | Games.Foosball => (
               player.elo,
               player.lastEloChange,
               player.lastGames,

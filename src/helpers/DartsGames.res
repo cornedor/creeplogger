@@ -68,3 +68,65 @@ let addDartsGame = dartsGame => {
   | Error(_) => panic("Could not create darts game")
   }
 }
+
+external snapshotToArray: dataSnapshot => array<dataSnapshot> = "%identity"
+
+let fetchAllGames = async () => {
+  let games =
+    await Firebase.Database.query1(
+      Firebase.Database.refPath(Database.database, "dartsGames"),
+      Firebase.Database.orderByChild("date"),
+    )->Firebase.Database.get
+
+  let orderedGames = []
+  Array.forEach(snapshotToArray(games), snap => {
+    switch snap->Firebase.Database.Snapshot.val->Nullable.toOption {
+    | Some(val) =>
+      switch val->Schema.parseWith(dartsGameSchema) {
+      | Ok(val) => orderedGames->Array.push(val)
+      | Error(e) => Js.log(e)
+      }
+    | None => ()
+    }
+  })
+
+  orderedGames
+}
+
+let removeGame = gameKey => {
+  let gameRef = Firebase.Database.refPath(Database.database, "dartsGames/" ++ gameKey)
+  Firebase.Database.remove(gameRef)
+}
+
+let empty: Js.Dict.t<dartsGame> = Js.Dict.empty()
+let useLastGames = () => {
+  let (games, setGames) = React.useState(_ => empty)
+  let gamesRef = Firebase.Database.query1(
+    Firebase.Database.refPath(Database.database, "dartsGames"),
+    Firebase.Database.orderByChild("date"),
+  )
+  React.useEffect(() => {
+    let unsubscribe = Firebase.Database.onValue(
+      gamesRef,
+      snapshot => {
+        let games = switch Firebase.Database.Snapshot.val(snapshot)->Nullable.toOption {
+        | Some(val) =>
+          switch val->Schema.parseWith(Schema.dict(dartsGameSchema)) {
+          | Ok(val) => val
+          | Error(e) => {
+              Js.log(e)
+              Js.Dict.empty()
+            }
+          }
+        | None => empty
+        }
+        setGames(_ => games)
+      },
+      (),
+    )
+
+    Some(unsubscribe)
+  }, [setGames])
+
+  games
+}

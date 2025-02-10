@@ -15,3 +15,9 @@ type dartsGame = {
 let addDartsGame: dartsGame => promise<Firebase.databaseReference>
 
 let dartsModeToString: dartsMode => string
+
+let fetchAllGames: unit => promise<array<dartsGame>>
+
+let removeGame: string => promise<unit>
+
+let useLastGames: unit => Js.Dict.t<dartsGame>

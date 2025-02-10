@@ -14,7 +14,7 @@ let make = (~players: array<Players.player>) => {
   let (redState, setRedState) = React.useState(_ => -1)
   let (blueState, setBlueState) = React.useState(_ => -1)
   let (earnedPoints, setEarnedPoints) = React.useState(_ => 0)
-  let (gameMode, setGameMode) = React.useState(_ => Games.Fussball)
+  let (gameMode, setGameMode) = React.useState(_ => Games.Foosball)
 
   let reset = () => {
     setStep(_ => LoggerStep.UserSelection)

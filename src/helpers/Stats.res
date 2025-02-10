@@ -124,6 +124,7 @@ let writeStats = async stats => {
 
 let recalculateStats = async () => {
   let games = await Games.fetchAllGames()
+  let dartsGames = await DartsGames.fetchAllGames()
   let players = await Players.fetchAllPlayers()
 
   let playerKeys = Dict.keysToArray(players)
@@ -134,6 +135,7 @@ let recalculateStats = async () => {
       key,
       {
         ...player,
+        // Regular game stats
         games: 0,
         teamGoals: 0,
         teamGoalsAgainst: 0,
@@ -148,12 +150,20 @@ let recalculateStats = async () => {
         elo: 1000.0,
         lastEloChange: 0.0,
         lastGames: [],
+        // Darts game stats
+        dartsGames: 0,
+        dartsWins: 0,
+        dartsLosses: 0,
+        dartsElo: 1000.0,
+        dartsLastEloChange: 0.0,
+        dartsLastGames: [],
       },
     )
   })
 
   let stats: stats = empty
 
+  // Process regular games
   let stats = games->Array.reduce(stats, (stats, game) => {
     let blueWin = Rules.isBlueWin(game.redScore, game.blueScore)
     let redWin = Rules.isRedWin(game.redScore, game.blueScore)
@@ -210,8 +220,6 @@ let recalculateStats = async () => {
       )
     })
 
-    // Js.log(points)
-
     {
       totalGames: stats.totalGames + 1,
       totalRedWins: stats.totalRedWins + (redWin ? 1 : 0),
@@ -221,17 +229,63 @@ let recalculateStats = async () => {
     }
   })
 
+  // Process darts games
+  let stats = dartsGames->Array.reduce(stats, (stats, game) => {
+    let winners = game.winners->Array.map(key => Dict.get(players, key)->Option.getExn)
+    let losers = game.losers->Array.map(key => Dict.get(players, key)->Option.getExn)
+
+    let (winners, losers, _) = Elo.calculateScore(winners, losers, ~getEloFn=player =>
+      player.dartsElo
+    )
+
+    Array.forEach(winners, player => {
+      let lastGames = Players.getLastGames(player.dartsLastGames, true)
+      Dict.set(
+        players,
+        player.key,
+        {
+          ...player,
+          dartsGames: player.dartsGames + 1,
+          dartsWins: player.dartsWins + 1,
+          dartsLastGames: lastGames,
+          dartsElo: player.elo,
+          dartsLastEloChange: player.lastEloChange,
+        },
+      )
+    })
+
+    Array.forEach(losers, player => {
+      let lastGames = Players.getLastGames(player.dartsLastGames, false)
+      Dict.set(
+        players,
+        player.key,
+        {
+          ...player,
+          dartsGames: player.dartsGames + 1,
+          dartsLosses: player.dartsLosses + 1,
+          dartsLastGames: lastGames,
+          dartsElo: player.elo,
+          dartsLastEloChange: player.lastEloChange,
+        },
+      )
+    })
+
+    {
+      ...stats,
+      totalDartsGames: stats.totalDartsGames + 1,
+    }
+  })
+
   Js.log(stats)
   Js.log(players)
 
   let _ = await Promise.all(
-    Array.map(playerKeys, key => {
+    playerKeys->Array.map(key => {
       let player = Dict.get(players, key)->Option.getExn
       Players.writePlayer(player)
     }),
   )
 
   await writeStats(stats)
-
   stats
 }

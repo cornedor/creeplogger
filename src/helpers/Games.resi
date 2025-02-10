@@ -2,7 +2,7 @@ type modifier = Handicap(int, int) | OneVOne
 
 type peroid = Daily | Weekly | Monthly | All
 
-type gameMode = Fussball | Darts
+type gameMode = Foosball | Darts
 
 type game = {
   blueScore: int,

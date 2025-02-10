@@ -8,6 +8,7 @@ import * as Schema from "./Schema.bs.mjs";
 import * as Players from "./Players.bs.mjs";
 import * as Caml_obj from "rescript/lib/es6/caml_obj.js";
 import * as Database from "./Database.bs.mjs";
+import * as DartsGames from "./DartsGames.bs.mjs";
 import * as Core__Array from "@rescript/core/src/Core__Array.bs.mjs";
 import * as Core__Option from "@rescript/core/src/Core__Option.bs.mjs";
 import * as RescriptCore from "@rescript/core/src/RescriptCore.bs.mjs";
@@ -132,11 +133,18 @@ async function writeStats(stats) {
 
 async function recalculateStats() {
   var games = await Games.fetchAllGames();
+  var dartsGames = await DartsGames.fetchAllGames();
   var players = await Players.fetchAllPlayers();
   var playerKeys = Object.keys(players);
   playerKeys.forEach(function (key) {
         var player = Core__Option.getExn(players[key], undefined);
         var newrecord = Caml_obj.obj_dup(player);
+        newrecord.dartsLastGames = [];
+        newrecord.dartsLosses = 0;
+        newrecord.dartsWins = 0;
+        newrecord.dartsGames = 0;
+        newrecord.dartsLastEloChange = 0.0;
+        newrecord.dartsElo = 1000.0;
         newrecord.lastGames = [];
         newrecord.lastEloChange = 0.0;
         newrecord.elo = 1000.0;
@@ -218,14 +226,52 @@ async function recalculateStats() {
                   totalDartsGames: stats.totalDartsGames
                 };
         }));
-  console.log(stats);
+  var stats$1 = Core__Array.reduce(dartsGames, stats, (function (stats, game) {
+          var winners = game.winners.map(function (key) {
+                return Core__Option.getExn(players[key], undefined);
+              });
+          var losers = game.losers.map(function (key) {
+                return Core__Option.getExn(players[key], undefined);
+              });
+          var match = Elo.calculateScore(winners, losers, (function (player) {
+                  return player.dartsElo;
+                }));
+          match[0].forEach(function (player) {
+                var lastGames = Players.getLastGames(player.dartsLastGames, true);
+                var newrecord = Caml_obj.obj_dup(player);
+                newrecord.dartsLastGames = lastGames;
+                newrecord.dartsWins = player.dartsWins + 1 | 0;
+                newrecord.dartsGames = player.dartsGames + 1 | 0;
+                newrecord.dartsLastEloChange = player.lastEloChange;
+                newrecord.dartsElo = player.elo;
+                players[player.key] = newrecord;
+              });
+          match[1].forEach(function (player) {
+                var lastGames = Players.getLastGames(player.dartsLastGames, false);
+                var newrecord = Caml_obj.obj_dup(player);
+                newrecord.dartsLastGames = lastGames;
+                newrecord.dartsLosses = player.dartsLosses + 1 | 0;
+                newrecord.dartsGames = player.dartsGames + 1 | 0;
+                newrecord.dartsLastEloChange = player.lastEloChange;
+                newrecord.dartsElo = player.elo;
+                players[player.key] = newrecord;
+              });
+          return {
+                  totalGames: stats.totalGames,
+                  totalRedWins: stats.totalRedWins,
+                  totalBlueWins: stats.totalBlueWins,
+                  totalAbsoluteWins: stats.totalAbsoluteWins,
+                  totalDartsGames: stats.totalDartsGames + 1 | 0
+                };
+        }));
+  console.log(stats$1);
   console.log(players);
   await Promise.all(playerKeys.map(function (key) {
             var player = Core__Option.getExn(players[key], undefined);
             return Players.writePlayer(player);
           }));
-  await writeStats(stats);
-  return stats;
+  await writeStats(stats$1);
+  return stats$1;
 }
 
 export {

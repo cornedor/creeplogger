@@ -61,7 +61,7 @@ function UserGrid(props) {
                 ],
                 className: "grid grid-cols-4"
               }) : (
-            gameMode === "Fussball" ? JsxRuntime.jsxs("div", {
+            gameMode === "Foosball" ? JsxRuntime.jsxs("div", {
                     children: [
                       JsxRuntime.jsx("button", {
                             children: "Blauw",
@@ -111,7 +111,7 @@ function UserGrid(props) {
         var tmp$1;
         tmp$1 = match !== undefined ? (
             match === "Blue" ? (
-                gameMode === "Fussball" ? "ring-6 ring-blue" : "ring-6 ring-green-500"
+                gameMode === "Foosball" ? "ring-6 ring-blue" : "ring-6 ring-green-500"
               ) : "ring-6 ring-red"
           ) : "ring-0";
         return JsxRuntime.jsxs(GridItem.make, {

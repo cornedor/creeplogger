@@ -86,7 +86,7 @@ function LeaderboardModal(props) {
                                       var match = player.hidden;
                                       var isHidden = match !== undefined && match ? false : true;
                                       var match$1;
-                                      match$1 = gameMode === "Fussball" ? [
+                                      match$1 = gameMode === "Foosball" ? [
                                           player.elo,
                                           player.games
                                         ] : [
@@ -102,7 +102,7 @@ function LeaderboardModal(props) {
                                       }
                                     }).map(function (player) {
                                     var match;
-                                    match = gameMode === "Fussball" ? [
+                                    match = gameMode === "Foosball" ? [
                                         player.elo,
                                         player.lastEloChange,
                                         player.lastGames,
