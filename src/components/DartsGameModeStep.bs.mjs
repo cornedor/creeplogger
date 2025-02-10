@@ -9,6 +9,7 @@ import * as Players from "../helpers/Players.bs.mjs";
 import * as Caml_obj from "rescript/lib/es6/caml_obj.js";
 import * as DartsGames from "../helpers/DartsGames.bs.mjs";
 import * as LoggerStep from "../helpers/LoggerStep.bs.mjs";
+import * as Mattermost from "../helpers/Mattermost.bs.mjs";
 import * as Core__Option from "@rescript/core/src/Core__Option.bs.mjs";
 import * as Belt_MapString from "rescript/lib/es6/belt_MapString.js";
 import * as JsxRuntime from "react/jsx-runtime";
@@ -67,6 +68,15 @@ function DartsGameModeStep(props) {
             })));
   var blueUsers = selectedBlueUsers.map(mapUser);
   var redUsers = selectedRedUsers.map(mapUser);
+  var redPlayers = selectedRedUsers.map(function (key) {
+        return Core__Option.getExn(Players.playerByKey(players, key), undefined);
+      });
+  var bluePlayers = selectedBlueUsers.map(function (key) {
+        return Core__Option.getExn(Players.playerByKey(players, key), undefined);
+      });
+  var sendUpdate = function (extra, extra$1) {
+    return Mattermost.sendDartsUpdate(bluePlayers, redPlayers, extra, extra$1);
+  };
   var saveGame = async function () {
     setIsSaving(function (param) {
           return true;
@@ -97,6 +107,7 @@ function DartsGameModeStep(props) {
               return Players.updateDartsGameStats(player.key, 0, player.elo);
             }));
     await Stats.updateDartsStats();
+    await sendUpdate(roundedPoints, DartsGames.dartsModeToString(Core__Option.getOr(dartMode, "Unknown")));
     setIsSaving(function (param) {
           return false;
         });

@@ -96,7 +96,7 @@ let sendDartsUpdate = async (
     )
     ->Array.join(", ")
 
-  let message = `### Nieuw darts potje geregistreerd!
+  let message = `### 🎯 Nieuw darts potje geregistreerd!
 
 Winnaar: ${winnerNames} (+${points->Int.toString})
 Verliezer: ${loserNames} (-${points->Int.toString})

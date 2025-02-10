@@ -6,6 +6,7 @@ type dartsMode =
   | Killer
   | M501
   | M301
+  | Unknown
 
 type dartsGame = {
   winners: array<string>,
@@ -44,6 +45,7 @@ let dartsModeToString = dartsMode => {
   | Killer => "Killer"
   | M501 => "501"
   | M301 => "301"
+  | Unknown => "Unknown"
   }
 }
 

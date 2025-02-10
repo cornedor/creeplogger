@@ -4,6 +4,7 @@ type dartsMode =
   | Killer
   | M501
   | M301
+  | Unknown
 
 type dartsGame = {
   winners: array<string>,
