@@ -188,8 +188,8 @@ let writePlayer = (player: player) => {
 }
 
 let getLastGames = (lastGames, win) => {
-  Array.push(lastGames, win ? 1 : 0)
-  lastGames->Array.sliceToEnd(~start=-5)
+  let newGames = Array.concat(lastGames, [win ? 1 : 0])
+  newGames->Array.sliceToEnd(~start=-5)
 }
 
 let updateGameStats = (key, myTeamPoints, opponentTeamPoints, team: team, elo) => {
