@@ -11,6 +11,7 @@ import * as JsxRuntime from "react/jsx-runtime";
 
 function UserGrid(props) {
   var gameMode = props.gameMode;
+  var players = props.players;
   var setStep = props.setStep;
   var setSelectedUsers = props.setSelectedUsers;
   var selectedUsers = props.selectedUsers;
@@ -18,7 +19,11 @@ function UserGrid(props) {
         return false;
       });
   var showQueueButtons = match[0];
-  var players = props.players.map(function (item) {
+  var sorted;
+  sorted = gameMode === "Foosball" ? players : players.toSorted(function (a, b) {
+          return b.dartsGames - a.dartsGames | 0;
+        });
+  var players$1 = sorted.map(function (item) {
         var tmp;
         tmp = showQueueButtons ? JsxRuntime.jsxs("div", {
                 children: [
@@ -154,7 +159,7 @@ function UserGrid(props) {
                     }),
                 JsxRuntime.jsxs("div", {
                       children: [
-                        players,
+                        players$1,
                         JsxRuntime.jsx(GridItem.make, {
                               active: false,
                               children: JsxRuntime.jsx(NewPlayerForm.make, {})

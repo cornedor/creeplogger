@@ -9,7 +9,11 @@ let make = (
   ~setGameMode,
 ) => {
   let (showQueueButtons, setShowQueueButtons) = React.useState(_ => false)
-  let players = players->Js.Array2.map(item =>
+  let sorted = switch gameMode {
+  | Games.Foosball => players
+  | Games.Darts => players->Array.toSorted((a, b) => Int.toFloat(b.dartsGames - a.dartsGames))
+  }
+  let players = sorted->Js.Array2.map(item =>
     <GridItem
       key={item.key}
       active={Belt.Map.String.has(selectedUsers, item.key)}
