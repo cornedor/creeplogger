@@ -28,7 +28,7 @@ let make = (
       ])}>
       <button
         onClick={_ => setSelectedUsers(s => Belt.Map.String.remove(s, item.key))}
-        className="text-black text-3xl min-w-0 max-w-full">
+        className="text-black text-3xl min-w-0 max-w-full plausible-event-name=ResetUser">
         <b className="text-ellipsis max-w-full overflow-hidden inline-block p-2">
           {React.string(item.name)}
         </b>
@@ -61,12 +61,12 @@ let make = (
         <div className="grid grid-cols-2">
           <button
             onClick={_ => setSelectedUsers(s => Belt.Map.String.set(s, item.key, Players.Blue))}
-            className="bg-green-400 border-none cursor-pointer text-3xl rounded-bl text-black">
+            className="bg-green-400 border-none cursor-pointer text-3xl rounded-bl text-black plausible-event-name=SelectWinner">
             {React.string("Winner")}
           </button>
           <button
             onClick={_ => setSelectedUsers(s => Belt.Map.String.set(s, item.key, Players.Red))}
-            className="bg-[#ff8686] border-none cursor-pointer text-3xl rounded-br text-black">
+            className="bg-[#ff8686] border-none cursor-pointer text-3xl rounded-br text-black plausible-event-name=SelectLoser">
             {React.string("Loser")}
           </button>
         </div>
@@ -74,12 +74,12 @@ let make = (
         <div className="grid grid-cols-2">
           <button
             onClick={_ => setSelectedUsers(s => Belt.Map.String.set(s, item.key, Players.Blue))}
-            className="bg-[#86b7ff] border-none cursor-pointer text-3xl rounded-bl text-black">
+            className="bg-[#86b7ff] border-none cursor-pointer text-3xl rounded-bl text-black plausible-event-name=SelectBlue">
             {React.string("Blauw")}
           </button>
           <button
             onClick={_ => setSelectedUsers(s => Belt.Map.String.set(s, item.key, Players.Red))}
-            className="bg-[#ff8686] border-none cursor-pointer text-3xl rounded-br text-black">
+            className="bg-[#ff8686] border-none cursor-pointer text-3xl rounded-br text-black plausible-event-name=SelectRed">
             {React.string("Rood")}
           </button>
         </div>

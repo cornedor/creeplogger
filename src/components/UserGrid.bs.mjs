@@ -70,7 +70,7 @@ function UserGrid(props) {
                     children: [
                       JsxRuntime.jsx("button", {
                             children: "Blauw",
-                            className: "bg-[#86b7ff] border-none cursor-pointer text-3xl rounded-bl text-black",
+                            className: "bg-[#86b7ff] border-none cursor-pointer text-3xl rounded-bl text-black plausible-event-name=SelectBlue",
                             onClick: (function (param) {
                                 setSelectedUsers(function (s) {
                                       return Belt_MapString.set(s, item.key, "Blue");
@@ -79,7 +79,7 @@ function UserGrid(props) {
                           }),
                       JsxRuntime.jsx("button", {
                             children: "Rood",
-                            className: "bg-[#ff8686] border-none cursor-pointer text-3xl rounded-br text-black",
+                            className: "bg-[#ff8686] border-none cursor-pointer text-3xl rounded-br text-black plausible-event-name=SelectRed",
                             onClick: (function (param) {
                                 setSelectedUsers(function (s) {
                                       return Belt_MapString.set(s, item.key, "Red");
@@ -92,7 +92,7 @@ function UserGrid(props) {
                     children: [
                       JsxRuntime.jsx("button", {
                             children: "Winner",
-                            className: "bg-green-400 border-none cursor-pointer text-3xl rounded-bl text-black",
+                            className: "bg-green-400 border-none cursor-pointer text-3xl rounded-bl text-black plausible-event-name=SelectWinner",
                             onClick: (function (param) {
                                 setSelectedUsers(function (s) {
                                       return Belt_MapString.set(s, item.key, "Blue");
@@ -101,7 +101,7 @@ function UserGrid(props) {
                           }),
                       JsxRuntime.jsx("button", {
                             children: "Loser",
-                            className: "bg-[#ff8686] border-none cursor-pointer text-3xl rounded-br text-black",
+                            className: "bg-[#ff8686] border-none cursor-pointer text-3xl rounded-br text-black plausible-event-name=SelectLoser",
                             onClick: (function (param) {
                                 setSelectedUsers(function (s) {
                                       return Belt_MapString.set(s, item.key, "Red");
@@ -127,7 +127,7 @@ function UserGrid(props) {
                                   children: item.name,
                                   className: "text-ellipsis max-w-full overflow-hidden inline-block p-2"
                                 }),
-                            className: "text-black text-3xl min-w-0 max-w-full",
+                            className: "text-black text-3xl min-w-0 max-w-full plausible-event-name=ResetUser",
                             onClick: (function (param) {
                                 setSelectedUsers(function (s) {
                                       return Belt_MapString.remove(s, item.key);
