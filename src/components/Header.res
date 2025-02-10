@@ -7,6 +7,8 @@ let make = (
   ~onReset,
   ~disabled=false,
   ~setShowQueueButtons,
+  ~gameMode,
+  ~setGameMode,
 ) => {
   let user = Database.useUser()
   let (showScores, setShowScores) = React.useState(_ => false)
@@ -20,7 +22,7 @@ let make = (
   }
 
   <>
-    <LeaderboardModal show={showScores} setShow={setShowScores} />
+    <LeaderboardModal show={showScores} setShow={setShowScores} gameMode={gameMode} />
     <StatsModal show={showStats} setShow={setShowStats} />
     <div
       className="px-10 py-5 sticky top-0 bg-overlay z-40 backdrop-blur-overlay backdrop-saturate-overlay">
@@ -36,6 +38,24 @@ let make = (
             onClick={_ => setShowStats(_ => true)}>
             <PieChartIcon />
           </button>
+          {switch setGameMode {
+          | Some(setGameMode) =>
+            switch gameMode {
+            | Games.Fussball =>
+              <button
+                className="text-white w-[44px] aspect-square text-[26px] flex justify-center items-center -ml-3 rounded-full bg-black/0 transition-all ease-in-out duration-200 shadow-none hover:bg-black/20 hover:shadow-icon-button hover:ring-8 ring-black/20 active:bg-black/20 active:shadow-icon-button active:ring-8 "
+                onClick={_ => setGameMode(_ => Games.Darts)}>
+                <SoccerIcon />
+              </button>
+            | Games.Darts =>
+              <button
+                className="text-white w-[44px] aspect-square text-[26px] flex justify-center items-center -ml-3 rounded-full bg-black/0 transition-all ease-in-out duration-200 shadow-none hover:bg-black/20 hover:shadow-icon-button hover:ring-8 ring-black/20 active:bg-black/20 active:shadow-icon-button active:ring-8 "
+                onClick={_ => setGameMode(_ => Games.Fussball)}>
+                <DartsIcon />
+              </button>
+            }
+          | None => <> </>
+          }}
           <button
             className="text-white w-[44px] aspect-square text-[26px] hidden justify-center items-center -ml-3 rounded-full bg-black/0 transition-all ease-in-out duration-200 shadow-none hover:bg-black/20 hover:shadow-icon-button hover:ring-8 ring-black/20 active:bg-black/20 active:shadow-icon-button active:ring-8"
             onClick={_ => setShowQueueButtons(show => !show)}>

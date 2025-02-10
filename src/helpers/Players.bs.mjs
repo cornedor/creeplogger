@@ -3,6 +3,7 @@
 import * as Rules from "./Rules.bs.mjs";
 import * as React from "react";
 import * as Schema from "./Schema.bs.mjs";
+import * as Caml_obj from "rescript/lib/es6/caml_obj.js";
 import * as Database from "./Database.bs.mjs";
 import * as RescriptCore from "@rescript/core/src/RescriptCore.bs.mjs";
 import * as FirebaseSchema from "./FirebaseSchema.bs.mjs";
@@ -27,7 +28,13 @@ var playerSchema = Schema.object(function (s) {
               key: s.f("key", Schema.string),
               mattermostHandle: s.f("mh", FirebaseSchema.nullableTransform(Schema.option(Schema.string))),
               lastGames: s.fieldOr("lastGames", Schema.array(Schema.$$int), []),
-              hidden: s.f("hidden", FirebaseSchema.nullableTransform(Schema.option(Schema.bool)))
+              hidden: s.f("hidden", FirebaseSchema.nullableTransform(Schema.option(Schema.bool))),
+              dartsElo: s.fieldOr("dartsElo", Schema.$$float, 1000.0),
+              dartsLastEloChange: s.fieldOr("dartsChange", Schema.$$float, 0.0),
+              dartsGames: s.fieldOr("dartsGames", Schema.$$int, 0),
+              dartsWins: s.fieldOr("dartsWins", Schema.$$int, 0),
+              dartsLosses: s.fieldOr("dartsLosses", Schema.$$int, 0),
+              dartsLastGames: s.fieldOr("dartsLastGames", Schema.array(Schema.$$int), [])
             };
     });
 
@@ -53,7 +60,13 @@ async function addPlayer(name) {
         key: "",
         mattermostHandle: undefined,
         lastGames: [],
-        hidden: undefined
+        hidden: undefined,
+        dartsElo: 1000.0,
+        dartsLastEloChange: 0.0,
+        dartsGames: 0,
+        dartsWins: 0,
+        dartsLosses: 0,
+        dartsLastGames: []
       }, playerSchema);
   var data$1;
   data$1 = data.TAG === "Ok" ? data._0 : RescriptCore.panic("Could not serialize player");
@@ -168,26 +181,28 @@ function updateGameStats(key, myTeamPoints, opponentTeamPoints, team, elo) {
                   return data;
                 }
                 var player$1 = player._0;
-                var res = Schema.serializeWith({
-                      name: player$1.name,
-                      wins: isWin ? player$1.wins + 1 | 0 : player$1.wins,
-                      losses: isLoss ? player$1.losses + 1 | 0 : player$1.losses,
-                      absoluteWins: isAbsoluteWin ? player$1.absoluteWins + 1 | 0 : player$1.absoluteWins,
-                      absoluteLosses: isAbsoluteLoss ? player$1.absoluteLosses + 1 | 0 : player$1.absoluteLosses,
-                      games: player$1.games + 1 | 0,
-                      teamGoals: player$1.teamGoals + myTeamPoints | 0,
-                      teamGoalsAgainst: player$1.teamGoals + opponentTeamPoints | 0,
-                      blueGames: team === "Blue" ? player$1.blueGames + 1 | 0 : player$1.blueGames,
-                      redGames: team === "Red" ? player$1.redGames + 1 | 0 : player$1.redGames,
-                      blueWins: isBlueWin ? player$1.blueWins + 1 | 0 : player$1.blueWins,
-                      redWins: isRedWin ? player$1.redWins + 1 | 0 : player$1.redWins,
-                      elo: elo,
-                      lastEloChange: elo - player$1.elo,
-                      key: player$1.key,
-                      mattermostHandle: player$1.mattermostHandle,
-                      lastGames: getLastGames(player$1.lastGames, isWin),
-                      hidden: player$1.hidden
-                    }, playerSchema);
+                var newrecord = Caml_obj.obj_dup(player$1);
+                var res = Schema.serializeWith((newrecord.lastGames = getLastGames(player$1.lastGames, isWin), newrecord.lastEloChange = elo - player$1.elo, newrecord.elo = elo, newrecord.redWins = isRedWin ? player$1.redWins + 1 | 0 : player$1.redWins, newrecord.blueWins = isBlueWin ? player$1.blueWins + 1 | 0 : player$1.blueWins, newrecord.redGames = team === "Red" ? player$1.redGames + 1 | 0 : player$1.redGames, newrecord.blueGames = team === "Blue" ? player$1.blueGames + 1 | 0 : player$1.blueGames, newrecord.teamGoalsAgainst = player$1.teamGoals + opponentTeamPoints | 0, newrecord.teamGoals = player$1.teamGoals + myTeamPoints | 0, newrecord.games = player$1.games + 1 | 0, newrecord.absoluteLosses = isAbsoluteLoss ? player$1.absoluteLosses + 1 | 0 : player$1.absoluteLosses, newrecord.absoluteWins = isAbsoluteWin ? player$1.absoluteWins + 1 | 0 : player$1.absoluteWins, newrecord.losses = isLoss ? player$1.losses + 1 | 0 : player$1.losses, newrecord.wins = isWin ? player$1.wins + 1 | 0 : player$1.wins, newrecord), playerSchema);
+                if (res.TAG === "Ok") {
+                  return res._0;
+                } else {
+                  return data;
+                }
+              }));
+}
+
+function updateDartsGameStats(key, myTeamPoints, elo) {
+  var isWin = myTeamPoints === 1;
+  var isLoss = myTeamPoints === 0;
+  var playerRef = Database$1.ref(Database.database, "players/" + key);
+  return Database$1.runTransaction(playerRef, (function (data) {
+                var player = Schema.parseWith(data, playerSchema);
+                if (player.TAG !== "Ok") {
+                  return data;
+                }
+                var player$1 = player._0;
+                var newrecord = Caml_obj.obj_dup(player$1);
+                var res = Schema.serializeWith((newrecord.dartsLastGames = getLastGames(player$1.dartsLastGames, isWin), newrecord.dartsLosses = isLoss ? player$1.dartsLosses + 1 | 0 : player$1.dartsLosses, newrecord.dartsWins = isWin ? player$1.dartsWins + 1 | 0 : player$1.dartsWins, newrecord.dartsGames = player$1.dartsGames + 1 | 0, newrecord.dartsLastEloChange = elo - player$1.dartsElo, newrecord.dartsElo = elo, newrecord), playerSchema);
                 if (res.TAG === "Ok") {
                   return res._0;
                 } else {
@@ -210,6 +225,7 @@ export {
   fetchPlayerByKey ,
   playerByKey ,
   updateGameStats ,
+  updateDartsGameStats ,
   writePlayer ,
   getLastGames ,
   playersSchema ,

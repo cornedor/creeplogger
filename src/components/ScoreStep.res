@@ -18,6 +18,7 @@ let make = (
   ~setRedState,
   ~setEarnedPoints,
   ~players,
+  ~gameMode,
 ) => {
   let (isSaving, setIsSaving) = React.useState(_ => false)
   let redButtons = []
@@ -132,6 +133,8 @@ let make = (
       onReset={reset}
       disabled={isSaving}
       setShowQueueButtons={_ => ()}
+      gameMode
+      setGameMode={None}
     />
     <div className="flex flex-wrap content-padding gap-20">
       <div>

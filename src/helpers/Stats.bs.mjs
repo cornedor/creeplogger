@@ -6,6 +6,7 @@ import * as Rules from "./Rules.bs.mjs";
 import * as React from "react";
 import * as Schema from "./Schema.bs.mjs";
 import * as Players from "./Players.bs.mjs";
+import * as Caml_obj from "rescript/lib/es6/caml_obj.js";
 import * as Database from "./Database.bs.mjs";
 import * as Core__Array from "@rescript/core/src/Core__Array.bs.mjs";
 import * as Core__Option from "@rescript/core/src/Core__Option.bs.mjs";
@@ -17,7 +18,8 @@ var statsSchema = Schema.object(function (s) {
               totalGames: s.fieldOr("games", Schema.$$int, 0),
               totalRedWins: s.fieldOr("redWins", Schema.$$int, 0),
               totalBlueWins: s.fieldOr("blueWins", Schema.$$int, 0),
-              totalAbsoluteWins: s.fieldOr("absoluteWins", Schema.$$int, 0)
+              totalAbsoluteWins: s.fieldOr("absoluteWins", Schema.$$int, 0),
+              totalDartsGames: s.fieldOr("dartsGames", Schema.$$int, 0)
             };
     });
 
@@ -25,7 +27,8 @@ var empty = {
   totalGames: 0,
   totalRedWins: 0,
   totalBlueWins: 0,
-  totalAbsoluteWins: 0
+  totalAbsoluteWins: 0,
+  totalDartsGames: 0
 };
 
 var bucket = "stats";
@@ -89,7 +92,26 @@ async function updateStats(redScore, blueScore) {
                             ) | 0,
                             totalAbsoluteWins: data$2.totalAbsoluteWins + (
                               isAbsolute ? 1 : 0
-                            ) | 0
+                            ) | 0,
+                            totalDartsGames: data$2.totalDartsGames
+                          }, statsSchema);
+              }));
+}
+
+async function updateDartsStats() {
+  var statsRef = Database$1.ref(Database.database, bucket);
+  return Database$1.runTransaction(statsRef, (function (data) {
+                var data$1 = Schema.parseWith(data, statsSchema);
+                if (data$1.TAG !== "Ok") {
+                  return RescriptCore.panic("Failed parsing stats");
+                }
+                var data$2 = data$1._0;
+                return Schema.reverseConvertToJsonWith({
+                            totalGames: data$2.totalGames,
+                            totalRedWins: data$2.totalRedWins,
+                            totalBlueWins: data$2.totalBlueWins,
+                            totalAbsoluteWins: data$2.totalAbsoluteWins,
+                            totalDartsGames: data$2.totalDartsGames + 1 | 0
                           }, statsSchema);
               }));
 }
@@ -114,26 +136,22 @@ async function recalculateStats() {
   var playerKeys = Object.keys(players);
   playerKeys.forEach(function (key) {
         var player = Core__Option.getExn(players[key], undefined);
-        players[key] = {
-          name: player.name,
-          wins: 0,
-          losses: 0,
-          absoluteWins: 0,
-          absoluteLosses: 0,
-          games: 0,
-          teamGoals: 0,
-          teamGoalsAgainst: 0,
-          blueGames: 0,
-          redGames: 0,
-          blueWins: 0,
-          redWins: 0,
-          elo: 1000.0,
-          lastEloChange: 0.0,
-          key: player.key,
-          mattermostHandle: player.mattermostHandle,
-          lastGames: [],
-          hidden: player.hidden
-        };
+        var newrecord = Caml_obj.obj_dup(player);
+        newrecord.lastGames = [];
+        newrecord.lastEloChange = 0.0;
+        newrecord.elo = 1000.0;
+        newrecord.redWins = 0;
+        newrecord.blueWins = 0;
+        newrecord.redGames = 0;
+        newrecord.blueGames = 0;
+        newrecord.teamGoalsAgainst = 0;
+        newrecord.teamGoals = 0;
+        newrecord.games = 0;
+        newrecord.absoluteLosses = 0;
+        newrecord.absoluteWins = 0;
+        newrecord.losses = 0;
+        newrecord.wins = 0;
+        players[key] = newrecord;
       });
   var stats = Core__Array.reduce(games, empty, (function (stats, game) {
           var blueWin = Rules.isBlueWin(game.redScore, game.blueScore);
@@ -147,9 +165,9 @@ async function recalculateStats() {
               });
           var match;
           if (blueWin) {
-            match = Elo.calculateScore(bluePlayers, redPlayers);
+            match = Elo.calculateScore(bluePlayers, redPlayers, undefined);
           } else {
-            var match$1 = Elo.calculateScore(redPlayers, bluePlayers);
+            var match$1 = Elo.calculateScore(redPlayers, bluePlayers, undefined);
             match = [
               match$1[1],
               match$1[0],
@@ -158,49 +176,33 @@ async function recalculateStats() {
           }
           match[0].forEach(function (player) {
                 var lastGames = Players.getLastGames(player.lastGames, blueWin);
-                players[player.key] = {
-                  name: player.name,
-                  wins: blueWin ? player.wins + 1 | 0 : player.wins,
-                  losses: redWin ? player.losses + 1 | 0 : player.losses,
-                  absoluteWins: blueWin && isAbsolute ? player.absoluteWins + 1 | 0 : player.absoluteWins,
-                  absoluteLosses: redWin && isAbsolute ? player.absoluteLosses + 1 | 0 : player.absoluteLosses,
-                  games: player.games + 1 | 0,
-                  teamGoals: player.teamGoals + game.blueScore | 0,
-                  teamGoalsAgainst: player.teamGoalsAgainst + game.redScore | 0,
-                  blueGames: player.blueGames + 1 | 0,
-                  redGames: player.redGames,
-                  blueWins: blueWin ? player.blueWins + 1 | 0 : player.blueWins,
-                  redWins: player.redWins,
-                  elo: player.elo,
-                  lastEloChange: player.lastEloChange,
-                  key: player.key,
-                  mattermostHandle: player.mattermostHandle,
-                  lastGames: lastGames,
-                  hidden: player.hidden
-                };
+                var newrecord = Caml_obj.obj_dup(player);
+                newrecord.lastGames = lastGames;
+                newrecord.blueWins = blueWin ? player.blueWins + 1 | 0 : player.blueWins;
+                newrecord.blueGames = player.blueGames + 1 | 0;
+                newrecord.teamGoalsAgainst = player.teamGoalsAgainst + game.redScore | 0;
+                newrecord.teamGoals = player.teamGoals + game.blueScore | 0;
+                newrecord.games = player.games + 1 | 0;
+                newrecord.absoluteLosses = redWin && isAbsolute ? player.absoluteLosses + 1 | 0 : player.absoluteLosses;
+                newrecord.absoluteWins = blueWin && isAbsolute ? player.absoluteWins + 1 | 0 : player.absoluteWins;
+                newrecord.losses = redWin ? player.losses + 1 | 0 : player.losses;
+                newrecord.wins = blueWin ? player.wins + 1 | 0 : player.wins;
+                players[player.key] = newrecord;
               });
           match[1].forEach(function (player) {
                 var lastGames = Players.getLastGames(player.lastGames, redWin);
-                players[player.key] = {
-                  name: player.name,
-                  wins: redWin ? player.wins + 1 | 0 : player.wins,
-                  losses: blueWin ? player.losses + 1 | 0 : player.losses,
-                  absoluteWins: redWin && isAbsolute ? player.absoluteWins + 1 | 0 : player.absoluteWins,
-                  absoluteLosses: blueWin && isAbsolute ? player.absoluteLosses + 1 | 0 : player.absoluteLosses,
-                  games: player.games + 1 | 0,
-                  teamGoals: player.teamGoals + game.redScore | 0,
-                  teamGoalsAgainst: player.teamGoalsAgainst + game.blueScore | 0,
-                  blueGames: player.blueGames,
-                  redGames: player.redGames + 1 | 0,
-                  blueWins: player.blueWins,
-                  redWins: redWin ? player.redWins + 1 | 0 : player.redWins,
-                  elo: player.elo,
-                  lastEloChange: player.lastEloChange,
-                  key: player.key,
-                  mattermostHandle: player.mattermostHandle,
-                  lastGames: lastGames,
-                  hidden: player.hidden
-                };
+                var newrecord = Caml_obj.obj_dup(player);
+                newrecord.lastGames = lastGames;
+                newrecord.redWins = redWin ? player.redWins + 1 | 0 : player.redWins;
+                newrecord.redGames = player.redGames + 1 | 0;
+                newrecord.teamGoalsAgainst = player.teamGoalsAgainst + game.blueScore | 0;
+                newrecord.teamGoals = player.teamGoals + game.redScore | 0;
+                newrecord.games = player.games + 1 | 0;
+                newrecord.absoluteLosses = blueWin && isAbsolute ? player.absoluteLosses + 1 | 0 : player.absoluteLosses;
+                newrecord.absoluteWins = redWin && isAbsolute ? player.absoluteWins + 1 | 0 : player.absoluteWins;
+                newrecord.losses = blueWin ? player.losses + 1 | 0 : player.losses;
+                newrecord.wins = redWin ? player.wins + 1 | 0 : player.wins;
+                players[player.key] = newrecord;
               });
           return {
                   totalGames: stats.totalGames + 1 | 0,
@@ -212,7 +214,8 @@ async function recalculateStats() {
                   ) | 0,
                   totalAbsoluteWins: stats.totalAbsoluteWins + (
                     isAbsolute ? 1 : 0
-                  ) | 0
+                  ) | 0,
+                  totalDartsGames: stats.totalDartsGames
                 };
         }));
   console.log(stats);
@@ -232,6 +235,7 @@ export {
   fetchStats ,
   useStats ,
   updateStats ,
+  updateDartsStats ,
   writeStats ,
   recalculateStats ,
 }

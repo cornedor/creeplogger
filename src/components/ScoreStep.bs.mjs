@@ -96,7 +96,7 @@ function ScoreStep(props) {
           redTeam: selectedRedUsers,
           date: new Date(),
           modifiers: redPlayers.length === 1 && bluePlayers.length === 1 ? ["OneVOne"] : []
-        }, undefined);
+        });
     var winningTeam = blueState > redState ? "Blue" : (
         redState > blueState ? "Red" : RescriptCore.panic("Tie not implemented")
       );
@@ -108,9 +108,9 @@ function ScoreStep(props) {
         });
     var match;
     if (winningTeam === "Blue") {
-      match = Elo.calculateScore(bluePlayers$1, redPlayers$1);
+      match = Elo.calculateScore(bluePlayers$1, redPlayers$1, undefined);
     } else {
-      var match$1 = Elo.calculateScore(redPlayers$1, bluePlayers$1);
+      var match$1 = Elo.calculateScore(redPlayers$1, bluePlayers$1, undefined);
       match = [
         match$1[1],
         match$1[0],
@@ -147,7 +147,8 @@ function ScoreStep(props) {
                       disabled: match[0],
                       setShowQueueButtons: (function (param) {
                           
-                        })
+                        }),
+                      gameMode: props.gameMode
                     }),
                 JsxRuntime.jsxs("div", {
                       children: [

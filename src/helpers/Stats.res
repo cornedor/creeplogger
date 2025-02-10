@@ -5,6 +5,7 @@ type stats = {
   totalRedWins: int,
   totalBlueWins: int,
   totalAbsoluteWins: int,
+  totalDartsGames: int,
 }
 
 let statsSchema = Schema.object(s => {
@@ -12,6 +13,7 @@ let statsSchema = Schema.object(s => {
   totalRedWins: s.fieldOr("redWins", Schema.int, 0),
   totalBlueWins: s.fieldOr("blueWins", Schema.int, 0),
   totalAbsoluteWins: s.fieldOr("absoluteWins", Schema.int, 0),
+  totalDartsGames: s.fieldOr("dartsGames", Schema.int, 0),
 })
 
 let empty: stats = {
@@ -19,6 +21,7 @@ let empty: stats = {
   totalRedWins: 0,
   totalBlueWins: 0,
   totalAbsoluteWins: 0,
+  totalDartsGames: 0,
 }
 
 let bucket = "stats"
@@ -73,10 +76,30 @@ let updateStats = async (redScore, blueScore) => {
     | Ok(data) => {
         let newData = Schema.reverseConvertToJsonWith(
           {
+            ...data,
             totalGames: data.totalGames + 1,
             totalRedWins: data.totalRedWins + (redWin ? 1 : 0),
             totalBlueWins: data.totalBlueWins + (blueWin ? 1 : 0),
             totalAbsoluteWins: data.totalAbsoluteWins + (isAbsolute ? 1 : 0),
+          },
+          statsSchema,
+        )
+        newData
+      }
+    | Error(_) => panic("Failed parsing stats")
+    }
+  })
+}
+
+let updateDartsStats = async () => {
+  let statsRef = Firebase.Database.refPath(Database.database, bucket)
+  Firebase.Database.runTransaction(statsRef, data => {
+    switch data->Schema.parseWith(statsSchema) {
+    | Ok(data) => {
+        let newData = Schema.reverseConvertToJsonWith(
+          {
+            ...data,
+            totalDartsGames: data.totalDartsGames + 1,
           },
           statsSchema,
         )
@@ -194,6 +217,7 @@ let recalculateStats = async () => {
       totalRedWins: stats.totalRedWins + (redWin ? 1 : 0),
       totalBlueWins: stats.totalBlueWins + (blueWin ? 1 : 0),
       totalAbsoluteWins: stats.totalAbsoluteWins + (isAbsolute ? 1 : 0),
+      totalDartsGames: stats.totalDartsGames,
     }
   })
 

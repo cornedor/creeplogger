@@ -5,4 +5,6 @@ let make: (
   ~reset: unit => unit,
   ~setStep: (LoggerStep.step => LoggerStep.step) => unit,
   ~players: array<Players.player>,
+  ~gameMode: Games.gameMode,
+  ~setGameMode: (Games.gameMode => Games.gameMode) => unit,
 ) => React.element

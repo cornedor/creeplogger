@@ -6,6 +6,7 @@ import * as React from "react";
 import * as Button from "../../components/Button.bs.mjs";
 import * as Js_dict from "rescript/lib/es6/js_dict.js";
 import * as Players from "../../helpers/Players.bs.mjs";
+import * as Caml_obj from "rescript/lib/es6/caml_obj.js";
 import * as Database from "../../helpers/Database.bs.mjs";
 import * as LoginForm from "./LoginForm.bs.mjs";
 import Link from "next/link";
@@ -108,26 +109,8 @@ function Admin(props) {
                                                                     className: "bg-slate-300 rounded py-1 px-3 text-black",
                                                                     onClick: (function (param) {
                                                                         var handle = prompt("New handle");
-                                                                        Players.writePlayer({
-                                                                              name: player.name,
-                                                                              wins: player.wins,
-                                                                              losses: player.losses,
-                                                                              absoluteWins: player.absoluteWins,
-                                                                              absoluteLosses: player.absoluteLosses,
-                                                                              games: player.games,
-                                                                              teamGoals: player.teamGoals,
-                                                                              teamGoalsAgainst: player.teamGoalsAgainst,
-                                                                              blueGames: player.blueGames,
-                                                                              redGames: player.redGames,
-                                                                              blueWins: player.blueWins,
-                                                                              redWins: player.redWins,
-                                                                              elo: player.elo,
-                                                                              lastEloChange: player.lastEloChange,
-                                                                              key: player.key,
-                                                                              mattermostHandle: (handle == null) ? undefined : Caml_option.some(handle),
-                                                                              lastGames: player.lastGames,
-                                                                              hidden: player.hidden
-                                                                            });
+                                                                        var newrecord = Caml_obj.obj_dup(player);
+                                                                        Players.writePlayer((newrecord.mattermostHandle = (handle == null) ? undefined : Caml_option.some(handle), newrecord));
                                                                       })
                                                                   }),
                                                               JsxRuntime.jsx("button", {

@@ -1,5 +1,5 @@
 @react.component
-let make = (~show, ~setShow) => {
+let make = (~show, ~setShow, ~gameMode) => {
   let (order, setOrder) = React.useState(_ => true)
   let players = Players.useAllPlayers(~orderBy=#elo, ~asc=order)
 
@@ -39,13 +39,34 @@ let make = (~show, ~setShow) => {
           | None => true
           }
 
-          let isLowGameCount = player.games > 0
-          let isLowElo = player.elo > 500.0
+          let (playerElo, games) = switch gameMode {
+          | Games.Darts => (player.dartsElo, player.dartsGames)
+          | _ => (player.elo, player.games)
+          }
+
+          let isLowGameCount = games > 0
+          let isLowElo = playerElo > 500.0
 
           isHidden && isLowGameCount && isLowElo
         })
         ->Array.map(player => {
-          let roundedElo = Elo.roundScore(player.elo)
+          let (playerElo, lastEloChange, lastGames, wins, games) = switch gameMode {
+          | Games.Darts => (
+              player.dartsElo,
+              player.dartsLastEloChange,
+              player.dartsLastGames,
+              player.dartsWins,
+              player.dartsGames,
+            )
+          | Games.Fussball => (
+              player.elo,
+              player.lastEloChange,
+              player.lastGames,
+              player.wins,
+              player.games,
+            )
+          }
+          let roundedElo = Elo.roundScore(playerElo)
 
           // When the scores are the same, both players get the same position
           // The next player will continue the count as if no position was skipped.
@@ -69,13 +90,13 @@ let make = (~show, ~setShow) => {
             <td>
               {React.int(roundedElo)}
               {React.string(" ")}
-              <small className={player.lastEloChange > 0.0 ? "text-green-400" : "text-red-400"}>
-                {React.int(Elo.roundScore(player.lastEloChange))}
+              <small className={lastEloChange > 0.0 ? "text-green-400" : "text-red-400"}>
+                {React.int(Elo.roundScore(lastEloChange))}
               </small>
             </td>
             <td>
               <div className="inline-flex gap-1 w-9">
-                {player.lastGames
+                {lastGames
                 ->Array.mapWithIndex((win, i) =>
                   <span
                     className={"w-1 h-1 rounded block " ++ (
@@ -88,14 +109,12 @@ let make = (~show, ~setShow) => {
               </div>
             </td>
             <td>
-              {React.int(player.games)}
+              {React.int(games)}
               {React.string(":")}
-              {React.int(player.wins)}
+              {React.int(wins)}
             </td>
             <td>
-              {React.float(
-                (Float.fromInt(player.wins) /. Float.fromInt(player.games) *. 100.)->Math.round,
-              )}
+              {React.float((Float.fromInt(wins) /. Float.fromInt(games) *. 100.)->Math.round)}
               {React.string("%")}
             </td>
           </tr>

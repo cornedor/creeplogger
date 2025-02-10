@@ -19,6 +19,12 @@ type player = {
   mattermostHandle: option<string>,
   lastGames: array<int>,
   hidden: option<bool>,
+  dartsElo: float,
+  dartsLastEloChange: float,
+  dartsGames: int,
+  dartsWins: int,
+  dartsLosses: int,
+  dartsLastGames: array<int>,
 }
 
 type playersOrder = [#games | #elo]
@@ -36,6 +42,8 @@ let fetchPlayerByKey: string => promise<option<player>>
 let playerByKey: (array<player>, string) => option<player>
 
 let updateGameStats: (string, int, int, team, float) => Js.Json.t => Js.Json.t
+
+let updateDartsGameStats: (string, int, float) => Js.Json.t => Js.Json.t
 
 let writePlayer: player => promise<unit>
 
