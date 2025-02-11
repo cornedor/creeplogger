@@ -1,7 +1,9 @@
 type team = array<Players.player>
 
+@inline
 let kFactor = 32.0
 
+@inline
 let getTotalEloFromTeam = (team: team, ~getEloFn) =>
   Array.reduce(team, 0.0, (acc, creeper) => acc +. getEloFn(creeper))
 
@@ -35,33 +37,43 @@ let getExpected = (scoreA, scoreB) =>
 @inline
 let getRatingChange = (expected, actual) => kFactor *. (actual -. expected)
 
-let calculateScore = (
-  winners: team,
-  losers: team,
-  ~getEloFn=(player: Players.player) => player.elo,
-) => {
-  let (winnersScore, losersScore) = getCombinedTeamScores(winners, losers, ~getEloFn)
+@inline
+let getEloFn = (gameMode: Games.gameMode, player: Players.player) =>
+  gameMode == Games.Darts ? player.dartsElo : player.elo
+
+@inline
+let setEloFn = (gameMode: Games.gameMode, player: Players.player, elo, change) =>
+  gameMode == Games.Darts
+    ? {
+        ...player,
+        dartsElo: elo,
+        dartsLastEloChange: change,
+      }
+    : {
+        ...player,
+        elo,
+        lastEloChange: change,
+      }
+
+let calculateScore = (winners: team, losers: team, ~gameMode: Games.gameMode) => {
+  let (winnersScore, losersScore) = getCombinedTeamScores(
+    winners,
+    losers,
+    ~getEloFn=getEloFn(gameMode, ...)
+  )
 
   let expectedScoreWinners = getExpected(winnersScore, losersScore)
   let expectedScoreLosers = getExpected(losersScore, winnersScore)
 
   let winners = Array.map(winners, creeper => {
     let change = getRatingChange(expectedScoreWinners, 1.0)
-    let elo = getEloFn(creeper) +. change
-    {
-      ...creeper,
-      elo,
-      lastEloChange: change,
-    }
+    let elo = getEloFn(gameMode, creeper) +. change
+    setEloFn(gameMode, creeper, elo, change)
   })
   let losers = Array.map(losers, creeper => {
     let change = getRatingChange(expectedScoreLosers, 0.0)
-    let elo = getEloFn(creeper) +. change
-    {
-      ...creeper,
-      elo,
-      lastEloChange: change,
-    }
+    let elo = getEloFn(gameMode, creeper) +. change
+    setEloFn(gameMode, creeper, elo, change)
   })
 
   (winners, losers, getRatingChange(expectedScoreWinners, 1.0))

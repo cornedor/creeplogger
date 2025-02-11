@@ -173,9 +173,13 @@ let recalculateStats = async () => {
     let bluePlayers = game.blueTeam->Array.map(key => Dict.get(players, key)->Option.getExn)
 
     let (bluePlayers, redPlayers, _) = switch blueWin {
-    | true => Elo.calculateScore(bluePlayers, redPlayers)
+    | true => Elo.calculateScore(bluePlayers, redPlayers, ~gameMode=Games.Foosball)
     | false => {
-        let (red, blue, points) = Elo.calculateScore(redPlayers, bluePlayers)
+        let (red, blue, points) = Elo.calculateScore(
+          redPlayers,
+          bluePlayers,
+          ~gameMode=Games.Foosball,
+        )
         (blue, red, points)
       }
     }
@@ -234,9 +238,7 @@ let recalculateStats = async () => {
     let winners = game.winners->Array.map(key => Dict.get(players, key)->Option.getExn)
     let losers = game.losers->Array.map(key => Dict.get(players, key)->Option.getExn)
 
-    let (winners, losers, _) = Elo.calculateScore(winners, losers, ~getEloFn=player =>
-      player.dartsElo
-    )
+    let (winners, losers, _) = Elo.calculateScore(winners, losers, ~gameMode=Games.Darts)
 
     Array.forEach(winners, player => {
       let lastGames = Players.getLastGames(player.dartsLastGames, true)
@@ -248,8 +250,8 @@ let recalculateStats = async () => {
           dartsGames: player.dartsGames + 1,
           dartsWins: player.dartsWins + 1,
           dartsLastGames: lastGames,
-          dartsElo: player.elo,
-          dartsLastEloChange: player.lastEloChange,
+          dartsElo: player.dartsElo,
+          dartsLastEloChange: player.dartsLastEloChange,
         },
       )
     })
@@ -264,8 +266,8 @@ let recalculateStats = async () => {
           dartsGames: player.dartsGames + 1,
           dartsLosses: player.dartsLosses + 1,
           dartsLastGames: lastGames,
-          dartsElo: player.elo,
-          dartsLastEloChange: player.lastEloChange,
+          dartsElo: player.dartsElo,
+          dartsLastEloChange: player.dartsLastEloChange,
         },
       )
     })

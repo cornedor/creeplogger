@@ -94,9 +94,13 @@ let make = (
       selectedBlueUsers->Array.map(key => Players.playerByKey(players, key)->Option.getExn)
 
     let (bluePlayers, redPlayers, points) = switch winningTeam {
-    | Blue => Elo.calculateScore(bluePlayers, redPlayers)
+    | Blue => Elo.calculateScore(bluePlayers, redPlayers, ~gameMode=Games.Foosball)
     | Red => {
-        let (red, blue, points) = Elo.calculateScore(redPlayers, bluePlayers)
+        let (red, blue, points) = Elo.calculateScore(
+          redPlayers,
+          bluePlayers,
+          ~gameMode=Games.Foosball,
+        )
         (blue, red, points)
       }
     }

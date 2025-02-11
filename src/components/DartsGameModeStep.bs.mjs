@@ -93,9 +93,7 @@ function DartsGameModeStep(props) {
     var redPlayers = selectedRedUsers.map(function (key) {
           return Core__Option.getExn(Players.playerByKey(players, key), undefined);
         });
-    var match = Elo.calculateScore(bluePlayers, redPlayers, (function (player) {
-            return player.dartsElo;
-          }));
+    var match = Elo.calculateScore(bluePlayers, redPlayers, "Darts");
     var roundedPoints = Elo.roundScore(match[2]);
     setEarnedPoints(function (param) {
           return roundedPoints;

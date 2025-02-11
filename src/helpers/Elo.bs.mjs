@@ -3,18 +3,20 @@
 import * as Caml_obj from "rescript/lib/es6/caml_obj.js";
 import * as Core__Array from "@rescript/core/src/Core__Array.bs.mjs";
 
-function getTotalEloFromTeam(team, getEloFn) {
-  return Core__Array.reduce(team, 0.0, (function (acc, creeper) {
-                return acc + getEloFn(creeper);
-              }));
-}
-
-function calculateScore(winners, losers, getEloFnOpt) {
-  var getEloFn = getEloFnOpt !== undefined ? getEloFnOpt : (function (player) {
-        return player.elo;
-      });
-  var totalEloA = getTotalEloFromTeam(winners, getEloFn);
-  var totalEloB = getTotalEloFromTeam(losers, getEloFn);
+function calculateScore(winners, losers, gameMode) {
+  var getEloFn = function (extra) {
+    if (gameMode === "Darts") {
+      return extra.dartsElo;
+    } else {
+      return extra.elo;
+    }
+  };
+  var totalEloA = Core__Array.reduce(winners, 0.0, (function (acc, creeper) {
+          return acc + getEloFn(creeper);
+        }));
+  var totalEloB = Core__Array.reduce(losers, 0.0, (function (acc, creeper) {
+          return acc + getEloFn(creeper);
+        }));
   var countA = winners.length;
   var countB = losers.length;
   var max = countA > countB ? countA : countB;
@@ -28,19 +30,35 @@ function calculateScore(winners, losers, getEloFnOpt) {
   var expectedScoreLosers = 1.0 / (1.0 + Math.pow(10.0, (winnersScore - losersScore) / 400.0));
   var winners$1 = winners.map(function (creeper) {
         var change = 32.0 * (1.0 - expectedScoreWinners);
-        var elo = getEloFn(creeper) + change;
-        var newrecord = Caml_obj.obj_dup(creeper);
-        newrecord.lastEloChange = change;
-        newrecord.elo = elo;
-        return newrecord;
+        var elo = (
+          gameMode === "Darts" ? creeper.dartsElo : creeper.elo
+        ) + change;
+        if (gameMode === "Darts") {
+          var newrecord = Caml_obj.obj_dup(creeper);
+          newrecord.dartsLastEloChange = change;
+          newrecord.dartsElo = elo;
+          return newrecord;
+        }
+        var newrecord$1 = Caml_obj.obj_dup(creeper);
+        newrecord$1.lastEloChange = change;
+        newrecord$1.elo = elo;
+        return newrecord$1;
       });
   var losers$1 = losers.map(function (creeper) {
         var change = 32.0 * (0.0 - expectedScoreLosers);
-        var elo = getEloFn(creeper) + change;
-        var newrecord = Caml_obj.obj_dup(creeper);
-        newrecord.lastEloChange = change;
-        newrecord.elo = elo;
-        return newrecord;
+        var elo = (
+          gameMode === "Darts" ? creeper.dartsElo : creeper.elo
+        ) + change;
+        if (gameMode === "Darts") {
+          var newrecord = Caml_obj.obj_dup(creeper);
+          newrecord.dartsLastEloChange = change;
+          newrecord.dartsElo = elo;
+          return newrecord;
+        }
+        var newrecord$1 = Caml_obj.obj_dup(creeper);
+        newrecord$1.lastEloChange = change;
+        newrecord$1.elo = elo;
+        return newrecord$1;
       });
   return [
           winners$1,

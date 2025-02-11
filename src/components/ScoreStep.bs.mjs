@@ -108,9 +108,9 @@ function ScoreStep(props) {
         });
     var match;
     if (winningTeam === "Blue") {
-      match = Elo.calculateScore(bluePlayers$1, redPlayers$1, undefined);
+      match = Elo.calculateScore(bluePlayers$1, redPlayers$1, "Foosball");
     } else {
-      var match$1 = Elo.calculateScore(redPlayers$1, bluePlayers$1, undefined);
+      var match$1 = Elo.calculateScore(redPlayers$1, bluePlayers$1, "Foosball");
       match = [
         match$1[1],
         match$1[0],

@@ -66,8 +66,10 @@ let make = (~selectedUsers, ~setStep, ~reset, ~setEarnedPoints, ~players, ~gameM
       selectedBlueUsers->Array.map(key => Players.playerByKey(players, key)->Option.getExn)
     let redPlayers =
       selectedRedUsers->Array.map(key => Players.playerByKey(players, key)->Option.getExn)
-    let (winners, losers, points) = Elo.calculateScore(bluePlayers, redPlayers, ~getEloFn=player =>
-      player.dartsElo
+    let (winners, losers, points) = Elo.calculateScore(
+      bluePlayers,
+      redPlayers,
+      ~gameMode=Games.Darts,
     )
 
     let roundedPoints = Elo.roundScore(points)
