@@ -27,7 +27,7 @@ type player = {
   dartsLastGames: array<int>,
 }
 
-type playersOrder = [#games | #elo]
+type playersOrder = [#games | #elo | #dartsElo]
 
 @inline
 let bucket: string
