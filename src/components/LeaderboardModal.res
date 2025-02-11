@@ -1,7 +1,10 @@
 @react.component
 let make = (~show, ~setShow, ~gameMode, ~setGameMode) => {
   let (order, setOrder) = React.useState(_ => true)
-  let players = Players.useAllPlayers(~orderBy=#elo, ~asc=order)
+  let players = Players.useAllPlayers(
+    ~orderBy=gameMode == Games.Darts ? #dartsElo : #elo,
+    ~asc=order,
+  )
 
   let position = ref(0)
   let previousScore = ref(0)

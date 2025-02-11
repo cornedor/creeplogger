@@ -104,7 +104,7 @@ let addPlayer = async name => {
   ref
 }
 
-type playersOrder = [#games | #elo]
+type playersOrder = [#games | #elo | #dartsElo]
 
 // let sortPlayersBy(orderBy: playersOrder)
 

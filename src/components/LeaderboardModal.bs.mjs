@@ -17,7 +17,7 @@ function LeaderboardModal(props) {
       });
   var setOrder = match[1];
   var order = match[0];
-  var players = Players.useAllPlayers("elo", order);
+  var players = Players.useAllPlayers(gameMode === "Darts" ? "dartsElo" : "elo", order);
   var position = {
     contents: 0
   };
