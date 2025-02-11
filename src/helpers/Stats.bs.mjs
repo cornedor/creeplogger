@@ -173,9 +173,9 @@ async function recalculateStats() {
               });
           var match;
           if (blueWin) {
-            match = Elo.calculateScore(bluePlayers, redPlayers, undefined);
+            match = Elo.calculateScore(bluePlayers, redPlayers, "Foosball");
           } else {
-            var match$1 = Elo.calculateScore(redPlayers, bluePlayers, undefined);
+            var match$1 = Elo.calculateScore(redPlayers, bluePlayers, "Foosball");
             match = [
               match$1[1],
               match$1[0],
@@ -233,17 +233,15 @@ async function recalculateStats() {
           var losers = game.losers.map(function (key) {
                 return Core__Option.getExn(players[key], undefined);
               });
-          var match = Elo.calculateScore(winners, losers, (function (player) {
-                  return player.dartsElo;
-                }));
+          var match = Elo.calculateScore(winners, losers, "Darts");
           match[0].forEach(function (player) {
                 var lastGames = Players.getLastGames(player.dartsLastGames, true);
                 var newrecord = Caml_obj.obj_dup(player);
                 newrecord.dartsLastGames = lastGames;
                 newrecord.dartsWins = player.dartsWins + 1 | 0;
                 newrecord.dartsGames = player.dartsGames + 1 | 0;
-                newrecord.dartsLastEloChange = player.lastEloChange;
-                newrecord.dartsElo = player.elo;
+                newrecord.dartsLastEloChange = player.dartsLastEloChange;
+                newrecord.dartsElo = player.dartsElo;
                 players[player.key] = newrecord;
               });
           match[1].forEach(function (player) {
@@ -252,8 +250,8 @@ async function recalculateStats() {
                 newrecord.dartsLastGames = lastGames;
                 newrecord.dartsLosses = player.dartsLosses + 1 | 0;
                 newrecord.dartsGames = player.dartsGames + 1 | 0;
-                newrecord.dartsLastEloChange = player.lastEloChange;
-                newrecord.dartsElo = player.elo;
+                newrecord.dartsLastEloChange = player.dartsLastEloChange;
+                newrecord.dartsElo = player.dartsElo;
                 players[player.key] = newrecord;
               });
           return {
