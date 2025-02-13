@@ -16,54 +16,66 @@ async function getDailyOverview(period) {
               var match = Core__Option.getOr(creepsMap.get(player), {
                     name: "",
                     creeps: 0,
-                    games: 0
+                    games: 0,
+                    score: 0
                   });
+              var score = match.score;
               var games = match.games;
               var creeps = match.creeps;
               var match$1;
               match$1 = winner === "Blue" ? [
                   creeps + 0 | 0,
-                  games + 1 | 0
+                  games + 1 | 0,
+                  score + game.blueScore | 0
                 ] : (
                   isAbsolute ? [
                       creeps + 2 | 0,
-                      games + 1 | 0
+                      games + 1 | 0,
+                      score + game.redScore | 0
                     ] : [
                       creeps + 1 | 0,
-                      games + 1 | 0
+                      games + 1 | 0,
+                      score + game.redScore | 0
                     ]
                 );
               creepsMap.set(player, {
                     name: players[player].name,
                     creeps: match$1[0],
-                    games: match$1[1]
+                    games: match$1[1],
+                    score: match$1[2]
                   });
             });
         game.redTeam.forEach(function (player) {
               var match = Core__Option.getOr(creepsMap.get(player), {
                     name: "",
                     creeps: 0,
-                    games: 0
+                    games: 0,
+                    score: 0
                   });
+              var score = match.score;
               var games = match.games;
               var creeps = match.creeps;
               var match$1;
               match$1 = winner === "Blue" ? (
                   isAbsolute ? [
                       creeps + 2 | 0,
-                      games + 1 | 0
+                      games + 1 | 0,
+                      score + game.blueScore | 0
                     ] : [
                       creeps + 1 | 0,
-                      games + 1 | 0
+                      games + 1 | 0,
+                      score + game.blueScore | 0
                     ]
                 ) : [
                   creeps + 0 | 0,
-                  games + 1 | 0
+                  games + 1 | 0,
+                  score + game.redScore | 0
                 ];
               creepsMap.set(player, {
                     name: players[player].name,
                     creeps: match$1[0],
-                    games: match$1[1]
+                    games: match$1[1],
+                    score: match$1[2]
                   });
             });
       });
