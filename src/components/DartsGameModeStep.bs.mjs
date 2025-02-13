@@ -99,10 +99,10 @@ function DartsGameModeStep(props) {
           return roundedPoints;
         });
     await Promise.all(match[0].map(async function (player) {
-              return Players.updateDartsGameStats(player.key, 1, player.elo);
+              return Players.updateDartsGameStats(player.key, 1, player.dartsElo);
             }));
     await Promise.all(match[1].map(async function (player) {
-              return Players.updateDartsGameStats(player.key, 0, player.elo);
+              return Players.updateDartsGameStats(player.key, 0, player.dartsElo);
             }));
     await Stats.updateDartsStats();
     await sendUpdate(roundedPoints, DartsGames.dartsModeToString(Core__Option.getOr(dartMode, "Unknown")));

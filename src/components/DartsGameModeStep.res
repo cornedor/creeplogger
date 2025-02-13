@@ -78,13 +78,13 @@ let make = (~selectedUsers, ~setStep, ~reset, ~setEarnedPoints, ~players, ~gameM
 
     let _ = await Promise.all(
       Array.map(winners, async player => {
-        Players.updateDartsGameStats(player.key, 1, player.elo)
+        Players.updateDartsGameStats(player.key, 1, player.dartsElo)
       }),
     )
 
     let _ = await Promise.all(
       Array.map(losers, async player => {
-        Players.updateDartsGameStats(player.key, 0, player.elo)
+        Players.updateDartsGameStats(player.key, 0, player.dartsElo)
       }),
     )
 
