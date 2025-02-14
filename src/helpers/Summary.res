@@ -25,8 +25,8 @@ let getDailyOverview = async period => {
         score: 0,
       })
       let (creeps, games, score) = switch (winner, isAbsolute) {
-      | (Red, true) => (creeps + 2, games + 1, score + game.redScore)
-      | (Red, false) => (creeps + 1, games + 1, score + game.redScore)
+      | (Red, true) => (creeps + 2, games + 1, score - game.redScore)
+      | (Red, false) => (creeps + 1, games + 1, score - game.redScore)
       | (Blue, _) => (creeps + 0, games + 1, score + game.blueScore)
       }
       Map.set(
@@ -48,8 +48,8 @@ let getDailyOverview = async period => {
         score: 0,
       })
       let (creeps, games, score) = switch (winner, isAbsolute) {
-      | (Blue, true) => (creeps + 2, games + 1, score + game.blueScore)
-      | (Blue, false) => (creeps + 1, games + 1, score + game.blueScore)
+      | (Blue, true) => (creeps + 2, games + 1, score - game.blueScore)
+      | (Blue, false) => (creeps + 1, games + 1, score - game.blueScore)
       | (Red, _) => (creeps + 0, games + 1, score + game.redScore)
       }
       Map.set(
@@ -60,7 +60,7 @@ let getDailyOverview = async period => {
           creeps,
           games,
           score,
-       },
+        },
       )
     })
   })

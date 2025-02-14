@@ -31,11 +31,11 @@ async function getDailyOverview(period) {
                   isAbsolute ? [
                       creeps + 2 | 0,
                       games + 1 | 0,
-                      score + game.redScore | 0
+                      score - game.redScore | 0
                     ] : [
                       creeps + 1 | 0,
                       games + 1 | 0,
-                      score + game.redScore | 0
+                      score - game.redScore | 0
                     ]
                 );
               creepsMap.set(player, {
@@ -60,11 +60,11 @@ async function getDailyOverview(period) {
                   isAbsolute ? [
                       creeps + 2 | 0,
                       games + 1 | 0,
-                      score + game.blueScore | 0
+                      score - game.blueScore | 0
                     ] : [
                       creeps + 1 | 0,
                       games + 1 | 0,
-                      score + game.blueScore | 0
+                      score - game.blueScore | 0
                     ]
                 ) : [
                   creeps + 0 | 0,
