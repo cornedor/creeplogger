@@ -119,8 +119,8 @@ let sendDailyUpdate = async () => {
     ->Map.values
     ->Core__Iterator.toArray
     ->Array.toSorted((a, b) => {
-      let a = Int32.shift_left(a.creeps, 16) - a.games
-      let b = Int32.shift_left(b.creeps, 16) - b.games
+      let a = Int32.shift_left(a.creeps, 16) - Int32.shift_left(a.games, 8) - a.score
+      let b = Int32.shift_left(b.creeps, 16) - Int32.shift_left(b.games, 8) - b.score
       b->Int.toFloat -. a->Int.toFloat
     })
 

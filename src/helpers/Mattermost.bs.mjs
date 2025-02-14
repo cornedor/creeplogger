@@ -84,8 +84,8 @@ async function sendDartsUpdate(winners, losers, points, mode) {
 async function sendDailyUpdate() {
   var overview = await Summary.getDailyOverview("Daily");
   var overviewArray = Array.from(overview.values()).toSorted(function (a, b) {
-        var a$1 = (a.creeps << 16) - a.games | 0;
-        var b$1 = (b.creeps << 16) - b.games | 0;
+        var a$1 = ((a.creeps << 16) - (a.games << 8) | 0) - a.score | 0;
+        var b$1 = ((b.creeps << 16) - (b.games << 8) | 0) - b.score | 0;
         return b$1 - a$1;
       });
   var match = overviewArray.length;
