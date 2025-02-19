@@ -22,7 +22,7 @@ let getCombinedTeamScores = (teamA: team, teamB: team, ~getEloFn) => {
 
   // Avg using the opposite team amount of players. For example:
   // Team 1: [1200] = 1200 / 2 = 600
-  // Team 2: [850, 700] = (850 + 700) / 1 = 775
+  // Team 2: [850, 700] = (850 + 700) / 2 = 775
 
   let avgA = totalEloA /. mulA
   let avgB = totalEloB /. mulB
