@@ -3,6 +3,7 @@ type dailyLine = {
   creeps: int,
   games: int,
   score: int,
+  goalDiff: int,
 }
 
 let getDailyOverview: Games.peroid => promise<RescriptCore.Map.t<string, dailyLine>>

@@ -93,10 +93,10 @@ async function sendDailyUpdate() {
     return false;
   }
   var table = overviewArray.map(function (creeper, index) {
-          return "| " + (index + 1 | 0).toString() + " | " + creeper.name + " | " + creeper.creeps.toString() + " | " + creeper.games.toString() + " | " + creeper.score.toString() + " |";
+          return "| " + (index + 1 | 0).toString() + " | " + creeper.name + " | " + creeper.creeps.toString() + " | " + creeper.games.toString() + " | " + creeper.score.toString() + " | " + creeper.goalDiff.toString() + " |";
         }).join("\n");
   var topCreeper = Core__Option.getExn(overviewArray[0], undefined);
-  var intro = "### De kruip statistieken van vandaag zijn bekend!\n\nFeliciteer direct onze top kruiper van de dag: " + topCreeper.name + " met maar liefst " + topCreeper.creeps.toString() + " kruipjes en een netto score van " + topCreeper.score.toString() + "!\n\n| # | Naam | Kruipjes | Potjes | Netto Score |\n| - | ---- | -------- | ------ | ----------- |\n" + table + "\n\n";
+  var intro = "### De kruip statistieken van vandaag zijn bekend!\n\nFeliciteer direct onze top kruiper van de dag: " + topCreeper.name + " met maar liefst " + topCreeper.creeps.toString() + " kruipjes en een netto score van " + topCreeper.score.toString() + "!\n\n| # | Naam | Kruipjes | Potjes | Netto Score | Doel saldo |\n| - | ---- | -------- | ------ | ----------- | ---------- |\n" + table + "\n\n";
   var prom = publishMessage(intro);
   if (prom !== undefined) {
     await Caml_option.valFromOption(prom);
