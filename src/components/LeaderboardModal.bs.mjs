@@ -13,11 +13,11 @@ function LeaderboardModal(props) {
   var gameMode = props.gameMode;
   var setShow = props.setShow;
   var match = React.useState(function () {
-        return true;
+        return false;
       });
   var setOrder = match[1];
-  var order = match[0];
-  var players = Players.useAllPlayers(gameMode === "Darts" ? "dartsElo" : "elo", order);
+  var ascOrder = match[0];
+  var players = Players.useAllPlayers(gameMode === "Darts" ? "dartsElo" : "elo", ascOrder);
   var position = {
     contents: 0
   };
@@ -83,7 +83,7 @@ function LeaderboardModal(props) {
                                       JsxRuntime.jsx("th", {
                                             children: JsxRuntime.jsx("button", {
                                                   children: "Score " + (
-                                                    order ? "↑" : "↓"
+                                                    ascOrder ? "↑" : "↓"
                                                   ),
                                                   onClick: (function (param) {
                                                       setOrder(function (order) {

@@ -1,9 +1,9 @@
 @react.component
 let make = (~show, ~setShow, ~gameMode, ~setGameMode) => {
-  let (order, setOrder) = React.useState(_ => true)
+  let (ascOrder, setOrder) = React.useState(_ => false)
   let players = Players.useAllPlayers(
     ~orderBy=gameMode == Games.Darts ? #dartsElo : #elo,
-    ~asc=order,
+    ~asc=ascOrder,
   )
 
   let position = ref(0)
@@ -43,7 +43,7 @@ let make = (~show, ~setShow, ~gameMode, ~setGameMode) => {
           <th className="text-lg text-left"> {React.string("Speler")} </th>
           <th className="text-lg text-left">
             <button onClick={_ => setOrder(order => !order)}>
-              {React.string("Score " ++ (order ? "↑" : "↓"))}
+              {React.string("Score " ++ (ascOrder ? "↑" : "↓"))}
             </button>
           </th>
           <th className="text-lg text-left"> {React.string("Last 5")} </th>

@@ -110,14 +110,12 @@ type playersOrder = [#games | #elo | #dartsElo]
 
 external snapshotToArray: dataSnapshot => array<dataSnapshot> = "%identity"
 
-let useAllPlayers = (~orderBy: playersOrder=#games, ~asc=true) => {
+let useAllPlayers = (~orderBy: playersOrder=#games, ~asc=false) => {
   let (players, setPlayers) = React.useState(_ => [])
   let playersRef = Firebase.Database.query1(
     Firebase.Database.refPath(Database.database, bucket),
-    Firebase.Database.orderByChild(orderBy),
+    Firebase.Database.orderByChild("games"),
   )
-
-  let sortFunction = asc ? Array.toReversed : a => a
 
   React.useEffect(() => {
     let unsubscribe = Firebase.Database.onValue(
@@ -143,7 +141,16 @@ let useAllPlayers = (~orderBy: playersOrder=#games, ~asc=true) => {
     Some(unsubscribe)
   }, [setPlayers])
 
-  let players = React.useMemo(() => players->sortFunction, (players, asc))
+  let players = React.useMemo(() =>
+    players->Array.toSorted((a, b) => {
+      let (a, b) = asc ? (a, b) : (b, a)
+      switch orderBy {
+      | #games => Int.toFloat(a.games - b.games)
+      | #elo => a.elo -. b.elo
+      | #dartsElo => a.dartsElo -. b.dartsElo
+      }
+    })
+  , (players, asc, orderBy))
 
   players
 }

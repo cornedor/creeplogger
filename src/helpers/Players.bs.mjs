@@ -80,18 +80,13 @@ async function addPlayer(name) {
 
 function useAllPlayers(orderByOpt, ascOpt) {
   var orderBy = orderByOpt !== undefined ? orderByOpt : "games";
-  var asc = ascOpt !== undefined ? ascOpt : true;
+  var asc = ascOpt !== undefined ? ascOpt : false;
   var match = React.useState(function () {
         return [];
       });
   var setPlayers = match[1];
   var players = match[0];
-  var playersRef = Database$1.query(Database$1.ref(Database.database, "players"), Database$1.orderByChild(orderBy));
-  var sortFunction = asc ? (function (prim) {
-        return prim.toReversed();
-      }) : (function (a) {
-        return a;
-      });
+  var playersRef = Database$1.query(Database$1.ref(Database.database, "players"), Database$1.orderByChild("games"));
   React.useEffect((function () {
           return Database$1.onValue(playersRef, (function (snapshot) {
                         var newPlayers = [];
@@ -113,10 +108,28 @@ function useAllPlayers(orderByOpt, ascOpt) {
                       }), undefined);
         }), [setPlayers]);
   return React.useMemo((function () {
-                return sortFunction(players);
+                return players.toSorted(function (a, b) {
+                            var match = asc ? [
+                                a,
+                                b
+                              ] : [
+                                b,
+                                a
+                              ];
+                            var b$1 = match[1];
+                            var a$1 = match[0];
+                            if (orderBy === "elo") {
+                              return a$1.elo - b$1.elo;
+                            } else if (orderBy === "games") {
+                              return a$1.games - b$1.games | 0;
+                            } else {
+                              return a$1.dartsElo - b$1.dartsElo;
+                            }
+                          });
               }), [
               players,
-              asc
+              asc,
+              orderBy
             ]);
 }
 
