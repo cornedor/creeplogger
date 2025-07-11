@@ -65,7 +65,7 @@ let make = (~show, ~setShow, ~gameMode, ~setGameMode) => {
           | _ => (player.elo, player.games)
           }
 
-          let isLowGameCount = games > 0
+          let isLowGameCount = games > 5
           let isLowElo = playerElo > 500.0
 
           isHidden && isLowGameCount && isLowElo
