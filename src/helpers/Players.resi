@@ -19,6 +19,9 @@ type player = {
   mattermostHandle: option<string>,
   lastGames: array<int>,
   hidden: option<bool>,
+  mu: float,
+  sigma: float,
+  ordinal: float,
   dartsElo: float,
   dartsLastEloChange: float,
   dartsGames: int,
@@ -27,7 +30,7 @@ type player = {
   dartsLastGames: array<int>,
 }
 
-type playersOrder = [#games | #elo | #dartsElo]
+type playersOrder = [#games | #rating | #dartsElo]
 
 @inline
 let bucket: string
@@ -42,6 +45,8 @@ let fetchPlayerByKey: string => promise<option<player>>
 let playerByKey: (array<player>, string) => option<player>
 
 let updateGameStats: (string, int, int, team, float) => Js.Json.t => Js.Json.t
+
+let updateOpenSkillGameStats: (string, int, int, team, float, float, float) => Js.Json.t => Js.Json.t
 
 let updateDartsGameStats: (string, int, float) => Js.Json.t => Js.Json.t
 
