@@ -2,7 +2,7 @@
 let make = (~show, ~setShow, ~gameMode, ~setGameMode) => {
   let (ascOrder, setOrder) = React.useState(_ => false)
   let players = Players.useAllPlayers(
-    ~orderBy=gameMode == Games.Darts ? #dartsElo : #elo,
+    ~orderBy=gameMode == Games.Darts ? #dartsElo : #rating,
     ~asc=ascOrder,
   )
 
@@ -60,18 +60,18 @@ let make = (~show, ~setShow, ~gameMode, ~setGameMode) => {
           | None => true
           }
 
-          let (playerElo, games) = switch gameMode {
+          let (playerRating, games) = switch gameMode {
           | Games.Darts => (player.dartsElo, player.dartsGames)
-          | _ => (player.elo, player.games)
+          | _ => (player.ordinal, player.games)
           }
 
           let isLowGameCount = games > 5
-          let isLowElo = playerElo > 500.0
+          let isLowRating = playerRating > 0.0
 
-          isHidden && isLowGameCount && isLowElo
+          isHidden && isLowGameCount && isLowRating
         })
         ->Array.map(player => {
-          let (playerElo, lastEloChange, lastGames, wins, games) = switch gameMode {
+          let (playerRating, lastRatingChange, lastGames, wins, games) = switch gameMode {
           | Games.Darts => (
               player.dartsElo,
               player.dartsLastEloChange,
@@ -80,18 +80,18 @@ let make = (~show, ~setShow, ~gameMode, ~setGameMode) => {
               player.dartsGames,
             )
           | Games.Foosball => (
-              player.elo,
+              player.ordinal,
               player.lastEloChange,
               player.lastGames,
               player.wins,
               player.games,
             )
           }
-          let roundedElo = Elo.roundScore(playerElo)
+          let roundedRating = OpenSkillRating.roundScore(playerRating)
 
           // When the scores are the same, both players get the same position
           // The next player will continue the count as if no position was skipped.
-          switch (roundedElo, previousScore.contents, skipped.contents) {
+          switch (roundedRating, previousScore.contents, skipped.contents) {
           | (a, b, _) if a == b =>
             // Previous score was the same as the current score, so we skip the position
             skipped := skipped.contents + 1
@@ -101,7 +101,7 @@ let make = (~show, ~setShow, ~gameMode, ~setGameMode) => {
             skipped := 0
           | (_, _, _) => position := position.contents + 1
           }
-          previousScore := roundedElo
+          previousScore := roundedRating
 
           <tr key={player.key}>
             <td className="font-semibold">
@@ -109,10 +109,10 @@ let make = (~show, ~setShow, ~gameMode, ~setGameMode) => {
             </td>
             <td> {React.string(player.name)} </td>
             <td>
-              {React.int(roundedElo)}
+              {React.int(roundedRating)}
               {React.string(" ")}
-              <small className={lastEloChange > 0.0 ? "text-green-400" : "text-red-400"}>
-                {React.int(Elo.roundScore(lastEloChange))}
+              <small className={lastRatingChange > 0.0 ? "text-green-400" : "text-red-400"}>
+                {React.int(OpenSkillRating.roundScore(lastRatingChange))}
               </small>
             </td>
             <td>
