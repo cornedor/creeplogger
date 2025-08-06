@@ -27,7 +27,9 @@ function rateGame(winningTeam, losingTeam) {
     winningTeam,
     losingTeam
   ];
-  var results = Openskill.rate(teams);
+  var results = Openskill.rate(teams, {
+        balance: true
+      });
   if (results.length !== 2) {
     return RescriptCore.panic("Unexpected result from rate function");
   }

@@ -5,6 +5,10 @@ type rating = {
   sigma: float,
 }
 
+type modelOptions = {
+  balance: bool,
+}
+
 type rateOptions = {
   tau: float,
   model: string,
@@ -15,6 +19,7 @@ type rateOptions = {
 @module("openskill") external ratingWithValues: {.."mu": float, "sigma": float} => rating = "rating"
 
 @module("openskill") external rate: array<array<rating>> => array<array<rating>> = "rate"
+@module("openskill") external rateWithModel: (array<array<rating>>, modelOptions) => array<array<rating>> = "rate"
 
 @module("openskill") external ordinal: rating => float = "ordinal"
 
@@ -31,10 +36,11 @@ let defaultRating = () => rating()
 @inline
 let getOrdinal = rating => ordinal(rating)
 
-// Calculate new ratings after a game
+// Calculate new ratings after a game with balance=true
 let rateGame = (winningTeam: array<rating>, losingTeam: array<rating>) => {
   let teams = [winningTeam, losingTeam]
-  let results = rate(teams)
+  let modelOptions = {balance: true}
+  let results = rateWithModel(teams, modelOptions)
   switch results {
   | [winnerUpdates, loserUpdates] => (winnerUpdates, loserUpdates)
   | _ => panic("Unexpected result from rate function")
