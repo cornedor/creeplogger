@@ -8,10 +8,11 @@ let mapPlayer = (users, key) => {
 }
 
 @react.component
-let make = (~score, ~winners, ~reset, ~players, ~perPlayerDeltas: option<Js.Dict.t<int>>=?) => {
-  let winners = winners->Array.map(winner => mapPlayer(players, winner))
-
-  let winnerNames = Array.join(winners, " & ")
+let make = (~score, ~winners, ~reset, ~players, ~perPlayerDeltas: option<Js.Dict.t<int>>) => {
+  let winnerNames =
+    winners
+    ->Array.map(winner => mapPlayer(players, winner))
+    ->Array.join(" & ")
 
   <div className="flex justify-center items-center h-screen flex-col">
     <h1 className="text-3xl"> {React.string("Gefeliciteerd, " ++ winnerNames ++ "!")} </h1>
