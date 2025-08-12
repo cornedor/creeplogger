@@ -60,15 +60,13 @@ let make = (~show, ~setShow, ~gameMode, ~setGameMode) => {
           | None => true
           }
 
-          let (playerRating, games) = switch gameMode {
+          let (_, games) = switch gameMode {
           | Games.Darts => (player.dartsElo, player.dartsGames)
           | _ => (player.ordinal, player.games)
           }
 
           let isLowGameCount = games > 5
-          let isLowRating = playerRating > 0.0
-
-          isHidden && isLowGameCount && isLowRating
+          isHidden && isLowGameCount
         })
         ->Array.map(player => {
           let (displayScore, lastChange, lastGames, wins, games) = switch gameMode {
@@ -79,12 +77,12 @@ let make = (~show, ~setShow, ~gameMode, ~setGameMode) => {
               player.dartsWins,
               player.dartsGames,
             )
-                      | Games.Foosball => (
-                player.ordinal,
-                player.lastOpenSkillChange,
-                player.lastGames,
-                player.wins,
-                player.games,
+          | Games.Foosball => (
+              player.ordinal,
+              player.lastOpenSkillChange,
+              player.lastGames,
+              player.wins,
+              player.games,
             )
           }
           let roundedScore = switch gameMode {
@@ -112,13 +110,15 @@ let make = (~show, ~setShow, ~gameMode, ~setGameMode) => {
             </td>
             <td> {React.string(player.name)} </td>
             <td>
-              {React.int(roundedScore)}
-              {React.string(" ")}
               {switch gameMode {
               | Games.Darts =>
-                <small className={lastChange > 0.0 ? "text-green-400" : "text-red-400"}>
-                  {React.int(Elo.roundScore(lastChange))}
-                </small>
+                <>
+                  {React.int(roundedScore)}
+                  {React.string(" ")}
+                  <small className={lastChange > 0.0 ? "text-green-400" : "text-red-400"}>
+                    {React.int(Elo.roundScore(lastChange))}
+                  </small>
+                </>
               | Games.Foosball =>
                 <span className="group inline-flex items-baseline gap-1">
                   <span className="group-hover:hidden"> {React.int(roundedScore)} </span>

@@ -122,9 +122,8 @@ function LeaderboardModal(props) {
                                           player.dartsGames
                                         ];
                                       var isLowGameCount = match$1[1] > 5;
-                                      var isLowRating = match$1[0] > 0.0;
-                                      if (isHidden && isLowGameCount) {
-                                        return isLowRating;
+                                      if (isHidden) {
+                                        return isLowGameCount;
                                       } else {
                                         return false;
                                       }
@@ -186,9 +185,15 @@ function LeaderboardModal(props) {
                                                   })
                                             ],
                                             className: "group inline-flex items-baseline gap-1"
-                                          }) : JsxRuntime.jsx("small", {
-                                            children: Elo.roundScore(lastChange),
-                                            className: lastChange > 0.0 ? "text-green-400" : "text-red-400"
+                                          }) : JsxRuntime.jsxs(JsxRuntime.Fragment, {
+                                            children: [
+                                              roundedScore,
+                                              " ",
+                                              JsxRuntime.jsx("small", {
+                                                    children: Elo.roundScore(lastChange),
+                                                    className: lastChange > 0.0 ? "text-green-400" : "text-red-400"
+                                                  })
+                                            ]
                                           });
                                     return JsxRuntime.jsxs("tr", {
                                                 children: [
@@ -199,12 +204,8 @@ function LeaderboardModal(props) {
                                                   JsxRuntime.jsx("td", {
                                                         children: player.name
                                                       }),
-                                                  JsxRuntime.jsxs("td", {
-                                                        children: [
-                                                          roundedScore,
-                                                          " ",
-                                                          tmp
-                                                        ]
+                                                  JsxRuntime.jsx("td", {
+                                                        children: tmp
                                                       }),
                                                   JsxRuntime.jsx("td", {
                                                         children: JsxRuntime.jsx("div", {
