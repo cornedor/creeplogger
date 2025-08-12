@@ -114,10 +114,10 @@ let sendCreepsUpdate = async (
 
   let message = `### Nieuw potje geregistreerd!
 
-| Team | Goals |
-| ---- | ----- |
-| Blauw (${blueNames}) | ${blueScore->Int.toString} |
-| Rood (${redNames}) | ${redScore->Int.toString} |
+| Team | Spelers | Goals |
+| ---- | ------- | ----- |
+| Blauw | ${blueNames} | ${blueScore->Int.toString} |
+| Rood | ${redNames} | ${redScore->Int.toString} |
 
 Individueel:
 - Blauw: ${blueIndividuals}
