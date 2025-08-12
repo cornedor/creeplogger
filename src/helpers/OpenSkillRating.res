@@ -16,14 +16,14 @@ let teamToRatings = (team: team) =>
 // Update a player with new OpenSkill values
 let updatePlayerRating = (player: Players.player, newRating: OpenSkill.rating) => {
   let newOrdinal = calculateOrdinal(newRating.mu, newRating.sigma)
-  let muChange = newRating.mu -. player.mu
+  let osDelta = newOrdinal -. player.ordinal
   
   {
     ...player,
     mu: newRating.mu,
     sigma: newRating.sigma, 
     ordinal: newOrdinal,
-    lastEloChange: muChange, // Keep using lastEloChange for compatibility
+    lastOpenSkillChange: osDelta,
   }
 }
 
@@ -48,9 +48,9 @@ let calculateScore = (winners: team, losers: team, ~gameMode: Games.gameMode=Gam
     updatePlayerRating(player, newRating)
   })
   
-  // Calculate average rating change for display (similar to Elo points)
+  // Calculate average rating change for display (using OpenSkill delta)
   let avgWinnerChange = Array.reduce(updatedWinners, 0.0, (acc, player) => 
-    acc +. player.lastEloChange
+    acc +. player.lastOpenSkillChange
   ) /. Int.toFloat(Array.length(updatedWinners))
   
   (updatedWinners, updatedLosers, avgWinnerChange)

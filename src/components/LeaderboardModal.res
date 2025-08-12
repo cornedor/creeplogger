@@ -81,7 +81,7 @@ let make = (~show, ~setShow, ~gameMode, ~setGameMode) => {
             )
                       | Games.Foosball => (
                 player.ordinal,
-                player.lastEloChange,
+                player.lastOpenSkillChange,
                 player.lastGames,
                 player.wins,
                 player.games,

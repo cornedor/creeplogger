@@ -18,12 +18,12 @@ function teamToRatings(team) {
 
 function updatePlayerRating(player, newRating) {
   var newOrdinal = newRating.mu - 3.0 * newRating.sigma;
-  var muChange = newRating.mu - player.mu;
+  var osDelta = newOrdinal - player.ordinal;
   var newrecord = Caml_obj.obj_dup(player);
+  newrecord.lastOpenSkillChange = osDelta;
   newrecord.ordinal = newOrdinal;
   newrecord.sigma = newRating.sigma;
   newrecord.mu = newRating.mu;
-  newrecord.lastEloChange = muChange;
   return newrecord;
 }
 
@@ -42,7 +42,7 @@ function calculateScore(winners, losers, gameModeOpt) {
         return updatePlayerRating(player, newRating);
       });
   var avgWinnerChange = Core__Array.reduce(updatedWinners, 0.0, (function (acc, player) {
-          return acc + player.lastEloChange;
+          return acc + player.lastOpenSkillChange;
         })) / updatedWinners.length;
   return [
           updatedWinners,

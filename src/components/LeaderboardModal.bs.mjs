@@ -132,7 +132,7 @@ function LeaderboardModal(props) {
                                     var match;
                                     match = gameMode === "Foosball" ? [
                                         player.ordinal,
-                                        player.lastEloChange,
+                                        player.lastOpenSkillChange,
                                         player.lastGames,
                                         player.wins,
                                         player.games
