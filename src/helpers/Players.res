@@ -228,7 +228,7 @@ let updateGameStats = (key, myTeamPoints, opponentTeamPoints, team: team, elo) =
           ...player,
           games: player.games + 1,
           teamGoals: player.teamGoals + myTeamPoints,
-          teamGoalsAgainst: player.teamGoals + opponentTeamPoints,
+          teamGoalsAgainst: player.teamGoalsAgainst + opponentTeamPoints,
           redGames: team == Red ? player.redGames + 1 : player.redGames,
           blueGames: team == Blue ? player.blueGames + 1 : player.blueGames,
           wins: isWin ? player.wins + 1 : player.wins,

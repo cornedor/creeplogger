@@ -153,6 +153,7 @@ async function recalculateStats() {
         newrecord.mu = 25.0;
         newrecord.lastGames = [];
         newrecord.lastEloChange = 0.0;
+        newrecord.elo = 1000.0;
         newrecord.redWins = 0;
         newrecord.blueWins = 0;
         newrecord.redGames = 0;
