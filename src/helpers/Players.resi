@@ -22,6 +22,7 @@ type player = {
   mu: float,
   sigma: float,
   ordinal: float,
+  lastOpenSkillChange: float,
   dartsElo: float,
   dartsLastEloChange: float,
   dartsGames: int,
