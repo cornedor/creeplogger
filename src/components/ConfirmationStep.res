@@ -8,7 +8,7 @@ let mapPlayer = (users, key) => {
 }
 
 @react.component
-let make = (~score, ~winners, ~reset, ~players) => {
+let make = (~score, ~winners, ~reset, ~players, ~perPlayerDeltas: option<Js.Dict.t<int>>=?) => {
   let winners = winners->Array.map(winner => mapPlayer(players, winner))
 
   let winnerNames = Array.join(winners, " & ")
@@ -21,6 +21,20 @@ let make = (~score, ~winners, ~reset, ~players) => {
       {React.string("+")}
       {React.int(score)}
     </div>
+    {switch perPlayerDeltas {
+    | Some(map) => {
+        let items =
+          winners
+          ->Array.map(wKey => {
+            let name = mapPlayer(players, wKey)
+            let delta = Js.Dict.get(map, wKey)->Option.getOr(0)
+            let sign = delta >= 0 ? "+" : ""
+            <li key={wKey}> {React.string(name ++ ": " ++ sign ++ Int.toString(delta))} </li>
+          })
+        <ul className="mb-6"> {React.array(items)} </ul>
+      }
+    | None => React.null
+    }}
     <Button variant={Blue} onClick={_ => reset()}> {React.string("Verder")} </Button>
   </div>
 }

@@ -17,6 +17,7 @@ import * as JsxRuntime from "react/jsx-runtime";
 
 function ScoreStep(props) {
   var players = props.players;
+  var setPerPlayerDeltas = props.setPerPlayerDeltas;
   var setEarnedPoints = props.setEarnedPoints;
   var setRedState = props.setRedState;
   var redState = props.redState;
@@ -118,6 +119,8 @@ function ScoreStep(props) {
         match$1[2]
       ];
     }
+    var redOS = match[1];
+    var blueOS = match[0];
     var match$2;
     if (winningTeam === "Blue") {
       match$2 = Elo.calculateScore(bluePlayers$1, redPlayers$1, "Foosball");
@@ -133,10 +136,22 @@ function ScoreStep(props) {
     setEarnedPoints(function (param) {
           return roundedPoints;
         });
-    await Promise.all(match[0].map(async function (player) {
+    var deltas = {};
+    blueOS.forEach(function (player) {
+          var delta = OpenSkillRating.toDisplayDelta(player.lastOpenSkillChange);
+          deltas[player.key] = delta;
+        });
+    redOS.forEach(function (player) {
+          var delta = OpenSkillRating.toDisplayDelta(player.lastOpenSkillChange);
+          deltas[player.key] = delta;
+        });
+    setPerPlayerDeltas(function (param) {
+          return deltas;
+        });
+    await Promise.all(blueOS.map(async function (player) {
               return Players.updateOpenSkillGameStats(player.key, blueState, redState, "Blue", player.mu, player.sigma, player.ordinal);
             }));
-    await Promise.all(match[1].map(async function (player) {
+    await Promise.all(redOS.map(async function (player) {
               return Players.updateOpenSkillGameStats(player.key, redState, blueState, "Red", player.mu, player.sigma, player.ordinal);
             }));
     await Promise.all(match$2[0].map(async function (player) {

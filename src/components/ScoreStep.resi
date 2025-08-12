@@ -8,6 +8,7 @@ let make: (
   ~redState: int,
   ~setRedState: (int => int) => unit,
   ~setEarnedPoints: (int => int) => unit,
+  ~setPerPlayerDeltas: (Js.Dict.t<int> => Js.Dict.t<int>) => unit,
   ~players: array<Players.player>,
   ~gameMode: Games.gameMode,
 ) => React.element
