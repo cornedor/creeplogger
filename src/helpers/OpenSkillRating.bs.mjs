@@ -28,11 +28,11 @@ function updatePlayerRating(player, newRating) {
 }
 
 function toDisplayOrdinal(ordinal) {
-  return Math.round(1000.0 + ordinal * 40.0) | 0;
+  return Math.round(ordinal * 60.0) | 0;
 }
 
 function toDisplayDelta(delta) {
-  return Math.round(delta * 40.0) | 0;
+  return Math.round(delta * 60.0) | 0;
 }
 
 function calculateScore(winners, losers, gameModeOpt) {

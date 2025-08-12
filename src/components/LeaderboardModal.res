@@ -181,7 +181,7 @@ let make = (~show, ~setShow, ~gameMode, ~setGameMode) => {
             | Games.Foosball =>
               <>
                                                   <td title={"μ=" ++ round2(player.mu)->Js.Float.toString ++ " σ=" ++ round2(player.sigma)->Js.Float.toString ++ " ELO=" ++ round2(player.elo)->Js.Float.toString}>
-                   {React.int(Js.Math.round(player.ordinal)->Float.toInt)}
+                   {React.int(OpenSkillRating.toDisplayOrdinal(player.ordinal))}
                  </td>
                 <td>
                   <small className={deltaColor}>
