@@ -33,10 +33,10 @@ function LeaderboardModal(props) {
                           player.dartsGames
                         ];
                       var match$1 = player.hidden;
-                      var isHidden = match$1 !== undefined && match$1 ? false : true;
-                      var isLowGameCount = match[1] > 5;
-                      if (isHidden) {
-                        return isLowGameCount;
+                      var isVisible = match$1 !== undefined && match$1 ? false : true;
+                      var hasEnoughGames = match[1] > 5;
+                      if (isVisible) {
+                        return hasEnoughGames;
                       } else {
                         return false;
                       }
@@ -120,6 +120,7 @@ function LeaderboardModal(props) {
   tmp = setGameMode !== undefined ? (
       gameMode === "Foosball" ? JsxRuntime.jsx("button", {
               children: JsxRuntime.jsx(SoccerIcon.make, {}),
+              "aria-label": "Switch to Darts leaderboard",
               className: "text-white w-[44px] aspect-square text-[26px] flex justify-center items-center rounded-full bg-black/0 transition-all ease-in-out duration-200 shadow-none hover:bg-black/20 hover:shadow-icon-button hover:ring-8 ring-black/20 active:bg-black/20 active:shadow-icon-button active:ring-8",
               onClick: (function (param) {
                   setGameMode(function (param) {
@@ -128,6 +129,7 @@ function LeaderboardModal(props) {
                 })
             }) : JsxRuntime.jsx("button", {
               children: JsxRuntime.jsx(DartsIcon.make, {}),
+              "aria-label": "Switch to Foosball leaderboard",
               className: "text-white w-[44px] aspect-square text-[26px] flex justify-center items-center rounded-full bg-black/0 transition-all ease-in-out duration-200 shadow-none hover:bg-black/20 hover:shadow-icon-button hover:ring-8 ring-black/20 active:bg-black/20 active:shadow-icon-button active:ring-8",
               onClick: (function (param) {
                   setGameMode(function (param) {
@@ -174,6 +176,7 @@ function LeaderboardModal(props) {
                                                   children: "Score " + (
                                                     ascOrder ? "↑" : "↓"
                                                   ),
+                                                  "aria-label": "Toggle sort order",
                                                   onClick: (function (param) {
                                                       setOrder(function (order) {
                                                             return !order;
@@ -277,7 +280,7 @@ function LeaderboardModal(props) {
                                                       }),
                                                   JsxRuntime.jsxs("td", {
                                                         children: [
-                                                          Math.round(wins / games * 100),
+                                                          Math.round(games > 0 ? wins / games * 100 : 0.0),
                                                           "%"
                                                         ]
                                                       })

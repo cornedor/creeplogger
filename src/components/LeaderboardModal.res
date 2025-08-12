@@ -15,14 +15,14 @@ let make = (~show, ~setShow, ~gameMode, ~setGameMode) => {
       | _ => (player.ordinal, player.games)
       }
 
-      let isHidden = switch player.hidden {
+      let isVisible = switch player.hidden {
       | Some(true) => false
       | Some(false) => true
       | None => true
       }
 
-      let isLowGameCount = games > 5
-      isHidden && isLowGameCount
+      let hasEnoughGames = games > 5
+      isVisible && hasEnoughGames
     })
   , (players, gameMode))
 
@@ -88,12 +88,14 @@ let make = (~show, ~setShow, ~gameMode, ~setGameMode) => {
         switch gameMode {
         | Games.Foosball =>
           <button
+            ariaLabel="Switch to Darts leaderboard"
             className="text-white w-[44px] aspect-square text-[26px] flex justify-center items-center rounded-full bg-black/0 transition-all ease-in-out duration-200 shadow-none hover:bg-black/20 hover:shadow-icon-button hover:ring-8 ring-black/20 active:bg-black/20 active:shadow-icon-button active:ring-8"
             onClick={_ => setGameMode(_ => Games.Darts)}>
             <SoccerIcon />
           </button>
         | Games.Darts =>
           <button
+            ariaLabel="Switch to Foosball leaderboard"
             className="text-white w-[44px] aspect-square text-[26px] flex justify-center items-center rounded-full bg-black/0 transition-all ease-in-out duration-200 shadow-none hover:bg-black/20 hover:shadow-icon-button hover:ring-8 ring-black/20 active:bg-black/20 active:shadow-icon-button active:ring-8"
             onClick={_ => setGameMode(_ => Games.Foosball)}>
             <DartsIcon />
@@ -110,7 +112,7 @@ let make = (~show, ~setShow, ~gameMode, ~setGameMode) => {
           </th>
           <th className="text-lg text-left"> {React.string("Speler")} </th>
           <th className="text-lg text-left">
-            <button onClick={_ => setOrder(order => !order)}>
+            <button ariaLabel="Toggle sort order" onClick={_ => setOrder(order => !order)}>
               {React.string("Score " ++ (ascOrder ? "↑" : "↓"))}
             </button>
           </th>
@@ -192,7 +194,7 @@ let make = (~show, ~setShow, ~gameMode, ~setGameMode) => {
               {React.int(wins)}
             </td>
             <td>
-              {React.float((Float.fromInt(wins) /. Float.fromInt(games) *. 100.)->Math.round)}
+              {React.float((games > 0 ? (Float.fromInt(wins) /. Float.fromInt(games) *. 100.) : 0.0)->Math.round)}
               {React.string("%")}
             </td>
           </tr>
