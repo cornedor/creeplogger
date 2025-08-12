@@ -149,8 +149,8 @@ async function recalculateStats() {
         newrecord.dartsLastEloChange = 0.0;
         newrecord.dartsElo = 1000.0;
         newrecord.ordinal = 0.0;
-        newrecord.sigma = 500.0;
-        newrecord.mu = 1500.0;
+        newrecord.sigma = 8.333;
+        newrecord.mu = 25.0;
         newrecord.lastGames = [];
         newrecord.lastEloChange = 0.0;
         newrecord.elo = 1000.0;

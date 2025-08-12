@@ -260,7 +260,7 @@ function LeaderboardModal(props) {
                                     tmp = gameMode === "Foosball" ? JsxRuntime.jsxs(JsxRuntime.Fragment, {
                                             children: [
                                               JsxRuntime.jsx("td", {
-                                                    children: Math.round(player.ordinal) | 0,
+                                                    children: OpenSkillRating.toDisplayOrdinal(player.ordinal),
                                                     title: "μ=" + round2(player.mu).toString() + " σ=" + round2(player.sigma).toString() + " ELO=" + round2(player.elo).toString()
                                                   }),
                                               JsxRuntime.jsx("td", {

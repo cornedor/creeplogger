@@ -6,8 +6,8 @@ import * as PervasivesU from "rescript/lib/es6/pervasivesU.js";
 import * as RescriptCore from "@rescript/core/src/RescriptCore.bs.mjs";
 
 function createRating(muOpt, sigmaOpt, param) {
-  var mu = muOpt !== undefined ? muOpt : 1500.0;
-  var sigma = sigmaOpt !== undefined ? sigmaOpt : 500.0;
+  var mu = muOpt !== undefined ? muOpt : 25.0;
+  var sigma = sigmaOpt !== undefined ? sigmaOpt : 8.333;
   return Openskill.rating({
               mu: mu,
               sigma: sigma

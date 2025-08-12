@@ -118,7 +118,7 @@ let make = (
       }
     }
 
-    let roundedPoints = OpenSkillRating.roundScore(osPoints)
+    let roundedPoints = OpenSkillRating.toDisplayDelta(osPoints)
 
     setEarnedPoints(_ => roundedPoints)
 

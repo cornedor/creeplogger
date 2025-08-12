@@ -129,7 +129,7 @@ function ScoreStep(props) {
         match$3[2]
       ];
     }
-    var roundedPoints = OpenSkillRating.roundScore(match[2]);
+    var roundedPoints = OpenSkillRating.toDisplayDelta(match[2]);
     setEarnedPoints(function (param) {
           return roundedPoints;
         });

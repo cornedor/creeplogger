@@ -153,8 +153,8 @@ let recalculateStats = async () => {
         elo: 1000.0,
         lastEloChange: 0.0,
         // Reset OpenSkill fields
-        mu: 1500.0,
-        sigma: 500.0,
+        mu: 25.0,
+        sigma: 8.333,
         ordinal: 0.0,
         lastGames: [],
         // Darts game stats

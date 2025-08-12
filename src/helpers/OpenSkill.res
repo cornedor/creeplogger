@@ -28,7 +28,7 @@ type rateOptions = {
 // Helper functions for creating and working with ratings
 
 @inline
-let createRating = (~mu=1500.0, ~sigma=500.0, ()) => ratingWithValues({"mu": mu, "sigma": sigma})
+let createRating = (~mu=25.0, ~sigma=8.333, ()) => ratingWithValues({"mu": mu, "sigma": sigma})
 
 @inline
 let defaultRating = () => rating()
