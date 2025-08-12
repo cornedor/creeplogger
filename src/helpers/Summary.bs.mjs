@@ -5,9 +5,9 @@ import * as Players from "./Players.bs.mjs";
 import * as PervasivesU from "rescript/lib/es6/pervasivesU.js";
 import * as Core__Option from "@rescript/core/src/Core__Option.bs.mjs";
 
-async function getDailyOverview(period) {
-  var games = await Games.getTimePeriod(period);
-  var players = await Players.fetchAllPlayers();
+async function getDailyOverviewWith(period, getTimePeriod, fetchAllPlayers) {
+  var games = await getTimePeriod(period);
+  var players = await fetchAllPlayers();
   var creepsMap = new Map();
   Object.values(games).forEach(function (game) {
         var winner = game.blueScore > game.redScore ? "Blue" : "Red";
@@ -82,11 +82,16 @@ async function getDailyOverview(period) {
   return creepsMap;
 }
 
+async function getDailyOverview(period) {
+  return await getDailyOverviewWith(period, Games.getTimePeriod, Players.fetchAllPlayers);
+}
+
 function toAPIObject(data) {
   return Object.fromEntries(data.entries());
 }
 
 export {
+  getDailyOverviewWith ,
   getDailyOverview ,
   toAPIObject ,
 }

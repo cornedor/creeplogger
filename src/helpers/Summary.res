@@ -5,9 +5,9 @@ type dailyLine = {
   score: int,
 }
 
-let getDailyOverview = async period => {
-  let games = await Games.getTimePeriod(period)
-  let players = await Players.fetchAllPlayers()
+let getDailyOverviewWith = async (period, ~getTimePeriod, ~fetchAllPlayers) => {
+  let games: Js.Dict.t<Games.game> = await getTimePeriod(period)
+  let players: Js.Dict.t<Players.player> = await fetchAllPlayers()
 
   let creepsMap = Map.make()
 
@@ -66,6 +66,15 @@ let getDailyOverview = async period => {
   })
 
   creepsMap
+}
+
+let getDailyOverview = async period => {
+  let result = await getDailyOverviewWith(
+    period,
+    ~getTimePeriod=Games.getTimePeriod,
+    ~fetchAllPlayers=Players.fetchAllPlayers,
+  )
+  result
 }
 
 let toAPIObject = data => {

@@ -36,13 +36,18 @@ let toDisplayDelta = (delta: float) => (delta *. 60.0)->Js.Math.round->Float.toI
 
 // Calculate new ratings for both teams after a game
 // Returns (updated winners, updated losers, points change for display)
-let calculateScore = (winners: team, losers: team, ~gameMode: Games.gameMode=Games.Foosball) => {
+let calculateScore = (
+  winners: team,
+  losers: team,
+  ~gameMode: Games.gameMode=Games.Foosball,
+  ~rateGame=(OpenSkill.rateGame),
+) => {
   // Convert teams to OpenSkill ratings
   let winnerRatings = teamToRatings(winners)
   let loserRatings = teamToRatings(losers)
   
   // Calculate new ratings
-  let (newWinnerRatings, newLoserRatings) = OpenSkill.rateGame(winnerRatings, loserRatings)
+  let (newWinnerRatings, newLoserRatings) = rateGame(winnerRatings, loserRatings)
   
   // Update players with new ratings
   let updatedWinners = Array.mapWithIndex(winners, (player, index) => {

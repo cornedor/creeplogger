@@ -109,9 +109,9 @@ function ScoreStep(props) {
         });
     var match;
     if (winningTeam === "Blue") {
-      match = OpenSkillRating.calculateScore(bluePlayers$1, redPlayers$1, "Foosball");
+      match = OpenSkillRating.calculateScore(bluePlayers$1, redPlayers$1, "Foosball", undefined);
     } else {
-      var match$1 = OpenSkillRating.calculateScore(redPlayers$1, bluePlayers$1, "Foosball");
+      var match$1 = OpenSkillRating.calculateScore(redPlayers$1, bluePlayers$1, "Foosball", undefined);
       match = [
         match$1[1],
         match$1[0],

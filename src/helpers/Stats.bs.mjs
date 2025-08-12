@@ -179,9 +179,9 @@ async function recalculateStats() {
               });
           var match;
           if (blueWin) {
-            match = OpenSkillRating.calculateScore(bluePlayers, redPlayers, "Foosball");
+            match = OpenSkillRating.calculateScore(bluePlayers, redPlayers, "Foosball", undefined);
           } else {
-            var match$1 = OpenSkillRating.calculateScore(redPlayers, bluePlayers, "Foosball");
+            var match$1 = OpenSkillRating.calculateScore(redPlayers, bluePlayers, "Foosball", undefined);
             match = [
               match$1[1],
               match$1[0],

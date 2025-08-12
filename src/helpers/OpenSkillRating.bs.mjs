@@ -35,10 +35,11 @@ function toDisplayDelta(delta) {
   return Math.round(delta * 60.0) | 0;
 }
 
-function calculateScore(winners, losers, gameModeOpt) {
+function calculateScore(winners, losers, gameModeOpt, rateGameOpt) {
+  var rateGame = rateGameOpt !== undefined ? rateGameOpt : OpenSkill.rateGame;
   var winnerRatings = winners.map(getOpenSkillRating);
   var loserRatings = losers.map(getOpenSkillRating);
-  var match = OpenSkill.rateGame(winnerRatings, loserRatings);
+  var match = rateGame(winnerRatings, loserRatings);
   var newLoserRatings = match[1];
   var newWinnerRatings = match[0];
   var updatedWinners = winners.map(function (player, index) {
