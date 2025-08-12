@@ -271,7 +271,6 @@ let updateOpenSkillGameStats = (
   Firebase.Database.runTransaction(playerRef, data => {
     switch data->Schema.parseWith(playerSchema) {
     | Ok(player) =>
-      let muChange = mu -. player.mu
       switch Schema.serializeWith(
         {
           ...player,
@@ -286,8 +285,8 @@ let updateOpenSkillGameStats = (
           absoluteWins: isAbsoluteWin ? player.absoluteWins + 1 : player.absoluteWins,
           redWins: isRedWin ? player.redWins + 1 : player.redWins,
           blueWins: isBlueWin ? player.blueWins + 1 : player.blueWins,
-          // Keep lastEloChange semantics, but for OpenSkill we store mu delta
-          lastEloChange: muChange,
+          // Do not touch Elo deltas here; Elo updates elsewhere
+          lastEloChange: player.lastEloChange,
           mu,
           sigma,
           ordinal,

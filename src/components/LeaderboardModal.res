@@ -79,12 +79,12 @@ let make = (~show, ~setShow, ~gameMode, ~setGameMode) => {
               player.dartsWins,
               player.dartsGames,
             )
-          | Games.Foosball => (
-              player.ordinal,
-              player.lastEloChange, // mu delta
-              player.lastGames,
-              player.wins,
-              player.games,
+                      | Games.Foosball => (
+                player.ordinal,
+                player.lastEloChange,
+                player.lastGames,
+                player.wins,
+                player.games,
             )
           }
           let roundedScore = OpenSkillRating.roundScore(displayScore)
