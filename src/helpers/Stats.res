@@ -1,5 +1,7 @@
 open Firebase
 
+let _ignoreOpenSkill = OpenSkillRating.roundScore(0.0)
+
 type stats = {
   totalGames: int,
   totalRedWins: int,
@@ -147,8 +149,12 @@ let recalculateStats = async () => {
         absoluteWins: 0,
         redWins: 0,
         blueWins: 0,
-        elo: 1000.0,
+        // Keep existing Elo; do not reset to avoid data loss
         lastEloChange: 0.0,
+        // Reset OpenSkill fields
+        mu: 25.0,
+        sigma: 8.333,
+        ordinal: 0.0,
         lastGames: [],
         // Darts game stats
         dartsGames: 0,
@@ -173,9 +179,9 @@ let recalculateStats = async () => {
     let bluePlayers = game.blueTeam->Array.map(key => Dict.get(players, key)->Option.getExn)
 
     let (bluePlayers, redPlayers, _) = switch blueWin {
-    | true => Elo.calculateScore(bluePlayers, redPlayers, ~gameMode=Games.Foosball)
+    | true => OpenSkillRating.calculateScore(bluePlayers, redPlayers, ~gameMode=Games.Foosball)
     | false => {
-        let (red, blue, points) = Elo.calculateScore(
+        let (red, blue, points) = OpenSkillRating.calculateScore(
           redPlayers,
           bluePlayers,
           ~gameMode=Games.Foosball,

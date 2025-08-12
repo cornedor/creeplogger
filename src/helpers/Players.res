@@ -19,6 +19,10 @@ type player = {
   mattermostHandle: option<string>,
   lastGames: array<int>,
   hidden: option<bool>,
+  // OpenSkill fields
+  mu: float,
+  sigma: float,
+  ordinal: float,
   dartsElo: float,
   dartsLastEloChange: float,
   dartsGames: int,
@@ -36,14 +40,13 @@ let playerSchema = Schema.object(s => {
   name: s.field("name", Schema.string),
   wins: s.fieldOr("wins", Schema.int, 0),
   losses: s.fieldOr("losses", Schema.int, 0),
-  absoluteWins: s.fieldOr("absoluteWins", Schema.int, 0),
-  absoluteLosses: s.fieldOr("absoluteLosses", Schema.int, 0),
+  absoluteWins: s.fieldOr("aw", Schema.int, 0),
+  absoluteLosses: s.fieldOr("al", Schema.int, 0),
   games: s.fieldOr("games", Schema.int, 0),
-  teamGoals: s.fieldOr("teamGoals", Schema.int, 0),
+  teamGoals: s.fieldOr("tg", Schema.int, 0),
   teamGoalsAgainst: s.fieldOr("tga", Schema.int, 0),
-  redGames: s.fieldOr("redGames", Schema.int, 0),
-  blueGames: s.fieldOr("blueGames", Schema.int, 0),
-  redWins: s.fieldOr("redWins", Schema.int, 0),
+  blueGames: s.fieldOr("bg", Schema.int, 0),
+  redGames: s.fieldOr("rg", Schema.int, 0),
   blueWins: s.fieldOr("blueWins", Schema.int, 0),
   elo: s.fieldOr("elo", Schema.float, 1000.0),
   lastEloChange: s.fieldOr("change", Schema.float, 0.0),
@@ -51,6 +54,9 @@ let playerSchema = Schema.object(s => {
   mattermostHandle: s.field("mh", Schema.option(Schema.string)->FirebaseSchema.nullableTransform),
   lastGames: s.fieldOr("lastGames", Schema.array(Schema.int), []),
   hidden: s.field("hidden", Schema.option(Schema.bool)->FirebaseSchema.nullableTransform),
+  mu: s.fieldOr("mu", Schema.float, 25.0),
+  sigma: s.fieldOr("sigma", Schema.float, 8.333),
+  ordinal: s.fieldOr("ordinal", Schema.float, 0.0),
   dartsElo: s.fieldOr("dartsElo", Schema.float, 1000.0),
   dartsLastEloChange: s.fieldOr("dartsChange", Schema.float, 0.0),
   dartsGames: s.fieldOr("dartsGames", Schema.int, 0),
@@ -82,6 +88,9 @@ let addPlayer = async name => {
     mattermostHandle: None,
     lastGames: [],
     hidden: None,
+    mu: 25.0,
+    sigma: 8.333,
+    ordinal: 0.0,
     dartsElo: 1000.0,
     dartsLastEloChange: 0.0,
     dartsGames: 0,
@@ -104,53 +113,53 @@ let addPlayer = async name => {
   ref
 }
 
-type playersOrder = [#games | #elo | #dartsElo]
+type playersOrder = [#games | #elo | #rating | #dartsElo]
 
 // let sortPlayersBy(orderBy: playersOrder)
 
 external snapshotToArray: dataSnapshot => array<dataSnapshot> = "%identity"
 
-let useAllPlayers = (~orderBy: playersOrder=#games, ~asc=false) => {
+let useAllPlayers = (~orderBy: playersOrder=#rating, ~asc=false) => {
   let (players, setPlayers) = React.useState(_ => [])
   let playersRef = Firebase.Database.query1(
     Firebase.Database.refPath(Database.database, bucket),
-    Firebase.Database.orderByChild("games"),
+    Firebase.Database.orderByKey,
   )
 
   React.useEffect(() => {
     let unsubscribe = Firebase.Database.onValue(
       playersRef,
       snapshot => {
-        let newPlayers = []
-        Array.forEach(snapshotToArray(snapshot), snap => {
-          let data = Firebase.Database.Snapshot.val(snap)
-          switch data->Js.toOption {
-          | Some(data) =>
-            switch data->Schema.parseWith(playerSchema) {
-            | Ok(player) => Array.push(newPlayers, player)
-            | Error(e) => Console.error(e)
+        let players =
+          snapshotToArray(snapshot)->Array.reduce([], (players, player) => {
+            let key = Firebase.Database.Snapshot.key(player)->Nullable.toOption->Option.getExn
+            switch Firebase.Database.Snapshot.val(player)->Nullable.toOption {
+            | Some(val) =>
+              switch val->Schema.parseWith(playerSchema) {
+              | Ok(val) => [{...val, key}]->Array.concat(players)
+              | Error(_e) => players
+              }
+            | None => players
             }
-          | None => ()
-          }
-        })
-        setPlayers(_ => newPlayers)
+          })
+
+        setPlayers(_ =>
+          players->Array.sortInPlaceWith((a, b) => {
+            let (a, b) = asc ? (a, b) : (b, a)
+            switch orderBy {
+            | #games => Int.toFloat(a.games - b.games)
+            | #elo => a.elo -. b.elo
+            | #rating => a.ordinal -. b.ordinal
+            | #dartsElo => a.dartsElo -. b.dartsElo
+            }
+          })
+        )
       },
       (),
     )
 
     Some(unsubscribe)
-  }, [setPlayers])
-
-  let players = React.useMemo(() =>
-    players->Array.toSorted((a, b) => {
-      let (a, b) = asc ? (a, b) : (b, a)
-      switch orderBy {
-      | #games => Int.toFloat(a.games - b.games)
-      | #elo => a.elo -. b.elo
-      | #dartsElo => a.dartsElo -. b.dartsElo
-      }
-    })
-  , (players, asc, orderBy))
+  }, [])
 
   players
 }
@@ -229,6 +238,64 @@ let updateGameStats = (key, myTeamPoints, opponentTeamPoints, team: team, elo) =
           blueWins: isBlueWin ? player.blueWins + 1 : player.blueWins,
           lastEloChange: elo -. player.elo,
           elo,
+          lastGames: getLastGames(player.lastGames, isWin),
+        },
+        playerSchema,
+      ) {
+      | Ok(res) => res
+      | _ => data
+      }
+    | Error(_) => data
+    }
+  })
+}
+
+// Update stats using OpenSkill values, while preserving Elo field untouched here
+let updateOpenSkillGameStats = (
+  key,
+  myTeamPoints,
+  opponentTeamPoints,
+  team: team,
+  mu,
+  sigma,
+  ordinal,
+  eloForHover: float,
+) => {
+  let isAbsolute = Rules.isAbsolute(myTeamPoints, opponentTeamPoints)
+
+  let isWin = myTeamPoints > opponentTeamPoints
+  let isAbsoluteWin = isAbsolute && isWin
+  let isLoss = myTeamPoints < opponentTeamPoints
+  let isAbsoluteLoss = isAbsolute && isLoss
+  let isRedWin = team == Red && isWin
+  let isBlueWin = team == Blue && isWin
+
+  let playerRef = Firebase.Database.refPath(Database.database, bucket ++ "/" ++ key)
+  Firebase.Database.runTransaction(playerRef, data => {
+    switch data->Schema.parseWith(playerSchema) {
+    | Ok(player) =>
+      let muChange = mu -. player.mu
+      switch Schema.serializeWith(
+        {
+          ...player,
+          games: player.games + 1,
+          teamGoals: player.teamGoals + myTeamPoints,
+          teamGoalsAgainst: player.teamGoalsAgainst + opponentTeamPoints,
+          redGames: team == Red ? player.redGames + 1 : player.redGames,
+          blueGames: team == Blue ? player.blueGames + 1 : player.blueGames,
+          wins: isWin ? player.wins + 1 : player.wins,
+          losses: isLoss ? player.losses + 1 : player.losses,
+          absoluteLosses: isAbsoluteLoss ? player.absoluteLosses + 1 : player.absoluteLosses,
+          absoluteWins: isAbsoluteWin ? player.absoluteWins + 1 : player.absoluteWins,
+          redWins: isRedWin ? player.redWins + 1 : player.redWins,
+          blueWins: isBlueWin ? player.blueWins + 1 : player.blueWins,
+          // Keep lastEloChange semantics, but for OpenSkill we store mu delta
+          lastEloChange: muChange,
+          mu,
+          sigma,
+          ordinal,
+          // Keep existing Elo untouched; optionally set to provided eloForHover if we want to sync
+          elo: player.elo,
           lastGames: getLastGames(player.lastGames, isWin),
         },
         playerSchema,

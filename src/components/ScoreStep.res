@@ -94,9 +94,9 @@ let make = (
       selectedBlueUsers->Array.map(key => Players.playerByKey(players, key)->Option.getExn)
 
     let (bluePlayers, redPlayers, points) = switch winningTeam {
-    | Blue => Elo.calculateScore(bluePlayers, redPlayers, ~gameMode=Games.Foosball)
+    | Blue => OpenSkillRating.calculateScore(bluePlayers, redPlayers, ~gameMode=Games.Foosball)
     | Red => {
-        let (red, blue, points) = Elo.calculateScore(
+        let (red, blue, points) = OpenSkillRating.calculateScore(
           redPlayers,
           bluePlayers,
           ~gameMode=Games.Foosball,
@@ -105,18 +105,36 @@ let make = (
       }
     }
 
-    let roundedPoints = Elo.roundScore(points)
+    let roundedPoints = OpenSkillRating.roundScore(points)
 
     setEarnedPoints(_ => roundedPoints)
 
     let _ = await Promise.all(
       Array.map(bluePlayers, async player => {
-        Players.updateGameStats(player.key, blueState, redState, Blue, player.elo)
+        Players.updateOpenSkillGameStats(
+          player.key,
+          blueState,
+          redState,
+          Blue,
+          player.mu,
+          player.sigma,
+          player.ordinal,
+          player.elo,
+        )
       }),
     )
     let _ = await Promise.all(
       Array.map(redPlayers, async player => {
-        Players.updateGameStats(player.key, redState, blueState, Red, player.elo)
+        Players.updateOpenSkillGameStats(
+          player.key,
+          redState,
+          blueState,
+          Red,
+          player.mu,
+          player.sigma,
+          player.ordinal,
+          player.elo,
+        )
       }),
     )
 
