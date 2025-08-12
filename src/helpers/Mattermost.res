@@ -139,7 +139,9 @@ let sendDailyUpdate = async () => {
           " | " ++
           creeper.games->Int.toString ++
           " | " ++
-          creeper.score->Int.toString ++ " |"
+          creeper.score->Int.toString ++
+          " | " ++
+          creeper.goalDiff->Int.toString ++ " |"
         )
         ->Array.join("\n")
 
@@ -149,8 +151,8 @@ let sendDailyUpdate = async () => {
 
 Feliciteer direct onze top kruiper van de dag: ${topCreeper.name} met maar liefst ${topCreeper.creeps->Int.toString} kruipjes en een netto score van ${topCreeper.score->Int.toString}!
 
-| # | Naam | Kruipjes | Potjes | Netto Score |
-| - | ---- | -------- | ------ | ----------- |
+| # | Naam | Kruipjes | Potjes | Netto Score | Doel saldo |
+| - | ---- | -------- | ------ | ----------- | ---------- |
 ${table}
 
 `

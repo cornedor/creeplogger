@@ -3,6 +3,7 @@ type dailyLine = {
   creeps: int,
   games: int,
   score: int,
+  goalDiff: int,
 }
 
 let getDailyOverview = async period => {
@@ -16,18 +17,22 @@ let getDailyOverview = async period => {
   ->Array.forEach(game => {
     let winner = game.blueScore > game.redScore ? Players.Blue : Players.Red
     let isAbsolute = abs(game.blueScore - game.redScore) == 7
+    let absGoalDiff = abs(game.blueScore - game.redScore)
+    // todo: collect game points
+    let gamePoints = 16
 
     game.blueTeam->Array.forEach(player => {
-      let {creeps, games, score} = Map.get(creepsMap, player)->Option.getOr({
+      let {creeps, games, score, goalDiff} = Map.get(creepsMap, player)->Option.getOr({
         name: "",
         creeps: 0,
         games: 0,
         score: 0,
+        goalDiff: 0,
       })
-      let (creeps, games, score) = switch (winner, isAbsolute) {
-      | (Red, true) => (creeps + 2, games + 1, score - game.redScore)
-      | (Red, false) => (creeps + 1, games + 1, score - game.redScore)
-      | (Blue, _) => (creeps + 0, games + 1, score + game.blueScore)
+      let (creeps, games, score, goalDiff) = switch (winner, isAbsolute) {
+      | (Red, true) => (creeps + 2, games + 1, score - gamePoints, goalDiff - absGoalDiff)
+      | (Red, false) => (creeps + 1, games + 1, score - gamePoints, goalDiff - absGoalDiff)
+      | (Blue, _) => (creeps + 0, games + 1, score + gamePoints, goalDiff + absGoalDiff)
       }
       Map.set(
         creepsMap,
@@ -37,20 +42,22 @@ let getDailyOverview = async period => {
           creeps,
           games,
           score,
+          goalDiff,
         },
       )
     })
     game.redTeam->Array.forEach(player => {
-      let {creeps, games, score} = Map.get(creepsMap, player)->Option.getOr({
+      let {creeps, games, score, goalDiff} = Map.get(creepsMap, player)->Option.getOr({
         name: "",
         creeps: 0,
         games: 0,
         score: 0,
+        goalDiff: 0,
       })
-      let (creeps, games, score) = switch (winner, isAbsolute) {
-      | (Blue, true) => (creeps + 2, games + 1, score - game.blueScore)
-      | (Blue, false) => (creeps + 1, games + 1, score - game.blueScore)
-      | (Red, _) => (creeps + 0, games + 1, score + game.redScore)
+      let (creeps, games, score, goalDiff) = switch (winner, isAbsolute) {
+      | (Blue, true) => (creeps + 2, games + 1, score - gamePoints, goalDiff - absGoalDiff)
+      | (Blue, false) => (creeps + 1, games + 1, score - gamePoints, goalDiff - absGoalDiff)
+      | (Red, _) => (creeps + 0, games + 1, score + gamePoints, goalDiff + absGoalDiff)
       }
       Map.set(
         creepsMap,
@@ -60,6 +67,7 @@ let getDailyOverview = async period => {
           creeps,
           games,
           score,
+          goalDiff,
         },
       )
     })
