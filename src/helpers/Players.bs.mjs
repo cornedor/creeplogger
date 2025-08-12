@@ -93,6 +93,7 @@ function useAllPlayers(orderByOpt, ascOpt) {
         return [];
       });
   var setPlayers = match[1];
+  var players = match[0];
   var playersRef = Database$1.query(Database$1.ref(Database.database, "players"), Database$1.orderByChild("games"));
   React.useEffect((function () {
           return Database$1.onValue(playersRef, (function (snapshot) {
@@ -109,30 +110,36 @@ function useAllPlayers(orderByOpt, ascOpt) {
                               newPlayers.push(player._0);
                             });
                         setPlayers(function (param) {
-                              return newPlayers.toSorted(function (a, b) {
-                                          var match = asc ? [
-                                              a,
-                                              b
-                                            ] : [
-                                              b,
-                                              a
-                                            ];
-                                          var b$1 = match[1];
-                                          var a$1 = match[0];
-                                          if (orderBy === "elo") {
-                                            return a$1.elo - b$1.elo;
-                                          } else if (orderBy === "games") {
-                                            return a$1.games - b$1.games | 0;
-                                          } else if (orderBy === "rating") {
-                                            return a$1.ordinal - b$1.ordinal;
-                                          } else {
-                                            return a$1.dartsElo - b$1.dartsElo;
-                                          }
-                                        });
+                              return newPlayers;
                             });
                       }), undefined);
         }), [setPlayers]);
-  return match[0];
+  return React.useMemo((function () {
+                return players.toSorted(function (a, b) {
+                            var match = asc ? [
+                                a,
+                                b
+                              ] : [
+                                b,
+                                a
+                              ];
+                            var b$1 = match[1];
+                            var a$1 = match[0];
+                            if (orderBy === "elo") {
+                              return a$1.elo - b$1.elo;
+                            } else if (orderBy === "games") {
+                              return a$1.games - b$1.games | 0;
+                            } else if (orderBy === "rating") {
+                              return a$1.ordinal - b$1.ordinal;
+                            } else {
+                              return a$1.dartsElo - b$1.dartsElo;
+                            }
+                          });
+              }), [
+              players,
+              asc,
+              orderBy
+            ]);
 }
 
 async function fetchAllPlayers() {

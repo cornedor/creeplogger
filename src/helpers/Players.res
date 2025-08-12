@@ -144,17 +144,7 @@ let useAllPlayers = (~orderBy: playersOrder=#rating, ~asc=false) => {
           | None => ()
           }
         })
-        setPlayers(_ =>
-  newPlayers->Array.toSorted((a, b) => {
-    let (a, b) = asc ? (a, b) : (b, a)
-    switch orderBy {
-    | #games => Int.toFloat(a.games - b.games)
-    | #elo => a.elo -. b.elo
-    | #rating => a.ordinal -. b.ordinal
-    | #dartsElo => a.dartsElo -. b.dartsElo
-    }
-  })
-)
+                setPlayers(_ => newPlayers)
       },
       (),
     )
@@ -162,7 +152,17 @@ let useAllPlayers = (~orderBy: playersOrder=#rating, ~asc=false) => {
     Some(unsubscribe)
   }, [setPlayers])
 
-  players
+  React.useMemo(() =>
+    players->Array.toSorted((a, b) => {
+      let (a, b) = asc ? (a, b) : (b, a)
+      switch orderBy {
+      | #games => Int.toFloat(a.games - b.games)
+      | #elo => a.elo -. b.elo
+      | #rating => a.ordinal -. b.ordinal
+      | #dartsElo => a.dartsElo -. b.dartsElo
+      }
+    })
+  , (players, asc, orderBy))
 }
 
 let fetchAllPlayers = async () => {
