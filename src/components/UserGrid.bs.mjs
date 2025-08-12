@@ -20,7 +20,9 @@ function UserGrid(props) {
       });
   var showQueueButtons = match[0];
   var sorted;
-  sorted = gameMode === "Foosball" ? players : players.toSorted(function (a, b) {
+  sorted = gameMode === "Foosball" ? players.toSorted(function (a, b) {
+          return b.games - a.games | 0;
+        }) : players.toSorted(function (a, b) {
           return b.dartsGames - a.dartsGames | 0;
         });
   var players$1 = sorted.map(function (item) {
