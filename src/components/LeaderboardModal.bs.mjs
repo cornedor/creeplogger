@@ -142,16 +142,8 @@ function LeaderboardModal(props) {
   tmp$1 = gameMode === "Foosball" ? JsxRuntime.jsxs(JsxRuntime.Fragment, {
           children: [
             JsxRuntime.jsx("th", {
-                  children: "μ",
-                  className: "text-lg text-left"
-                }),
-            JsxRuntime.jsx("th", {
-                  children: "σ",
-                  className: "text-lg text-left"
-                }),
-            JsxRuntime.jsx("th", {
                   children: JsxRuntime.jsx("button", {
-                        children: "Ord. " + (
+                        children: "Score " + (
                           ascOrder ? "↑" : "↓"
                         ),
                         "aria-label": "Toggle sort order",
@@ -230,11 +222,11 @@ function LeaderboardModal(props) {
                                           }),
                                       JsxRuntime.jsx("th", {
                                             children: "G/W",
-                                            className: "text-lg text-left hidden min-[1200px]:table-cell"
+                                            className: "text-lg text-left"
                                           }),
                                       JsxRuntime.jsx("th", {
                                             children: "Win%",
-                                            className: "text-lg text-left hidden min-[1200px]:table-cell"
+                                            className: "text-lg text-left"
                                           })
                                     ]
                                   })
@@ -268,13 +260,8 @@ function LeaderboardModal(props) {
                                     tmp = gameMode === "Foosball" ? JsxRuntime.jsxs(JsxRuntime.Fragment, {
                                             children: [
                                               JsxRuntime.jsx("td", {
-                                                    children: round2(player.mu)
-                                                  }),
-                                              JsxRuntime.jsx("td", {
-                                                    children: round2(player.sigma)
-                                                  }),
-                                              JsxRuntime.jsx("td", {
-                                                    children: round2(player.ordinal)
+                                                    children: Math.round(player.ordinal) | 0,
+                                                    title: "μ=" + round2(player.mu).toString() + " σ=" + round2(player.sigma).toString() + " ELO=" + round2(player.elo).toString()
                                                   }),
                                               JsxRuntime.jsx("td", {
                                                     children: JsxRuntime.jsx("small", {
@@ -323,15 +310,13 @@ function LeaderboardModal(props) {
                                                           games,
                                                           ":",
                                                           wins
-                                                        ],
-                                                        className: "hidden min-[1200px]:table-cell"
+                                                        ]
                                                       }),
                                                   JsxRuntime.jsxs("td", {
                                                         children: [
-                                                          Math.round(games > 0 ? wins / games * 100 : 0.0),
+                                                          Math.round(games > 0 ? wins / games * 100 : 0.0) | 0,
                                                           "%"
-                                                        ],
-                                                        className: "hidden min-[1200px]:table-cell"
+                                                        ]
                                                       })
                                                 ]
                                               }, player.key);

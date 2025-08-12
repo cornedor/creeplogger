@@ -114,11 +114,9 @@ let make = (~show, ~setShow, ~gameMode, ~setGameMode) => {
           {switch gameMode {
           | Games.Foosball =>
             <>
-              <th className="text-lg text-left"> {React.string("μ")} </th>
-              <th className="text-lg text-left"> {React.string("σ")} </th>
               <th className="text-lg text-left">
                 <button ariaLabel="Toggle sort order" onClick={_ => setOrder(order => !order)}>
-                  {React.string("Ord. " ++ (ascOrder ? "↑" : "↓"))}
+                  {React.string("Score " ++ (ascOrder ? "↑" : "↓"))}
                 </button>
               </th>
               <th className="text-lg text-left"> {React.string("Δ")} </th>
@@ -134,8 +132,8 @@ let make = (~show, ~setShow, ~gameMode, ~setGameMode) => {
             </>
           }}
           <th className="text-lg text-left"> {React.string("Last 5")} </th>
-          <th className="text-lg text-left hidden min-[1200px]:table-cell"> {React.string("G/W")} </th>
-          <th className="text-lg text-left hidden min-[1200px]:table-cell"> {React.string("Win%")} </th>
+                     <th className="text-lg text-left"> {React.string("G/W")} </th>
+          <th className="text-lg text-left"> {React.string("Win%") } </th>
         </tr>
       </thead>
       <tbody>
@@ -182,9 +180,9 @@ let make = (~show, ~setShow, ~gameMode, ~setGameMode) => {
               </>
             | Games.Foosball =>
               <>
-                <td> {React.float(round2(player.mu))} </td>
-                <td> {React.float(round2(player.sigma))} </td>
-                <td> {React.float(round2(player.ordinal))} </td>
+                                                  <td title={"μ=" ++ round2(player.mu)->Js.Float.toString ++ " σ=" ++ round2(player.sigma)->Js.Float.toString ++ " ELO=" ++ round2(player.elo)->Js.Float.toString}>
+                   {React.int(Js.Math.round(player.ordinal)->Float.toInt)}
+                 </td>
                 <td>
                   <small className={deltaColor}>
                     {delta == 0 ? React.string("-") : React.int(deltaAbs)}
@@ -206,14 +204,14 @@ let make = (~show, ~setShow, ~gameMode, ~setGameMode) => {
                 ->React.array}
               </div>
             </td>
-            <td className="hidden min-[1200px]:table-cell">
+            <td>
               {React.int(games)}
               {React.string(":")}
               {React.int(wins)}
             </td>
-            <td className="hidden min-[1200px]:table-cell">
-              {React.float((games > 0 ? (Float.fromInt(wins) /. Float.fromInt(games) *. 100.) : 0.0)->Math.round)}
-              {React.string("%")}
+            <td>
+              {React.int((games > 0 ? (Float.fromInt(wins) /. Float.fromInt(games) *. 100.) : 0.0)->Js.Math.round->Float.toInt)}
+              {React.string("%") }
             </td>
           </tr>
         })
