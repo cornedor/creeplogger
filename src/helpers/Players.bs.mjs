@@ -18,7 +18,7 @@ var playerSchema = Schema.object(function (s) {
               absoluteLosses: s.fieldOr("absoluteLosses", Schema.$$int, 0),
               games: s.fieldOr("games", Schema.$$int, 0),
               teamGoals: s.fieldOr("teamGoals", Schema.$$int, 0),
-              teamGoalsAgainst: s.fieldOr("tga", Schema.$$int, 0),
+              teamGoalsAgainst: s.fieldOr("teamGoalsAgainst", Schema.$$int, 0),
               blueGames: s.fieldOr("blueGames", Schema.$$int, 0),
               redGames: s.fieldOr("redGames", Schema.$$int, 0),
               blueWins: s.fieldOr("blueWins", Schema.$$int, 0),
@@ -29,6 +29,9 @@ var playerSchema = Schema.object(function (s) {
               mattermostHandle: s.f("mh", FirebaseSchema.nullableTransform(Schema.option(Schema.string))),
               lastGames: s.fieldOr("lastGames", Schema.array(Schema.$$int), []),
               hidden: s.f("hidden", FirebaseSchema.nullableTransform(Schema.option(Schema.bool))),
+              mu: s.fieldOr("mu", Schema.$$float, 25.0),
+              sigma: s.fieldOr("sigma", Schema.$$float, 8.333),
+              ordinal: s.fieldOr("ordinal", Schema.$$float, 0.0),
               dartsElo: s.fieldOr("dartsElo", Schema.$$float, 1000.0),
               dartsLastEloChange: s.fieldOr("dartsChange", Schema.$$float, 0.0),
               dartsGames: s.fieldOr("dartsGames", Schema.$$int, 0),
@@ -61,6 +64,9 @@ async function addPlayer(name) {
         mattermostHandle: undefined,
         lastGames: [],
         hidden: undefined,
+        mu: 25.0,
+        sigma: 8.333,
+        ordinal: 0.0,
         dartsElo: 1000.0,
         dartsLastEloChange: 0.0,
         dartsGames: 0,
@@ -79,58 +85,52 @@ async function addPlayer(name) {
 }
 
 function useAllPlayers(orderByOpt, ascOpt) {
-  var orderBy = orderByOpt !== undefined ? orderByOpt : "games";
+  var orderBy = orderByOpt !== undefined ? orderByOpt : "rating";
   var asc = ascOpt !== undefined ? ascOpt : false;
   var match = React.useState(function () {
         return [];
       });
   var setPlayers = match[1];
-  var players = match[0];
   var playersRef = Database$1.query(Database$1.ref(Database.database, "players"), Database$1.orderByChild("games"));
   React.useEffect((function () {
           return Database$1.onValue(playersRef, (function (snapshot) {
                         var newPlayers = [];
                         snapshot.forEach(function (snap) {
-                              var data = snap.val();
-                              if (data == null) {
+                              var val = snap.val();
+                              if (val == null) {
                                 return ;
                               }
-                              var player = Schema.parseWith(data, playerSchema);
-                              if (player.TAG === "Ok") {
-                                newPlayers.push(player._0);
+                              var player = Schema.parseWith(val, playerSchema);
+                              if (player.TAG !== "Ok") {
                                 return ;
                               }
-                              console.error(player._0);
+                              newPlayers.push(player._0);
                             });
                         setPlayers(function (param) {
-                              return newPlayers;
+                              return newPlayers.toSorted(function (a, b) {
+                                          var match = asc ? [
+                                              a,
+                                              b
+                                            ] : [
+                                              b,
+                                              a
+                                            ];
+                                          var b$1 = match[1];
+                                          var a$1 = match[0];
+                                          if (orderBy === "elo") {
+                                            return a$1.elo - b$1.elo;
+                                          } else if (orderBy === "games") {
+                                            return a$1.games - b$1.games | 0;
+                                          } else if (orderBy === "rating") {
+                                            return a$1.ordinal - b$1.ordinal;
+                                          } else {
+                                            return a$1.dartsElo - b$1.dartsElo;
+                                          }
+                                        });
                             });
                       }), undefined);
         }), [setPlayers]);
-  return React.useMemo((function () {
-                return players.toSorted(function (a, b) {
-                            var match = asc ? [
-                                a,
-                                b
-                              ] : [
-                                b,
-                                a
-                              ];
-                            var b$1 = match[1];
-                            var a$1 = match[0];
-                            if (orderBy === "elo") {
-                              return a$1.elo - b$1.elo;
-                            } else if (orderBy === "games") {
-                              return a$1.games - b$1.games | 0;
-                            } else {
-                              return a$1.dartsElo - b$1.dartsElo;
-                            }
-                          });
-              }), [
-              players,
-              asc,
-              orderBy
-            ]);
+  return match[0];
 }
 
 async function fetchAllPlayers() {
@@ -204,6 +204,32 @@ function updateGameStats(key, myTeamPoints, opponentTeamPoints, team, elo) {
               }));
 }
 
+function updateOpenSkillGameStats(key, myTeamPoints, opponentTeamPoints, team, mu, sigma, ordinal) {
+  var isAbsolute = Rules.isAbsolute(myTeamPoints, opponentTeamPoints);
+  var isWin = myTeamPoints > opponentTeamPoints;
+  var isAbsoluteWin = isAbsolute && isWin;
+  var isLoss = myTeamPoints < opponentTeamPoints;
+  var isAbsoluteLoss = isAbsolute && isLoss;
+  var isRedWin = team === "Red" && isWin;
+  var isBlueWin = team === "Blue" && isWin;
+  var playerRef = Database$1.ref(Database.database, "players/" + key);
+  return Database$1.runTransaction(playerRef, (function (data) {
+                var player = Schema.parseWith(data, playerSchema);
+                if (player.TAG !== "Ok") {
+                  return data;
+                }
+                var player$1 = player._0;
+                var muChange = mu - player$1.mu;
+                var newrecord = Caml_obj.obj_dup(player$1);
+                var res = Schema.serializeWith((newrecord.ordinal = ordinal, newrecord.sigma = sigma, newrecord.mu = mu, newrecord.lastGames = getLastGames(player$1.lastGames, isWin), newrecord.lastEloChange = muChange, newrecord.elo = player$1.elo, newrecord.redWins = isRedWin ? player$1.redWins + 1 | 0 : player$1.redWins, newrecord.blueWins = isBlueWin ? player$1.blueWins + 1 | 0 : player$1.blueWins, newrecord.redGames = team === "Red" ? player$1.redGames + 1 | 0 : player$1.redGames, newrecord.blueGames = team === "Blue" ? player$1.blueGames + 1 | 0 : player$1.blueGames, newrecord.teamGoalsAgainst = player$1.teamGoalsAgainst + opponentTeamPoints | 0, newrecord.teamGoals = player$1.teamGoals + myTeamPoints | 0, newrecord.games = player$1.games + 1 | 0, newrecord.absoluteLosses = isAbsoluteLoss ? player$1.absoluteLosses + 1 | 0 : player$1.absoluteLosses, newrecord.absoluteWins = isAbsoluteWin ? player$1.absoluteWins + 1 | 0 : player$1.absoluteWins, newrecord.losses = isLoss ? player$1.losses + 1 | 0 : player$1.losses, newrecord.wins = isWin ? player$1.wins + 1 | 0 : player$1.wins, newrecord), playerSchema);
+                if (res.TAG === "Ok") {
+                  return res._0;
+                } else {
+                  return data;
+                }
+              }));
+}
+
 function updateDartsGameStats(key, myTeamPoints, elo) {
   var isWin = myTeamPoints === 1;
   var isLoss = myTeamPoints === 0;
@@ -238,6 +264,7 @@ export {
   fetchPlayerByKey ,
   playerByKey ,
   updateGameStats ,
+  updateOpenSkillGameStats ,
   updateDartsGameStats ,
   writePlayer ,
   getLastGames ,

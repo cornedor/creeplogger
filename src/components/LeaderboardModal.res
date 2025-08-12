@@ -125,7 +125,8 @@ let make = (~show, ~setShow, ~gameMode, ~setGameMode) => {
                   {React.int(Elo.roundScore(lastChange))}
                 </small>
               | Games.Foosball =>
-                <small title={`Elo: ${player.elo->Float.toInt->Int.toString}`}
+                <small
+                  title={`Elo: ${player.elo->Float.toInt->Int.toString}`}
                   className={lastChange > 0.0 ? "text-green-400" : "text-red-400"}>
                   {React.int(OpenSkillRating.roundScore(lastChange))}
                 </small>

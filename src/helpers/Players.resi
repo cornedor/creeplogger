@@ -46,7 +46,7 @@ let playerByKey: (array<player>, string) => option<player>
 
 let updateGameStats: (string, int, int, team, float) => Js.Json.t => Js.Json.t
 
-let updateOpenSkillGameStats: (string, int, int, team, float, float, float, float) => Js.Json.t => Js.Json.t
+let updateOpenSkillGameStats: (string, int, int, team, float, float, float) => Js.Json.t => Js.Json.t
 
 let updateDartsGameStats: (string, int, float) => Js.Json.t => Js.Json.t
 

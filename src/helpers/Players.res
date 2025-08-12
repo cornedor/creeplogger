@@ -40,14 +40,15 @@ let playerSchema = Schema.object(s => {
   name: s.field("name", Schema.string),
   wins: s.fieldOr("wins", Schema.int, 0),
   losses: s.fieldOr("losses", Schema.int, 0),
-  absoluteWins: s.fieldOr("aw", Schema.int, 0),
-  absoluteLosses: s.fieldOr("al", Schema.int, 0),
+  absoluteWins: s.fieldOr("absoluteWins", Schema.int, 0),
+  absoluteLosses: s.fieldOr("absoluteLosses", Schema.int, 0),
   games: s.fieldOr("games", Schema.int, 0),
-  teamGoals: s.fieldOr("tg", Schema.int, 0),
-  teamGoalsAgainst: s.fieldOr("tga", Schema.int, 0),
-  blueGames: s.fieldOr("bg", Schema.int, 0),
-  redGames: s.fieldOr("rg", Schema.int, 0),
+  teamGoals: s.fieldOr("teamGoals", Schema.int, 0),
+  teamGoalsAgainst: s.fieldOr("teamGoalsAgainst", Schema.int, 0),
+  blueGames: s.fieldOr("blueGames", Schema.int, 0),
+  redGames: s.fieldOr("redGames", Schema.int, 0),
   blueWins: s.fieldOr("blueWins", Schema.int, 0),
+  redWins: s.fieldOr("redWins", Schema.int, 0),
   elo: s.fieldOr("elo", Schema.float, 1000.0),
   lastEloChange: s.fieldOr("change", Schema.float, 0.0),
   key: s.field("key", Schema.string),
@@ -123,43 +124,40 @@ let useAllPlayers = (~orderBy: playersOrder=#rating, ~asc=false) => {
   let (players, setPlayers) = React.useState(_ => [])
   let playersRef = Firebase.Database.query1(
     Firebase.Database.refPath(Database.database, bucket),
-    Firebase.Database.orderByKey,
+    Firebase.Database.orderByChild("games"),
   )
-
   React.useEffect(() => {
     let unsubscribe = Firebase.Database.onValue(
       playersRef,
       snapshot => {
-        let players =
-          snapshotToArray(snapshot)->Array.reduce([], (players, player) => {
-            let key = Firebase.Database.Snapshot.key(player)->Nullable.toOption->Option.getExn
-            switch Firebase.Database.Snapshot.val(player)->Nullable.toOption {
-            | Some(val) =>
-              switch val->Schema.parseWith(playerSchema) {
-              | Ok(val) => [{...val, key}]->Array.concat(players)
-              | Error(_e) => players
-              }
-            | None => players
+        let newPlayers = []
+        Array.forEach(snapshotToArray(snapshot), snap => {
+          switch Firebase.Database.Snapshot.val(snap)->Nullable.toOption {
+          | Some(val) =>
+            switch val->Schema.parseWith(playerSchema) {
+            | Ok(player) => Array.push(newPlayers, player)
+            | Error(_e) => ()
             }
-          })
-
+          | None => ()
+          }
+        })
         setPlayers(_ =>
-          players->Array.sortInPlaceWith((a, b) => {
-            let (a, b) = asc ? (a, b) : (b, a)
-            switch orderBy {
-            | #games => Int.toFloat(a.games - b.games)
-            | #elo => a.elo -. b.elo
-            | #rating => a.ordinal -. b.ordinal
-            | #dartsElo => a.dartsElo -. b.dartsElo
-            }
-          })
-        )
+  newPlayers->Array.toSorted((a, b) => {
+    let (a, b) = asc ? (a, b) : (b, a)
+    switch orderBy {
+    | #games => Int.toFloat(a.games - b.games)
+    | #elo => a.elo -. b.elo
+    | #rating => a.ordinal -. b.ordinal
+    | #dartsElo => a.dartsElo -. b.dartsElo
+    }
+  })
+)
       },
       (),
     )
 
     Some(unsubscribe)
-  }, [])
+  }, [setPlayers])
 
   players
 }
@@ -259,7 +257,6 @@ let updateOpenSkillGameStats = (
   mu,
   sigma,
   ordinal,
-  eloForHover: float,
 ) => {
   let isAbsolute = Rules.isAbsolute(myTeamPoints, opponentTeamPoints)
 
@@ -294,7 +291,7 @@ let updateOpenSkillGameStats = (
           mu,
           sigma,
           ordinal,
-          // Keep existing Elo untouched; optionally set to provided eloForHover if we want to sync
+          // Keep existing Elo untouched
           elo: player.elo,
           lastGames: getLastGames(player.lastGames, isWin),
         },
