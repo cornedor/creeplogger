@@ -114,11 +114,9 @@ let make = (~show, ~setShow, ~gameMode, ~setGameMode) => {
           {switch gameMode {
           | Games.Foosball =>
             <>
-              <th className="text-lg text-left"> {React.string("μ")} </th>
-              <th className="text-lg text-left"> {React.string("σ")} </th>
               <th className="text-lg text-left">
                 <button ariaLabel="Toggle sort order" onClick={_ => setOrder(order => !order)}>
-                  {React.string("Ord. " ++ (ascOrder ? "↑" : "↓"))}
+                  {React.string("Score " ++ (ascOrder ? "↑" : "↓"))}
                 </button>
               </th>
               <th className="text-lg text-left"> {React.string("Δ")} </th>
@@ -182,9 +180,9 @@ let make = (~show, ~setShow, ~gameMode, ~setGameMode) => {
               </>
             | Games.Foosball =>
               <>
-                <td> {React.float(round2(player.mu))} </td>
-                <td> {React.float(round2(player.sigma))} </td>
-                <td> {React.float(round2(player.ordinal))} </td>
+                <td title={"μ=" ++ round2(player.mu)->Js.Float.toString ++ " σ=" ++ round2(player.sigma)->Js.Float.toString ++ " ELO=" ++ round2(player.elo)->Js.Float.toString}>
+                  {React.float(round2(player.ordinal))}
+                </td>
                 <td>
                   <small className={deltaColor}>
                     {delta == 0 ? React.string("-") : React.int(deltaAbs)}
