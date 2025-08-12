@@ -219,9 +219,9 @@ let make = (~show, ~setShow) => {
     renderSeriesWithColor(key, getColorByIndex(idx))
 
   let onSelectChange = (_e: ReactEvent.Form.t) => {
-    let getValues: unit => array<string> = [%raw
-      "() => Array.from(document.getElementById('players-select').selectedOptions).map(o => o.value)"
-    ]
+    let getValues: unit => array<string> = [%raw {|
+      () => Array.from(document.getElementById('players-select').selectedOptions).map(o => o.value)
+    |}]
     let values = getValues()
     setSelectedPlayerKeys(_ => values)
   }
