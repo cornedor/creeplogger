@@ -10,7 +10,7 @@ let make = (
 ) => {
   let (showQueueButtons, setShowQueueButtons) = React.useState(_ => false)
   let sorted = switch gameMode {
-  | Games.Foosball => players
+  | Games.Foosball => players->Array.toSorted((a, b) => Int.toFloat(b.games - a.games))
   | Games.Darts => players->Array.toSorted((a, b) => Int.toFloat(b.dartsGames - a.dartsGames))
   }
   let players = sorted->Js.Array2.map(item =>
