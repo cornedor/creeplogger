@@ -149,7 +149,8 @@ let recalculateStats = async () => {
         absoluteWins: 0,
         redWins: 0,
         blueWins: 0,
-        // Keep existing Elo; do not reset to avoid data loss
+        // Reset Elo for foosball to baseline (same as darts)
+        elo: 1000.0,
         lastEloChange: 0.0,
         // Reset OpenSkill fields
         mu: 25.0,
