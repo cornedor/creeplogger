@@ -116,8 +116,8 @@ let sendCreepsUpdate = async (
 
 | Team | Goals | OpenSkill Δ |
 | ---- | ----- | ----------- |
-| ${blueNames} | ${blueScore->Int.toString} | ${bluePoints->Int.toString} |
-| ${redNames} | ${redScore->Int.toString} | ${redPoints->Int.toString} |
+| Blauw (${blueNames}) | ${blueScore->Int.toString} | ${bluePoints->Int.toString} |
+| Rood (${redNames}) | ${redScore->Int.toString} | ${redPoints->Int.toString} |
 
 Individueel:
 - Blauw: ${blueIndividuals}
