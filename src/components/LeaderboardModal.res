@@ -111,20 +111,35 @@ let make = (~show, ~setShow, ~gameMode, ~setGameMode) => {
             {React.string("#")}
           </th>
           <th className="text-lg text-left"> {React.string("Speler")} </th>
-          <th className="text-lg text-left">
-            <button ariaLabel="Toggle sort order" onClick={_ => setOrder(order => !order)}>
-              {React.string("Score " ++ (ascOrder ? "↑" : "↓"))}
-            </button>
-          </th>
+          {switch gameMode {
+          | Games.Foosball =>
+            <>
+              <th className="text-lg text-left"> {React.string("μ")} </th>
+              <th className="text-lg text-left"> {React.string("σ")} </th>
+              <th className="text-lg text-left">
+                <button ariaLabel="Toggle sort order" onClick={_ => setOrder(order => !order)}>
+                  {React.string("Ordinal " ++ (ascOrder ? "↑" : "↓"))}
+                </button>
+              </th>
+              <th className="text-lg text-left"> {React.string("Δ")} </th>
+            </>
+          | Games.Darts =>
+            <>
+              <th className="text-lg text-left">
+                <button ariaLabel="Toggle sort order" onClick={_ => setOrder(order => !order)}>
+                  {React.string("Elo " ++ (ascOrder ? "↑" : "↓"))}
+                </button>
+              </th>
+              <th className="text-lg text-left"> {React.string("Δ")} </th>
+            </>
+          }}
           <th className="text-lg text-left"> {React.string("Last 5")} </th>
-          <th className="text-lg text-left"> {React.string("G/W")} </th>
-          <th className="text-lg text-left"> {React.string("Win%")} </th>
         </tr>
       </thead>
       <tbody>
         {visiblePlayers
         ->Array.map(player => {
-          let (_, lastChange, lastGames, wins, games) = switch gameMode {
+          let (_, _lastChange, lastGames, _wins, _games) = switch gameMode {
           | Games.Darts => (
               player.dartsElo,
               player.dartsLastEloChange,
@@ -153,27 +168,28 @@ let make = (~show, ~setShow, ~gameMode, ~setGameMode) => {
               {React.string(`${currentPos->Int.toString}`)}
             </td>
             <td> {React.string(player.name)} </td>
-            <td>
-              {switch gameMode {
-              | Games.Darts =>
-                <>
-                  {React.int(Elo.roundScore(player.dartsElo))}
-                  {React.string(" ")}
+            {switch gameMode {
+            | Games.Darts =>
+              <>
+                <td> {React.int(Elo.roundScore(player.dartsElo))} </td>
+                <td>
                   <small className={deltaColor}>
                     {delta == 0 ? React.string("-") : React.int(deltaAbs)}
                   </small>
-                </>
-              | Games.Foosball =>
-                <span className="inline-flex items-baseline gap-2">
-                  <span>
-                    {React.string(`${round2(player.mu)->Float.toString} / ${round2(player.sigma)->Float.toString} / ${round2(player.ordinal)->Float.toString}`)}
-                  </span>
+                </td>
+              </>
+            | Games.Foosball =>
+              <>
+                <td> {React.float(round2(player.mu))} </td>
+                <td> {React.float(round2(player.sigma))} </td>
+                <td> {React.float(round2(player.ordinal))} </td>
+                <td>
                   <small className={deltaColor}>
                     {delta == 0 ? React.string("-") : React.int(deltaAbs)}
                   </small>
-                </span>
-              }}
-            </td>
+                </td>
+              </>
+            }}
             <td>
               <div className="inline-flex gap-1 w-9">
                 {lastGames
@@ -187,15 +203,6 @@ let make = (~show, ~setShow, ~gameMode, ~setGameMode) => {
                 )
                 ->React.array}
               </div>
-            </td>
-            <td>
-              {React.int(games)}
-              {React.string(":")}
-              {React.int(wins)}
-            </td>
-            <td>
-              {React.float((games > 0 ? (Float.fromInt(wins) /. Float.fromInt(games) *. 100.) : 0.0)->Math.round)}
-              {React.string("%")}
             </td>
           </tr>
         })

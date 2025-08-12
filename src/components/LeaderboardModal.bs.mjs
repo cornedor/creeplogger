@@ -138,6 +138,58 @@ function LeaderboardModal(props) {
                 })
             })
     ) : null;
+  var tmp$1;
+  tmp$1 = gameMode === "Foosball" ? JsxRuntime.jsxs(JsxRuntime.Fragment, {
+          children: [
+            JsxRuntime.jsx("th", {
+                  children: "μ",
+                  className: "text-lg text-left"
+                }),
+            JsxRuntime.jsx("th", {
+                  children: "σ",
+                  className: "text-lg text-left"
+                }),
+            JsxRuntime.jsx("th", {
+                  children: JsxRuntime.jsx("button", {
+                        children: "Ordinal " + (
+                          ascOrder ? "↑" : "↓"
+                        ),
+                        "aria-label": "Toggle sort order",
+                        onClick: (function (param) {
+                            setOrder(function (order) {
+                                  return !order;
+                                });
+                          })
+                      }),
+                  className: "text-lg text-left"
+                }),
+            JsxRuntime.jsx("th", {
+                  children: "Δ",
+                  className: "text-lg text-left"
+                })
+          ]
+        }) : JsxRuntime.jsxs(JsxRuntime.Fragment, {
+          children: [
+            JsxRuntime.jsx("th", {
+                  children: JsxRuntime.jsx("button", {
+                        children: "Elo " + (
+                          ascOrder ? "↑" : "↓"
+                        ),
+                        "aria-label": "Toggle sort order",
+                        onClick: (function (param) {
+                            setOrder(function (order) {
+                                  return !order;
+                                });
+                          })
+                      }),
+                  className: "text-lg text-left"
+                }),
+            JsxRuntime.jsx("th", {
+                  children: "Δ",
+                  className: "text-lg text-left"
+                })
+          ]
+        });
   return JsxRuntime.jsxs("div", {
               children: [
                 JsxRuntime.jsxs("header", {
@@ -171,30 +223,9 @@ function LeaderboardModal(props) {
                                             children: "Speler",
                                             className: "text-lg text-left"
                                           }),
-                                      JsxRuntime.jsx("th", {
-                                            children: JsxRuntime.jsx("button", {
-                                                  children: "Score " + (
-                                                    ascOrder ? "↑" : "↓"
-                                                  ),
-                                                  "aria-label": "Toggle sort order",
-                                                  onClick: (function (param) {
-                                                      setOrder(function (order) {
-                                                            return !order;
-                                                          });
-                                                    })
-                                                }),
-                                            className: "text-lg text-left"
-                                          }),
+                                      tmp$1,
                                       JsxRuntime.jsx("th", {
                                             children: "Last 5",
-                                            className: "text-lg text-left"
-                                          }),
-                                      JsxRuntime.jsx("th", {
-                                            children: "G/W",
-                                            className: "text-lg text-left"
-                                          }),
-                                      JsxRuntime.jsx("th", {
-                                            children: "Win%",
                                             className: "text-lg text-left"
                                           })
                                     ]
@@ -216,8 +247,6 @@ function LeaderboardModal(props) {
                                         player.dartsWins,
                                         player.dartsGames
                                       ];
-                                    var games = match[4];
-                                    var wins = match[3];
                                     var currentPos = Core__Option.getOr(Js_dict.get(currentPositions, player.key), 0);
                                     var previousPos = Core__Option.getOr(Js_dict.get(previousPositions, player.key), currentPos);
                                     var delta = previousPos - currentPos | 0;
@@ -226,24 +255,34 @@ function LeaderboardModal(props) {
                                         delta > 0 ? "text-green-400" : "text-red-400"
                                       );
                                     var tmp;
-                                    tmp = gameMode === "Foosball" ? JsxRuntime.jsxs("span", {
+                                    tmp = gameMode === "Foosball" ? JsxRuntime.jsxs(JsxRuntime.Fragment, {
                                             children: [
-                                              JsxRuntime.jsx("span", {
-                                                    children: round2(player.mu).toString() + " / " + round2(player.sigma).toString() + " / " + round2(player.ordinal).toString()
+                                              JsxRuntime.jsx("td", {
+                                                    children: round2(player.mu)
                                                   }),
-                                              JsxRuntime.jsx("small", {
-                                                    children: delta === 0 ? "-" : deltaAbs,
-                                                    className: deltaColor
+                                              JsxRuntime.jsx("td", {
+                                                    children: round2(player.sigma)
+                                                  }),
+                                              JsxRuntime.jsx("td", {
+                                                    children: round2(player.ordinal)
+                                                  }),
+                                              JsxRuntime.jsx("td", {
+                                                    children: JsxRuntime.jsx("small", {
+                                                          children: delta === 0 ? "-" : deltaAbs,
+                                                          className: deltaColor
+                                                        })
                                                   })
-                                            ],
-                                            className: "inline-flex items-baseline gap-2"
+                                            ]
                                           }) : JsxRuntime.jsxs(JsxRuntime.Fragment, {
                                             children: [
-                                              Elo.roundScore(player.dartsElo),
-                                              " ",
-                                              JsxRuntime.jsx("small", {
-                                                    children: delta === 0 ? "-" : deltaAbs,
-                                                    className: deltaColor
+                                              JsxRuntime.jsx("td", {
+                                                    children: Elo.roundScore(player.dartsElo)
+                                                  }),
+                                              JsxRuntime.jsx("td", {
+                                                    children: JsxRuntime.jsx("small", {
+                                                          children: delta === 0 ? "-" : deltaAbs,
+                                                          className: deltaColor
+                                                        })
                                                   })
                                             ]
                                           });
@@ -256,9 +295,7 @@ function LeaderboardModal(props) {
                                                   JsxRuntime.jsx("td", {
                                                         children: player.name
                                                       }),
-                                                  JsxRuntime.jsx("td", {
-                                                        children: tmp
-                                                      }),
+                                                  tmp,
                                                   JsxRuntime.jsx("td", {
                                                         children: JsxRuntime.jsx("div", {
                                                               children: match[2].map(function (win, i) {
@@ -270,19 +307,6 @@ function LeaderboardModal(props) {
                                                                   }),
                                                               className: "inline-flex gap-1 w-9"
                                                             })
-                                                      }),
-                                                  JsxRuntime.jsxs("td", {
-                                                        children: [
-                                                          games,
-                                                          ":",
-                                                          wins
-                                                        ]
-                                                      }),
-                                                  JsxRuntime.jsxs("td", {
-                                                        children: [
-                                                          Math.round(games > 0 ? wins / games * 100 : 0.0),
-                                                          "%"
-                                                        ]
                                                       })
                                                 ]
                                               }, player.key);
