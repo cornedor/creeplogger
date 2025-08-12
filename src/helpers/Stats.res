@@ -189,6 +189,22 @@ let recalculateStats = async () => {
         (blue, red, points)
       }
     }
+    
+    // Also calculate Elo for foosball games (for legacy compatibility)
+    let (blueElo, redElo, _) = switch blueWin {
+    | true => Elo.calculateScore(bluePlayers, redPlayers, ~gameMode=Games.Foosball)
+    | false => {
+        let (red, blue, points) = Elo.calculateScore(
+          redPlayers,
+          bluePlayers,
+          ~gameMode=Games.Foosball,
+        )
+        (blue, red, points)
+      }
+    }
+    
+    let bluePlayers = blueElo
+    let redPlayers = redElo
     Array.forEach(bluePlayers, player => {
       let lastGames = Players.getLastGames(player.lastGames, blueWin)
       Dict.set(

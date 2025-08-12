@@ -187,7 +187,20 @@ async function recalculateStats() {
               match$1[2]
             ];
           }
-          match[0].forEach(function (player) {
+          var redPlayers$1 = match[1];
+          var bluePlayers$1 = match[0];
+          var match$2;
+          if (blueWin) {
+            match$2 = Elo.calculateScore(bluePlayers$1, redPlayers$1, "Foosball");
+          } else {
+            var match$3 = Elo.calculateScore(redPlayers$1, bluePlayers$1, "Foosball");
+            match$2 = [
+              match$3[1],
+              match$3[0],
+              match$3[2]
+            ];
+          }
+          match$2[0].forEach(function (player) {
                 var lastGames = Players.getLastGames(player.lastGames, blueWin);
                 var newrecord = Caml_obj.obj_dup(player);
                 newrecord.lastGames = lastGames;
@@ -202,7 +215,7 @@ async function recalculateStats() {
                 newrecord.wins = blueWin ? player.wins + 1 | 0 : player.wins;
                 players[player.key] = newrecord;
               });
-          match[1].forEach(function (player) {
+          match$2[1].forEach(function (player) {
                 var lastGames = Players.getLastGames(player.lastGames, redWin);
                 var newrecord = Caml_obj.obj_dup(player);
                 newrecord.lastGames = lastGames;
