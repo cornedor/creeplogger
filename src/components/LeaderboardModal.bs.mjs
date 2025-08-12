@@ -161,10 +161,31 @@ function LeaderboardModal(props) {
                                     }
                                     previousScore.contents = roundedScore;
                                     var tmp;
-                                    tmp = gameMode === "Foosball" ? JsxRuntime.jsx("small", {
-                                            children: OpenSkillRating.toDisplayDelta(lastChange),
-                                            className: lastChange > 0.0 ? "text-green-400" : "text-red-400",
-                                            title: "Elo: " + (player.elo | 0).toString()
+                                    tmp = gameMode === "Foosball" ? JsxRuntime.jsxs("span", {
+                                            children: [
+                                              JsxRuntime.jsx("span", {
+                                                    children: roundedScore,
+                                                    className: "group-hover:hidden"
+                                                  }),
+                                              JsxRuntime.jsx("span", {
+                                                    children: Elo.roundScore(player.elo),
+                                                    className: "hidden group-hover:inline"
+                                                  }),
+                                              " ",
+                                              JsxRuntime.jsx("small", {
+                                                    children: OpenSkillRating.toDisplayDelta(lastChange),
+                                                    className: (
+                                                      lastChange > 0.0 ? "text-green-400" : "text-red-400"
+                                                    ) + " group-hover:hidden"
+                                                  }),
+                                              JsxRuntime.jsx("small", {
+                                                    children: Elo.roundScore(player.lastEloChange),
+                                                    className: (
+                                                      player.lastEloChange > 0.0 ? "text-green-400" : "text-red-400"
+                                                    ) + " hidden group-hover:inline"
+                                                  })
+                                            ],
+                                            className: "group inline-flex items-baseline gap-1"
                                           }) : JsxRuntime.jsx("small", {
                                             children: Elo.roundScore(lastChange),
                                             className: lastChange > 0.0 ? "text-green-400" : "text-red-400"

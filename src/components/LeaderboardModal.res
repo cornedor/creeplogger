@@ -120,11 +120,17 @@ let make = (~show, ~setShow, ~gameMode, ~setGameMode) => {
                   {React.int(Elo.roundScore(lastChange))}
                 </small>
               | Games.Foosball =>
-                <small
-                  title={`Elo: ${player.elo->Float.toInt->Int.toString}`}
-                  className={lastChange > 0.0 ? "text-green-400" : "text-red-400"}>
-                  {React.int(OpenSkillRating.toDisplayDelta(lastChange))}
-                </small>
+                <span className="group inline-flex items-baseline gap-1">
+                  <span className="group-hover:hidden"> {React.int(roundedScore)} </span>
+                  <span className="hidden group-hover:inline"> {React.int(Elo.roundScore(player.elo))} </span>
+                  {React.string(" ")}
+                  <small className={(lastChange > 0.0 ? "text-green-400" : "text-red-400") ++ " group-hover:hidden"}>
+                    {React.int(OpenSkillRating.toDisplayDelta(lastChange))}
+                  </small>
+                  <small className={((player.lastEloChange > 0.0 ? "text-green-400" : "text-red-400") ++ " hidden group-hover:inline") }>
+                    {React.int(Elo.roundScore(player.lastEloChange))}
+                  </small>
+                </span>
               }}
             </td>
             <td>
