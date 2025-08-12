@@ -101,6 +101,9 @@ let make = (~show, ~setShow) => {
   let chartHeight = 260.0
   let margin = 24.0
 
+  // Hovered series key for tooltip
+  let (hoverKey, setHoverKey) = React.useState(_ => None)
+
   let getDomain = () => {
     let times: array<float> = []
     let scores: array<float> = []
@@ -170,15 +173,21 @@ let make = (~show, ~setShow) => {
             />
           }
         });
-        <g key={key}> {React.array(lines)} </g>
+        <g
+          key={key}
+          onMouseEnter={_ => setHoverKey(_ => Some(key))}
+          onMouseLeave={_ => setHoverKey(_ => None)}>
+          {React.array(lines)}
+        </g>
       }
     }
   }
 
-  let renderSeriesWithIndexColor = (key: string, idx: int) => {
+  // Simple color palette cycling by index without using mod directly
+  let getColorByIndex = idx => {
     let rec normalize = i => if i < 10 { i } else { normalize(i - 10) };
     let i10 = normalize(idx);
-    let color = switch i10 {
+    switch i10 {
     | 0 => "#60a5fa"
     | 1 => "#f472b6"
     | 2 => "#34d399"
@@ -189,9 +198,10 @@ let make = (~show, ~setShow) => {
     | 7 => "#fde047"
     | 8 => "#4ade80"
     | _ => "#f97316"
-    };
-    renderSeriesWithColor(key, color)
+    }
   }
+  let renderSeriesWithIndexColor = (key: string, idx: int) =>
+    renderSeriesWithColor(key, getColorByIndex(idx))
 
   // Selection handling (toggle on option click)
   let isSelected = (key, sel) => sel->Array.some(v => v == key)
@@ -243,7 +253,22 @@ let make = (~show, ~setShow) => {
 
     <div className="mt-6">
       <h3 className="mb-2 block text-xl"> {React.string("OpenSkill progression")} </h3>
-      <div className="rounded border border-white/20 bg-white/5 p-3">
+      <div className="rounded border border-white/20 bg-white/5 p-3 relative">
+        {switch hoverKey {
+        | Some(k) => {
+            let name = switch playersForChart->Array.find(p => p.key == k) {
+            | Some(p) => p.name
+            | None => k
+            }
+            let idx = Belt.Array.getIndexBy(selectedPlayerKeys, kk => kk == k)->Belt.Option.getWithDefault(0)
+            let color = getColorByIndex(idx)
+            <div className="absolute top-2 right-2 px-2 py-1 rounded bg-black/60 text-white text-xs flex items-center gap-2">
+              <span style={ReactDOM.Style.make(~backgroundColor=color, ())} className="inline-block w-2 h-2 rounded-full" />
+              {React.string(name)}
+            </div>
+          }
+        | None => React.null
+        }}
         {(switch (isLoadingChart, Array.length(playersForChart)) {
         | (true, _) => <div className="text-center py-8 opacity-70"> {React.string("Loading chart...")} </div>
         | (false, 0) => <div className="text-center py-8 opacity-70"> {React.string("No data") } </div>

@@ -144,6 +144,11 @@ function StatsModal(props) {
         show,
         hasLoadedOnce
       ]);
+  var match$6 = React.useState(function () {
+        
+      });
+  var setHoverKey = match$6[1];
+  var hoverKey = match$6[0];
   var getDomain = function () {
     var times = [];
     var scores = [];
@@ -199,11 +204,11 @@ function StatsModal(props) {
             maxS
           ];
   };
-  var match$6 = getDomain();
-  var maxS = match$6[3];
-  var minS = match$6[2];
-  var maxT = match$6[1];
-  var minT = match$6[0];
+  var match$7 = getDomain();
+  var maxS = match$7[3];
+  var minS = match$7[2];
+  var maxT = match$7[1];
+  var minT = match$7[0];
   var spanT = maxT - minT === 0.0 ? 1.0 : maxT - minT;
   var spanS = maxS - minS === 0.0 ? 1.0 : maxS - minS;
   var scaleX = function (t) {
@@ -212,12 +217,72 @@ function StatsModal(props) {
   var scaleY = function (s) {
     return 260.0 - 24.0 - (s - minS) / spanS * (260.0 - 2.0 * 24.0);
   };
+  var getColorByIndex = function (idx) {
+    var normalize = function (_i) {
+      while(true) {
+        var i = _i;
+        if (i < 10) {
+          return i;
+        }
+        _i = i - 10 | 0;
+        continue ;
+      };
+    };
+    var i10 = normalize(idx);
+    switch (i10) {
+      case 0 :
+          return "#60a5fa";
+      case 1 :
+          return "#f472b6";
+      case 2 :
+          return "#34d399";
+      case 3 :
+          return "#f59e0b";
+      case 4 :
+          return "#a78bfa";
+      case 5 :
+          return "#fb7185";
+      case 6 :
+          return "#22d3ee";
+      case 7 :
+          return "#fde047";
+      case 8 :
+          return "#4ade80";
+      default:
+        return "#f97316";
+    }
+  };
   var isSelected = function (key, sel) {
     return sel.some(function (v) {
                 return Caml_obj.equal(v, key);
               });
   };
-  var match$7 = playersForChart.length;
+  var tmp;
+  if (hoverKey !== undefined) {
+    var p = playersForChart.find(function (p) {
+          return p.key === hoverKey;
+        });
+    var name = p !== undefined ? p.name : hoverKey;
+    var idx = Belt_Option.getWithDefault(Belt_Array.getIndexBy(selectedPlayerKeys, (function (kk) {
+                return kk === hoverKey;
+              })), 0);
+    var color = getColorByIndex(idx);
+    tmp = JsxRuntime.jsxs("div", {
+          children: [
+            JsxRuntime.jsx("span", {
+                  className: "inline-block w-2 h-2 rounded-full",
+                  style: {
+                    backgroundColor: color
+                  }
+                }),
+            name
+          ],
+          className: "absolute top-2 right-2 px-2 py-1 rounded bg-black/60 text-white text-xs flex items-center gap-2"
+        });
+  } else {
+    tmp = null;
+  }
+  var match$8 = playersForChart.length;
   return JsxRuntime.jsxs("div", {
               children: [
                 JsxRuntime.jsx("header", {
@@ -299,107 +364,78 @@ function StatsModal(props) {
                               children: "OpenSkill progression",
                               className: "mb-2 block text-xl"
                             }),
-                        JsxRuntime.jsx("div", {
-                              children: match$4[0] ? JsxRuntime.jsx("div", {
-                                      children: "Loading chart...",
-                                      className: "text-center py-8 opacity-70"
-                                    }) : (
-                                  match$7 !== 0 ? JsxRuntime.jsxs("svg", {
-                                          children: [
-                                            JsxRuntime.jsx("line", {
-                                                  stroke: "#ffffff22",
-                                                  strokeWidth: "1",
-                                                  x1: (24.0).toString(),
-                                                  x2: (720.0 - 24.0).toString(),
-                                                  y1: (260.0 - 24.0).toString(),
-                                                  y2: (260.0 - 24.0).toString()
-                                                }),
-                                            JsxRuntime.jsx("line", {
-                                                  stroke: "#ffffff22",
-                                                  strokeWidth: "1",
-                                                  x1: (24.0).toString(),
-                                                  x2: (24.0).toString(),
-                                                  y1: (24.0).toString(),
-                                                  y2: (260.0 - 24.0).toString()
-                                                }),
-                                            selectedPlayerKeys.map(function (key, idx) {
-                                                  var normalize = function (_i) {
-                                                    while(true) {
-                                                      var i = _i;
-                                                      if (i < 10) {
-                                                        return i;
-                                                      }
-                                                      _i = i - 10 | 0;
-                                                      continue ;
-                                                    };
-                                                  };
-                                                  var i10 = normalize(idx);
-                                                  var color;
-                                                  switch (i10) {
-                                                    case 0 :
-                                                        color = "#60a5fa";
-                                                        break;
-                                                    case 1 :
-                                                        color = "#f472b6";
-                                                        break;
-                                                    case 2 :
-                                                        color = "#34d399";
-                                                        break;
-                                                    case 3 :
-                                                        color = "#f59e0b";
-                                                        break;
-                                                    case 4 :
-                                                        color = "#a78bfa";
-                                                        break;
-                                                    case 5 :
-                                                        color = "#fb7185";
-                                                        break;
-                                                    case 6 :
-                                                        color = "#22d3ee";
-                                                        break;
-                                                    case 7 :
-                                                        color = "#fde047";
-                                                        break;
-                                                    case 8 :
-                                                        color = "#4ade80";
-                                                        break;
-                                                    default:
-                                                      color = "#f97316";
-                                                  }
-                                                  var points = Js_dict.get(seriesByPlayer, key);
-                                                  if (points === undefined) {
-                                                    return null;
-                                                  }
-                                                  var lines = points.map(function (p, i) {
-                                                        if (i === 0) {
-                                                          return null;
-                                                        }
-                                                        var prev = points[i - 1 | 0];
-                                                        return JsxRuntime.jsx("line", {
-                                                                    stroke: color,
-                                                                    strokeWidth: "2",
-                                                                    x1: scaleX(prev.time).toString(),
-                                                                    x2: scaleX(p.time).toString(),
-                                                                    y1: scaleY(prev.score).toString(),
-                                                                    y2: scaleY(p.score).toString()
-                                                                  }, i.toString());
-                                                      });
-                                                  return JsxRuntime.jsx("g", {
-                                                              children: lines
-                                                            }, key);
-                                                })
-                                          ],
-                                          className: "w-full h-64",
-                                          height: (Math.round(260.0) | 0).toString(),
-                                          width: (Math.round(720.0) | 0).toString(),
-                                          preserveAspectRatio: "none",
-                                          viewBox: "0 0 " + (Math.round(720.0) | 0).toString() + " " + (Math.round(260.0) | 0).toString()
-                                        }) : JsxRuntime.jsx("div", {
-                                          children: "No data",
-                                          className: "text-center py-8 opacity-70"
-                                        })
-                                ),
-                              className: "rounded border border-white/20 bg-white/5 p-3"
+                        JsxRuntime.jsxs("div", {
+                              children: [
+                                tmp,
+                                match$4[0] ? JsxRuntime.jsx("div", {
+                                        children: "Loading chart...",
+                                        className: "text-center py-8 opacity-70"
+                                      }) : (
+                                    match$8 !== 0 ? JsxRuntime.jsxs("svg", {
+                                            children: [
+                                              JsxRuntime.jsx("line", {
+                                                    stroke: "#ffffff22",
+                                                    strokeWidth: "1",
+                                                    x1: (24.0).toString(),
+                                                    x2: (720.0 - 24.0).toString(),
+                                                    y1: (260.0 - 24.0).toString(),
+                                                    y2: (260.0 - 24.0).toString()
+                                                  }),
+                                              JsxRuntime.jsx("line", {
+                                                    stroke: "#ffffff22",
+                                                    strokeWidth: "1",
+                                                    x1: (24.0).toString(),
+                                                    x2: (24.0).toString(),
+                                                    y1: (24.0).toString(),
+                                                    y2: (260.0 - 24.0).toString()
+                                                  }),
+                                              selectedPlayerKeys.map(function (key, idx) {
+                                                    var color = getColorByIndex(idx);
+                                                    var points = Js_dict.get(seriesByPlayer, key);
+                                                    if (points === undefined) {
+                                                      return null;
+                                                    }
+                                                    var lines = points.map(function (p, i) {
+                                                          if (i === 0) {
+                                                            return null;
+                                                          }
+                                                          var prev = points[i - 1 | 0];
+                                                          return JsxRuntime.jsx("line", {
+                                                                      stroke: color,
+                                                                      strokeWidth: "2",
+                                                                      x1: scaleX(prev.time).toString(),
+                                                                      x2: scaleX(p.time).toString(),
+                                                                      y1: scaleY(prev.score).toString(),
+                                                                      y2: scaleY(p.score).toString()
+                                                                    }, i.toString());
+                                                        });
+                                                    return JsxRuntime.jsx("g", {
+                                                                children: lines,
+                                                                onMouseEnter: (function (param) {
+                                                                    setHoverKey(function (param) {
+                                                                          return key;
+                                                                        });
+                                                                  }),
+                                                                onMouseLeave: (function (param) {
+                                                                    setHoverKey(function (param) {
+                                                                          
+                                                                        });
+                                                                  })
+                                                              }, key);
+                                                  })
+                                            ],
+                                            className: "w-full h-64",
+                                            height: (Math.round(260.0) | 0).toString(),
+                                            width: (Math.round(720.0) | 0).toString(),
+                                            preserveAspectRatio: "none",
+                                            viewBox: "0 0 " + (Math.round(720.0) | 0).toString() + " " + (Math.round(260.0) | 0).toString()
+                                          }) : JsxRuntime.jsx("div", {
+                                            children: "No data",
+                                            className: "text-center py-8 opacity-70"
+                                          })
+                                  )
+                              ],
+                              className: "rounded border border-white/20 bg-white/5 p-3 relative"
                             }),
                         JsxRuntime.jsxs("div", {
                               children: [
