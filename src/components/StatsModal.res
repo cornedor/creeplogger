@@ -218,16 +218,12 @@ let make = (~show, ~setShow) => {
   let renderSeriesWithIndexColor = (key: string, idx: int) =>
     renderSeriesWithColor(key, getColorByIndex(idx))
 
-  // Selection handling (toggle on option click)
-  let isSelected = (key, sel) => sel->Array.some(v => v == key)
-  let toggleSelection = key => {
-    setSelectedPlayerKeys(sel => {
-      if isSelected(key, sel) {
-        Belt.Array.keep(sel, v => v != key)
-      } else {
-        Array.concat(sel, [key])
-      }
-    })
+  let onSelectChange = (_e: ReactEvent.Form.t) => {
+    let getValues: unit => array<string> = [%raw
+      "() => Array.from(document.getElementById('players-select').selectedOptions).map(o => o.value)"
+    ]
+    let values = getValues()
+    setSelectedPlayerKeys(_ => values)
   }
 
   <div
@@ -303,17 +299,15 @@ let make = (~show, ~setShow) => {
       </div>
       <div className="mt-3">
         <label className="block mb-2 text-sm opacity-80"> {React.string("Players to show (multi-select)")} </label>
-        <select multiple=true className="w-full bg-white/5 border border-white/20 rounded p-2 min-h-[140px]">
-          {playersForChart->Array.map(p => {
-            let sel = selectedPlayerKeys->Array.some(k => k == p.key)
-            <option
-              key={p.key}
-              value={p.key}
-              selected={sel}
-              onClick={_ => toggleSelection(p.key)}>
-              {React.string(p.name)}
-            </option>
-          })->React.array}
+        <select
+          id="players-select"
+          multiple=true
+          value={selectedPlayerKeys}
+          onChange={onSelectChange}
+          className="w-full bg-white/5 border border-white/20 rounded p-2 min-h-[140px]">
+          {playersForChart->Array.map(p =>
+            <option key={p.key} value={p.key}> {React.string(p.name)} </option>
+          )->React.array}
         </select>
       </div>
     </div>
