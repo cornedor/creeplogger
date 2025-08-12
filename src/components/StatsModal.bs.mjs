@@ -8,6 +8,7 @@ import * as Button from "./Button.bs.mjs";
 import * as Js_dict from "rescript/lib/es6/js_dict.js";
 import * as Players from "../helpers/Players.bs.mjs";
 import * as Caml_obj from "rescript/lib/es6/caml_obj.js";
+import * as DomUtils from "../helpers/DomUtils.bs.mjs";
 import * as Belt_Array from "rescript/lib/es6/belt_Array.js";
 import * as Belt_Option from "rescript/lib/es6/belt_Option.js";
 import * as Core__Array from "@rescript/core/src/Core__Array.bs.mjs";
@@ -252,10 +253,11 @@ function StatsModal(props) {
         return "#f97316";
     }
   };
-  var isSelected = function (key, sel) {
-    return sel.some(function (v) {
-                return Caml_obj.equal(v, key);
-              });
+  var onSelectChange = function (_e) {
+    var values = DomUtils.getMultiSelectValues("players-select");
+    setSelectedPlayerKeys(function (param) {
+          return values;
+        });
   };
   var tmp;
   if (hoverKey !== undefined) {
@@ -461,29 +463,16 @@ function StatsModal(props) {
                                     }),
                                 JsxRuntime.jsx("select", {
                                       children: playersForChart.map(function (p) {
-                                            var sel = selectedPlayerKeys.some(function (k) {
-                                                  return k === p.key;
-                                                });
                                             return JsxRuntime.jsx("option", {
                                                         children: p.name,
-                                                        selected: sel,
-                                                        value: p.key,
-                                                        onClick: (function (param) {
-                                                            var key = p.key;
-                                                            setSelectedPlayerKeys(function (sel) {
-                                                                  if (isSelected(key, sel)) {
-                                                                    return Belt_Array.keep(sel, (function (v) {
-                                                                                  return v !== key;
-                                                                                }));
-                                                                  } else {
-                                                                    return sel.concat([key]);
-                                                                  }
-                                                                });
-                                                          })
+                                                        value: p.key
                                                       }, p.key);
                                           }),
                                       className: "w-full bg-white/5 border border-white/20 rounded p-2 min-h-[140px]",
-                                      multiple: true
+                                      id: "players-select",
+                                      multiple: true,
+                                      value: selectedPlayerKeys.join(","),
+                                      onChange: onSelectChange
                                     })
                               ],
                               className: "mt-3"

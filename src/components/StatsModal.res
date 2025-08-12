@@ -1,3 +1,5 @@
+open DomUtils
+
 type point = {time: float, score: int}
 
 @react.component
@@ -219,10 +221,7 @@ let make = (~show, ~setShow) => {
     renderSeriesWithColor(key, getColorByIndex(idx))
 
   let onSelectChange = (_e: ReactEvent.Form.t) => {
-    let getValues: unit => array<string> = [%raw {|
-      () => Array.from(document.getElementById('players-select').selectedOptions).map(o => o.value)
-    |}]
-    let values = getValues()
+    let values = getMultiSelectValues("players-select")
     setSelectedPlayerKeys(_ => values)
   }
 
@@ -302,7 +301,7 @@ let make = (~show, ~setShow) => {
         <select
           id="players-select"
           multiple=true
-          value={selectedPlayerKeys}
+          value={selectedPlayerKeys->Js.Array2.joinWith(",")}
           onChange={onSelectChange}
           className="w-full bg-white/5 border border-white/20 rounded p-2 min-h-[140px]">
           {playersForChart->Array.map(p =>
