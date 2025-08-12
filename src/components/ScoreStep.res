@@ -93,7 +93,20 @@ let make = (
     let bluePlayers =
       selectedBlueUsers->Array.map(key => Players.playerByKey(players, key)->Option.getExn)
 
-    let (bluePlayers, redPlayers, points) = switch winningTeam {
+    // Calculate both OpenSkill and Elo outcomes
+    let (blueOS, redOS, osPoints) = switch winningTeam {
+    | Blue => OpenSkillRating.calculateScore(bluePlayers, redPlayers, ~gameMode=Games.Foosball)
+    | Red => {
+        let (red, blue, points) = OpenSkillRating.calculateScore(
+          redPlayers,
+          bluePlayers,
+          ~gameMode=Games.Foosball,
+        )
+        (blue, red, points)
+      }
+    }
+
+    let (blueElo, redElo, _eloPoints) = switch winningTeam {
     | Blue => Elo.calculateScore(bluePlayers, redPlayers, ~gameMode=Games.Foosball)
     | Red => {
         let (red, blue, points) = Elo.calculateScore(
@@ -105,17 +118,46 @@ let make = (
       }
     }
 
-    let roundedPoints = Elo.roundScore(points)
+    let roundedPoints = OpenSkillRating.roundScore(osPoints)
 
     setEarnedPoints(_ => roundedPoints)
 
+    // Persist OpenSkill fields
     let _ = await Promise.all(
-      Array.map(bluePlayers, async player => {
+      Array.map(blueOS, async player => {
+        Players.updateOpenSkillGameStats(
+          player.key,
+          blueState,
+          redState,
+          Blue,
+          player.mu,
+          player.sigma,
+          player.ordinal,
+        )
+      }),
+    )
+    let _ = await Promise.all(
+      Array.map(redOS, async player => {
+        Players.updateOpenSkillGameStats(
+          player.key,
+          redState,
+          blueState,
+          Red,
+          player.mu,
+          player.sigma,
+          player.ordinal,
+        )
+      }),
+    )
+
+    // Persist Elo fields as well
+    let _ = await Promise.all(
+      Array.map(blueElo, async player => {
         Players.updateGameStats(player.key, blueState, redState, Blue, player.elo)
       }),
     )
     let _ = await Promise.all(
-      Array.map(redPlayers, async player => {
+      Array.map(redElo, async player => {
         Players.updateGameStats(player.key, redState, blueState, Red, player.elo)
       }),
     )

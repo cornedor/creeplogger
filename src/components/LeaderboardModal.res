@@ -2,7 +2,7 @@
 let make = (~show, ~setShow, ~gameMode, ~setGameMode) => {
   let (ascOrder, setOrder) = React.useState(_ => false)
   let players = Players.useAllPlayers(
-    ~orderBy=gameMode == Games.Darts ? #dartsElo : #elo,
+    ~orderBy=gameMode == Games.Darts ? #dartsElo : #rating,
     ~asc=ascOrder,
   )
 
@@ -60,18 +60,16 @@ let make = (~show, ~setShow, ~gameMode, ~setGameMode) => {
           | None => true
           }
 
-          let (playerElo, games) = switch gameMode {
+          let (_, games) = switch gameMode {
           | Games.Darts => (player.dartsElo, player.dartsGames)
-          | _ => (player.elo, player.games)
+          | _ => (player.ordinal, player.games)
           }
 
           let isLowGameCount = games > 5
-          let isLowElo = playerElo > 500.0
-
-          isHidden && isLowGameCount && isLowElo
+          isHidden && isLowGameCount
         })
         ->Array.map(player => {
-          let (playerElo, lastEloChange, lastGames, wins, games) = switch gameMode {
+          let (displayScore, lastChange, lastGames, wins, games) = switch gameMode {
           | Games.Darts => (
               player.dartsElo,
               player.dartsLastEloChange,
@@ -80,18 +78,21 @@ let make = (~show, ~setShow, ~gameMode, ~setGameMode) => {
               player.dartsGames,
             )
           | Games.Foosball => (
-              player.elo,
-              player.lastEloChange,
+              player.ordinal,
+              player.lastOpenSkillChange,
               player.lastGames,
               player.wins,
               player.games,
             )
           }
-          let roundedElo = Elo.roundScore(playerElo)
+          let roundedScore = switch gameMode {
+          | Games.Foosball => OpenSkillRating.toDisplayOrdinal(displayScore)
+          | Games.Darts => Elo.roundScore(displayScore)
+          }
 
           // When the scores are the same, both players get the same position
           // The next player will continue the count as if no position was skipped.
-          switch (roundedElo, previousScore.contents, skipped.contents) {
+          switch (roundedScore, previousScore.contents, skipped.contents) {
           | (a, b, _) if a == b =>
             // Previous score was the same as the current score, so we skip the position
             skipped := skipped.contents + 1
@@ -101,7 +102,7 @@ let make = (~show, ~setShow, ~gameMode, ~setGameMode) => {
             skipped := 0
           | (_, _, _) => position := position.contents + 1
           }
-          previousScore := roundedElo
+          previousScore := roundedScore
 
           <tr key={player.key}>
             <td className="font-semibold">
@@ -109,11 +110,28 @@ let make = (~show, ~setShow, ~gameMode, ~setGameMode) => {
             </td>
             <td> {React.string(player.name)} </td>
             <td>
-              {React.int(roundedElo)}
-              {React.string(" ")}
-              <small className={lastEloChange > 0.0 ? "text-green-400" : "text-red-400"}>
-                {React.int(Elo.roundScore(lastEloChange))}
-              </small>
+              {switch gameMode {
+              | Games.Darts =>
+                <>
+                  {React.int(roundedScore)}
+                  {React.string(" ")}
+                  <small className={lastChange > 0.0 ? "text-green-400" : "text-red-400"}>
+                    {React.int(Elo.roundScore(lastChange))}
+                  </small>
+                </>
+              | Games.Foosball =>
+                <span className="group inline-flex items-baseline gap-1">
+                  <span className="group-hover:hidden"> {React.int(roundedScore)} </span>
+                  <span className="hidden group-hover:inline"> {React.int(Elo.roundScore(player.elo))} </span>
+                  {React.string(" ")}
+                  <small className={(lastChange > 0.0 ? "text-green-400" : "text-red-400") ++ " group-hover:hidden"}>
+                    {React.int(OpenSkillRating.toDisplayDelta(lastChange))}
+                  </small>
+                  <small className={((player.lastEloChange > 0.0 ? "text-green-400" : "text-red-400") ++ " hidden group-hover:inline") }>
+                    {React.int(Elo.roundScore(player.lastEloChange))}
+                  </small>
+                </span>
+              }}
             </td>
             <td>
               <div className="inline-flex gap-1 w-9">

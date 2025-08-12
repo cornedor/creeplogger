@@ -6,6 +6,7 @@ import * as Button from "./Button.bs.mjs";
 import * as Players from "../helpers/Players.bs.mjs";
 import * as DartsIcon from "./DartsIcon.bs.mjs";
 import * as SoccerIcon from "./SoccerIcon.bs.mjs";
+import * as OpenSkillRating from "../helpers/OpenSkillRating.bs.mjs";
 import * as JsxRuntime from "react/jsx-runtime";
 
 function LeaderboardModal(props) {
@@ -17,7 +18,7 @@ function LeaderboardModal(props) {
       });
   var setOrder = match[1];
   var ascOrder = match[0];
-  var players = Players.useAllPlayers(gameMode === "Darts" ? "dartsElo" : "elo", ascOrder);
+  var players = Players.useAllPlayers(gameMode === "Darts" ? "dartsElo" : "rating", ascOrder);
   var position = {
     contents: 0
   };
@@ -114,24 +115,23 @@ function LeaderboardModal(props) {
                                       var isHidden = match !== undefined && match ? false : true;
                                       var match$1;
                                       match$1 = gameMode === "Foosball" ? [
-                                          player.elo,
+                                          player.ordinal,
                                           player.games
                                         ] : [
                                           player.dartsElo,
                                           player.dartsGames
                                         ];
-                                      var isLowGameCount = match$1[1] > 0;
-                                      var isLowElo = match$1[0] > 500.0;
-                                      if (isHidden && isLowGameCount) {
-                                        return isLowElo;
+                                      var isLowGameCount = match$1[1] > 5;
+                                      if (isHidden) {
+                                        return isLowGameCount;
                                       } else {
                                         return false;
                                       }
                                     }).map(function (player) {
                                     var match;
                                     match = gameMode === "Foosball" ? [
-                                        player.elo,
-                                        player.lastEloChange,
+                                        player.ordinal,
+                                        player.lastOpenSkillChange,
                                         player.lastGames,
                                         player.wins,
                                         player.games
@@ -144,11 +144,13 @@ function LeaderboardModal(props) {
                                       ];
                                     var games = match[4];
                                     var wins = match[3];
-                                    var lastEloChange = match[1];
-                                    var roundedElo = Elo.roundScore(match[0]);
+                                    var lastChange = match[1];
+                                    var displayScore = match[0];
+                                    var roundedScore;
+                                    roundedScore = gameMode === "Foosball" ? OpenSkillRating.toDisplayOrdinal(displayScore) : Elo.roundScore(displayScore);
                                     var match$1 = previousScore.contents;
                                     var match$2 = skipped.contents;
-                                    if (roundedElo === match$1) {
+                                    if (roundedScore === match$1) {
                                       skipped.contents = skipped.contents + 1 | 0;
                                     } else if (match$2 > 0) {
                                       position.contents = (position.contents + skipped.contents | 0) + 1 | 0;
@@ -156,7 +158,43 @@ function LeaderboardModal(props) {
                                     } else {
                                       position.contents = position.contents + 1 | 0;
                                     }
-                                    previousScore.contents = roundedElo;
+                                    previousScore.contents = roundedScore;
+                                    var tmp;
+                                    tmp = gameMode === "Foosball" ? JsxRuntime.jsxs("span", {
+                                            children: [
+                                              JsxRuntime.jsx("span", {
+                                                    children: roundedScore,
+                                                    className: "group-hover:hidden"
+                                                  }),
+                                              JsxRuntime.jsx("span", {
+                                                    children: Elo.roundScore(player.elo),
+                                                    className: "hidden group-hover:inline"
+                                                  }),
+                                              " ",
+                                              JsxRuntime.jsx("small", {
+                                                    children: OpenSkillRating.toDisplayDelta(lastChange),
+                                                    className: (
+                                                      lastChange > 0.0 ? "text-green-400" : "text-red-400"
+                                                    ) + " group-hover:hidden"
+                                                  }),
+                                              JsxRuntime.jsx("small", {
+                                                    children: Elo.roundScore(player.lastEloChange),
+                                                    className: (
+                                                      player.lastEloChange > 0.0 ? "text-green-400" : "text-red-400"
+                                                    ) + " hidden group-hover:inline"
+                                                  })
+                                            ],
+                                            className: "group inline-flex items-baseline gap-1"
+                                          }) : JsxRuntime.jsxs(JsxRuntime.Fragment, {
+                                            children: [
+                                              roundedScore,
+                                              " ",
+                                              JsxRuntime.jsx("small", {
+                                                    children: Elo.roundScore(lastChange),
+                                                    className: lastChange > 0.0 ? "text-green-400" : "text-red-400"
+                                                  })
+                                            ]
+                                          });
                                     return JsxRuntime.jsxs("tr", {
                                                 children: [
                                                   JsxRuntime.jsx("td", {
@@ -166,15 +204,8 @@ function LeaderboardModal(props) {
                                                   JsxRuntime.jsx("td", {
                                                         children: player.name
                                                       }),
-                                                  JsxRuntime.jsxs("td", {
-                                                        children: [
-                                                          roundedElo,
-                                                          " ",
-                                                          JsxRuntime.jsx("small", {
-                                                                children: Elo.roundScore(lastEloChange),
-                                                                className: lastEloChange > 0.0 ? "text-green-400" : "text-red-400"
-                                                              })
-                                                        ]
+                                                  JsxRuntime.jsx("td", {
+                                                        children: tmp
                                                       }),
                                                   JsxRuntime.jsx("td", {
                                                         children: JsxRuntime.jsx("div", {

@@ -12,7 +12,10 @@ import * as DartsGames from "./DartsGames.bs.mjs";
 import * as Core__Array from "@rescript/core/src/Core__Array.bs.mjs";
 import * as Core__Option from "@rescript/core/src/Core__Option.bs.mjs";
 import * as RescriptCore from "@rescript/core/src/RescriptCore.bs.mjs";
+import * as OpenSkillRating from "./OpenSkillRating.bs.mjs";
 import * as Database$1 from "firebase/database";
+
+var _ignoreOpenSkill = OpenSkillRating.roundScore(0.0);
 
 var statsSchema = Schema.object(function (s) {
       return {
@@ -145,9 +148,11 @@ async function recalculateStats() {
         newrecord.dartsGames = 0;
         newrecord.dartsLastEloChange = 0.0;
         newrecord.dartsElo = 1000.0;
+        newrecord.ordinal = 0.0;
+        newrecord.sigma = 8.333;
+        newrecord.mu = 25.0;
         newrecord.lastGames = [];
         newrecord.lastEloChange = 0.0;
-        newrecord.elo = 1000.0;
         newrecord.redWins = 0;
         newrecord.blueWins = 0;
         newrecord.redGames = 0;
@@ -173,9 +178,9 @@ async function recalculateStats() {
               });
           var match;
           if (blueWin) {
-            match = Elo.calculateScore(bluePlayers, redPlayers, "Foosball");
+            match = OpenSkillRating.calculateScore(bluePlayers, redPlayers, "Foosball");
           } else {
-            var match$1 = Elo.calculateScore(redPlayers, bluePlayers, "Foosball");
+            var match$1 = OpenSkillRating.calculateScore(redPlayers, bluePlayers, "Foosball");
             match = [
               match$1[1],
               match$1[0],
@@ -273,6 +278,7 @@ async function recalculateStats() {
 }
 
 export {
+  _ignoreOpenSkill ,
   statsSchema ,
   empty ,
   bucket ,
@@ -283,4 +289,4 @@ export {
   writeStats ,
   recalculateStats ,
 }
-/* statsSchema Not a pure module */
+/* _ignoreOpenSkill Not a pure module */
