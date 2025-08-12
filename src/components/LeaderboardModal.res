@@ -132,8 +132,8 @@ let make = (~show, ~setShow, ~gameMode, ~setGameMode) => {
             </>
           }}
           <th className="text-lg text-left"> {React.string("Last 5")} </th>
-          <th className="text-lg text-left hidden min-[1200px]:table-cell"> {React.string("G/W")} </th>
-          <th className="text-lg text-left hidden min-[1200px]:table-cell"> {React.string("Win%")} </th>
+                     <th className="text-lg text-left"> {React.string("G/W")} </th>
+          <th className="text-lg text-left"> {React.string("Win%") } </th>
         </tr>
       </thead>
       <tbody>
@@ -180,8 +180,8 @@ let make = (~show, ~setShow, ~gameMode, ~setGameMode) => {
               </>
             | Games.Foosball =>
               <>
-                <td title={"μ=" ++ round2(player.mu)->Js.Float.toString ++ " σ=" ++ round2(player.sigma)->Js.Float.toString ++ " ELO=" ++ round2(player.elo)->Js.Float.toString}>
-                  {React.float(round2(player.ordinal))}
+                                 <td title={"μ=" ++ round2(player.mu)->Js.Float.toString ++ " σ=" ++ round2(player.sigma)->Js.Float.toString ++ " ELO=" ++ round2(player.elo)->Js.Float.toString}>
+                  {React.int(OpenSkillRating.toDisplayOrdinal(player.ordinal))}
                 </td>
                 <td>
                   <small className={deltaColor}>
@@ -204,14 +204,14 @@ let make = (~show, ~setShow, ~gameMode, ~setGameMode) => {
                 ->React.array}
               </div>
             </td>
-            <td className="hidden min-[1200px]:table-cell">
+            <td>
               {React.int(games)}
               {React.string(":")}
               {React.int(wins)}
             </td>
-            <td className="hidden min-[1200px]:table-cell">
-              {React.float((games > 0 ? (Float.fromInt(wins) /. Float.fromInt(games) *. 100.) : 0.0)->Math.round)}
-              {React.string("%")}
+            <td>
+              {React.int((games > 0 ? (Float.fromInt(wins) /. Float.fromInt(games) *. 100.) : 0.0)->Js.Math.round->Float.toInt)}
+              {React.string("%") }
             </td>
           </tr>
         })
