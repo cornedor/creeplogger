@@ -1,11 +1,3 @@
-open Firebase
-open RescriptCore
-
-// Ensure helpers are referenced so generated output includes them
-let _ignoreOpenSkillRound = OpenSkillRating.roundScore(0.0)
-let _ignoreEloRound = Elo.roundScore(0.0)
-let _ignoreGameMode: Games.gameMode = Games.Foosball
-
 @react.component
 let make = (~show, ~setShow, ~gameMode, ~setGameMode) => {
   let (ascOrder, setOrder) = React.useState(_ => false)

@@ -9,10 +9,6 @@ import * as SoccerIcon from "./SoccerIcon.bs.mjs";
 import * as OpenSkillRating from "../helpers/OpenSkillRating.bs.mjs";
 import * as JsxRuntime from "react/jsx-runtime";
 
-OpenSkillRating.roundScore(0.0);
-
-Elo.roundScore(0.0);
-
 function LeaderboardModal(props) {
   var setGameMode = props.setGameMode;
   var gameMode = props.gameMode;
@@ -232,4 +228,4 @@ var make = LeaderboardModal;
 export {
   make ,
 }
-/*  Not a pure module */
+/* react Not a pure module */
