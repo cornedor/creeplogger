@@ -134,12 +134,14 @@ let make = (~show, ~setShow, ~gameMode, ~setGameMode) => {
             </>
           }}
           <th className="text-lg text-left"> {React.string("Last 5")} </th>
+          <th className="text-lg text-left hidden min-[1200px]:table-cell"> {React.string("G/W")} </th>
+          <th className="text-lg text-left hidden min-[1200px]:table-cell"> {React.string("Win%")} </th>
         </tr>
       </thead>
       <tbody>
         {visiblePlayers
         ->Array.map(player => {
-          let (_, _lastChange, lastGames, _wins, _games) = switch gameMode {
+          let (_, _lastChange, lastGames, wins, games) = switch gameMode {
           | Games.Darts => (
               player.dartsElo,
               player.dartsLastEloChange,
@@ -203,6 +205,15 @@ let make = (~show, ~setShow, ~gameMode, ~setGameMode) => {
                 )
                 ->React.array}
               </div>
+            </td>
+            <td className="hidden min-[1200px]:table-cell">
+              {React.int(games)}
+              {React.string(":")}
+              {React.int(wins)}
+            </td>
+            <td className="hidden min-[1200px]:table-cell">
+              {React.float((games > 0 ? (Float.fromInt(wins) /. Float.fromInt(games) *. 100.) : 0.0)->Math.round)}
+              {React.string("%")}
             </td>
           </tr>
         })

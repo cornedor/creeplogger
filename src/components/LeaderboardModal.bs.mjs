@@ -227,6 +227,14 @@ function LeaderboardModal(props) {
                                       JsxRuntime.jsx("th", {
                                             children: "Last 5",
                                             className: "text-lg text-left"
+                                          }),
+                                      JsxRuntime.jsx("th", {
+                                            children: "G/W",
+                                            className: "text-lg text-left hidden min-[1200px]:table-cell"
+                                          }),
+                                      JsxRuntime.jsx("th", {
+                                            children: "Win%",
+                                            className: "text-lg text-left hidden min-[1200px]:table-cell"
                                           })
                                     ]
                                   })
@@ -247,6 +255,8 @@ function LeaderboardModal(props) {
                                         player.dartsWins,
                                         player.dartsGames
                                       ];
+                                    var games = match[4];
+                                    var wins = match[3];
                                     var currentPos = Core__Option.getOr(Js_dict.get(currentPositions, player.key), 0);
                                     var previousPos = Core__Option.getOr(Js_dict.get(previousPositions, player.key), currentPos);
                                     var delta = previousPos - currentPos | 0;
@@ -307,6 +317,21 @@ function LeaderboardModal(props) {
                                                                   }),
                                                               className: "inline-flex gap-1 w-9"
                                                             })
+                                                      }),
+                                                  JsxRuntime.jsxs("td", {
+                                                        children: [
+                                                          games,
+                                                          ":",
+                                                          wins
+                                                        ],
+                                                        className: "hidden min-[1200px]:table-cell"
+                                                      }),
+                                                  JsxRuntime.jsxs("td", {
+                                                        children: [
+                                                          Math.round(games > 0 ? wins / games * 100 : 0.0),
+                                                          "%"
+                                                        ],
+                                                        className: "hidden min-[1200px]:table-cell"
                                                       })
                                                 ]
                                               }, player.key);
