@@ -27,6 +27,13 @@ let updatePlayerRating = (player: Players.player, newRating: OpenSkill.rating) =
   }
 }
 
+// Scale OpenSkill values to a familiar ~1000-based display
+@inline
+let toDisplayOrdinal = (ordinal: float) => (1000.0 +. ordinal *. 40.0)->Js.Math.round->Float.toInt
+
+@inline
+let toDisplayDelta = (delta: float) => (delta *. 40.0)->Js.Math.round->Float.toInt
+
 // Calculate new ratings for both teams after a game
 // Returns (updated winners, updated losers, points change for display)
 let calculateScore = (winners: team, losers: team, ~gameMode: Games.gameMode=Games.Foosball) => {

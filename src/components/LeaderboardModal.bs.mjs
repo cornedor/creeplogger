@@ -146,7 +146,9 @@ function LeaderboardModal(props) {
                                     var games = match[4];
                                     var wins = match[3];
                                     var lastChange = match[1];
-                                    var roundedScore = OpenSkillRating.roundScore(match[0]);
+                                    var displayScore = match[0];
+                                    var roundedScore;
+                                    roundedScore = gameMode === "Foosball" ? OpenSkillRating.toDisplayOrdinal(displayScore) : Elo.roundScore(displayScore);
                                     var match$1 = previousScore.contents;
                                     var match$2 = skipped.contents;
                                     if (roundedScore === match$1) {
@@ -160,7 +162,7 @@ function LeaderboardModal(props) {
                                     previousScore.contents = roundedScore;
                                     var tmp;
                                     tmp = gameMode === "Foosball" ? JsxRuntime.jsx("small", {
-                                            children: OpenSkillRating.roundScore(lastChange),
+                                            children: OpenSkillRating.toDisplayDelta(lastChange),
                                             className: lastChange > 0.0 ? "text-green-400" : "text-red-400",
                                             title: "Elo: " + (player.elo | 0).toString()
                                           }) : JsxRuntime.jsx("small", {

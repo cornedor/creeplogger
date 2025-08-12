@@ -27,6 +27,14 @@ function updatePlayerRating(player, newRating) {
   return newrecord;
 }
 
+function toDisplayOrdinal(ordinal) {
+  return Math.round(1000.0 + ordinal * 40.0) | 0;
+}
+
+function toDisplayDelta(delta) {
+  return Math.round(delta * 40.0) | 0;
+}
+
 function calculateScore(winners, losers, gameModeOpt) {
   var winnerRatings = winners.map(getOpenSkillRating);
   var loserRatings = losers.map(getOpenSkillRating);
@@ -66,6 +74,8 @@ export {
   calculateOrdinal ,
   teamToRatings ,
   updatePlayerRating ,
+  toDisplayOrdinal ,
+  toDisplayDelta ,
   calculateScore ,
   getWinProbability ,
   roundScore ,

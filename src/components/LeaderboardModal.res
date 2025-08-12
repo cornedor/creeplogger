@@ -87,7 +87,10 @@ let make = (~show, ~setShow, ~gameMode, ~setGameMode) => {
                 player.games,
             )
           }
-          let roundedScore = OpenSkillRating.roundScore(displayScore)
+          let roundedScore = switch gameMode {
+          | Games.Foosball => OpenSkillRating.toDisplayOrdinal(displayScore)
+          | Games.Darts => Elo.roundScore(displayScore)
+          }
 
           // When the scores are the same, both players get the same position
           // The next player will continue the count as if no position was skipped.
@@ -120,7 +123,7 @@ let make = (~show, ~setShow, ~gameMode, ~setGameMode) => {
                 <small
                   title={`Elo: ${player.elo->Float.toInt->Int.toString}`}
                   className={lastChange > 0.0 ? "text-green-400" : "text-red-400"}>
-                  {React.int(OpenSkillRating.roundScore(lastChange))}
+                  {React.int(OpenSkillRating.toDisplayDelta(lastChange))}
                 </small>
               }}
             </td>
