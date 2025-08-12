@@ -5,6 +5,7 @@ import * as Summary from "./Summary.bs.mjs";
 import * as Caml_option from "rescript/lib/es6/caml_option.js";
 import * as Core__Option from "@rescript/core/src/Core__Option.bs.mjs";
 import * as RescriptCore from "@rescript/core/src/RescriptCore.bs.mjs";
+import * as OpenSkillRating from "./OpenSkillRating.bs.mjs";
 
 var url = process.env.MATTERMOST_URL;
 
@@ -48,7 +49,13 @@ async function sendCreepsUpdate(bluePlayers, redPlayers, blueScore, redScore, po
         }).join(", ");
   var bluePoints = blueScore < redScore ? -points | 0 : points;
   var redPoints = blueScore > redScore ? -points | 0 : points;
-  var message = "### Nieuw potje geregistreerd!\n\n| Team | Goals | Punten |\n| ---- | ----- | ------ |\n| " + blueNames + " | " + blueScore.toString() + " | " + bluePoints.toString() + " |\n| " + redNames + " | " + redScore.toString() + " | " + redPoints.toString() + " |\n";
+  var blueWinProb = OpenSkillRating.getWinProbability(bluePlayers, redPlayers) * 100.0;
+  var redWinProb = 100.0 - blueWinProb;
+  var blueProbRounded = Math.round(blueWinProb * 10.0) / 10.0;
+  var redProbRounded = Math.round(redWinProb * 10.0) / 10.0;
+  var blueProbStr = blueProbRounded.toString();
+  var redProbStr = redProbRounded.toString();
+  var message = "### Nieuw potje geregistreerd!\n\n| Team | Goals | OpenSkill Δ |\n| ---- | ----- | ----------- |\n| " + blueNames + " | " + blueScore.toString() + " | " + bluePoints.toString() + " |\n| " + redNames + " | " + redScore.toString() + " | " + redPoints.toString() + " |\n\nOpenSkill winstkans (pre-game): Blauw " + blueProbStr + "% vs Rood " + redProbStr + "%\n";
   var promise = publishMessage(message);
   if (promise !== undefined) {
     await Caml_option.valFromOption(promise);

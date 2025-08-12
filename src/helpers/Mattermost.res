@@ -1,4 +1,5 @@
 @@directive("'use server';")
+open OpenSkillRating
 let url = %raw(`process.env.MATTERMOST_URL`)
 let isEnabled = %raw(`process.env.MATTERMOST_ENABLED`) == "true"
 
@@ -54,12 +55,22 @@ let sendCreepsUpdate = async (
   let bluePoints = blueScore < redScore ? 0 - points : points
   let redPoints = blueScore > redScore ? 0 - points : points
 
+  // Pre-game win probability based on OpenSkill
+  let blueWinProb = OpenSkillRating.getWinProbability(bluePlayers, redPlayers) *. 100.0
+  let redWinProb = 100.0 -. blueWinProb
+  let blueProbRounded = (blueWinProb *. 10.0)->Js.Math.round /. 10.0
+  let redProbRounded = (redWinProb *. 10.0)->Js.Math.round /. 10.0
+  let blueProbStr = blueProbRounded->Float.toString
+  let redProbStr = redProbRounded->Float.toString
+
   let message = `### Nieuw potje geregistreerd!
 
-| Team | Goals | Punten |
-| ---- | ----- | ------ |
+| Team | Goals | OpenSkill Δ |
+| ---- | ----- | ----------- |
 | ${blueNames} | ${blueScore->Int.toString} | ${bluePoints->Int.toString} |
 | ${redNames} | ${redScore->Int.toString} | ${redPoints->Int.toString} |
+
+OpenSkill winstkans (pre-game): Blauw ${blueProbStr}% vs Rood ${redProbStr}%
 `
 
   switch publishMessage(message) {
