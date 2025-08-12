@@ -151,7 +151,7 @@ function LeaderboardModal(props) {
                 }),
             JsxRuntime.jsx("th", {
                   children: JsxRuntime.jsx("button", {
-                        children: "Ordinal " + (
+                        children: "Ord. " + (
                           ascOrder ? "↑" : "↓"
                         ),
                         "aria-label": "Toggle sort order",

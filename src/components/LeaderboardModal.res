@@ -118,7 +118,7 @@ let make = (~show, ~setShow, ~gameMode, ~setGameMode) => {
               <th className="text-lg text-left"> {React.string("σ")} </th>
               <th className="text-lg text-left">
                 <button ariaLabel="Toggle sort order" onClick={_ => setOrder(order => !order)}>
-                  {React.string("Ordinal " ++ (ascOrder ? "↑" : "↓"))}
+                  {React.string("Ord. " ++ (ascOrder ? "↑" : "↓"))}
                 </button>
               </th>
               <th className="text-lg text-left"> {React.string("Δ")} </th>
