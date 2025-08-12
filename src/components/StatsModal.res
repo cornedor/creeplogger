@@ -157,20 +157,35 @@ let make = (~show, ~setShow) => {
     switch Js.Dict.get(seriesByPlayer, key) {
     | None => React.null
     | Some(points) => {
+        let isHover = switch hoverKey { | Some(k) => k == key | None => false }
+        let visibleWidth = if isHover { "4" } else { "2" }
         let lines = points->Array.mapWithIndex((p, i) => {
           if i == 0 {
             React.null
           } else {
             let prev = Array.getUnsafe(points, i - 1);
-            <line
-              key={Js.Int.toString(i)}
-              x1={Js.Float.toString(scaleX(prev.time))}
-              y1={Js.Float.toString(scaleY(prev.score))}
-              x2={Js.Float.toString(scaleX(p.time))}
-              y2={Js.Float.toString(scaleY(p.score))}
-              stroke={color}
-              strokeWidth="2"
-            />
+            <>
+              <line
+                key={Js.Int.toString(i) ++ "-v"}
+                x1={Js.Float.toString(scaleX(prev.time))}
+                y1={Js.Float.toString(scaleY(prev.score))}
+                x2={Js.Float.toString(scaleX(p.time))}
+                y2={Js.Float.toString(scaleY(p.score))}
+                stroke={color}
+                strokeWidth={visibleWidth}
+              />
+              <line
+                key={Js.Int.toString(i) ++ "-h"}
+                x1={Js.Float.toString(scaleX(prev.time))}
+                y1={Js.Float.toString(scaleY(prev.score))}
+                x2={Js.Float.toString(scaleX(p.time))}
+                y2={Js.Float.toString(scaleY(p.score))}
+                stroke={color}
+                strokeOpacity="0.01"
+                pointerEvents="stroke"
+                strokeWidth="14"
+              />
+            </>
           }
         });
         <g

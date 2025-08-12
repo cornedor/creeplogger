@@ -395,19 +395,35 @@ function StatsModal(props) {
                                                     if (points === undefined) {
                                                       return null;
                                                     }
+                                                    var isHover = hoverKey !== undefined ? hoverKey === key : false;
+                                                    var visibleWidth = isHover ? "4" : "2";
                                                     var lines = points.map(function (p, i) {
                                                           if (i === 0) {
                                                             return null;
                                                           }
                                                           var prev = points[i - 1 | 0];
-                                                          return JsxRuntime.jsx("line", {
-                                                                      stroke: color,
-                                                                      strokeWidth: "2",
-                                                                      x1: scaleX(prev.time).toString(),
-                                                                      x2: scaleX(p.time).toString(),
-                                                                      y1: scaleY(prev.score).toString(),
-                                                                      y2: scaleY(p.score).toString()
-                                                                    }, i.toString());
+                                                          return JsxRuntime.jsxs(JsxRuntime.Fragment, {
+                                                                      children: [
+                                                                        JsxRuntime.jsx("line", {
+                                                                              stroke: color,
+                                                                              strokeWidth: visibleWidth,
+                                                                              x1: scaleX(prev.time).toString(),
+                                                                              x2: scaleX(p.time).toString(),
+                                                                              y1: scaleY(prev.score).toString(),
+                                                                              y2: scaleY(p.score).toString()
+                                                                            }, i.toString() + "-v"),
+                                                                        JsxRuntime.jsx("line", {
+                                                                              pointerEvents: "stroke",
+                                                                              stroke: color,
+                                                                              strokeOpacity: "0.01",
+                                                                              strokeWidth: "14",
+                                                                              x1: scaleX(prev.time).toString(),
+                                                                              x2: scaleX(p.time).toString(),
+                                                                              y1: scaleY(prev.score).toString(),
+                                                                              y2: scaleY(p.score).toString()
+                                                                            }, i.toString() + "-h")
+                                                                      ]
+                                                                    });
                                                         });
                                                     return JsxRuntime.jsx("g", {
                                                                 children: lines,
