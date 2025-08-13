@@ -13,36 +13,36 @@ import * as DartsGameModeStep from "../components/DartsGameModeStep.bs.mjs";
 import * as JsxRuntime from "react/jsx-runtime";
 
 function Logger(props) {
-  var livePlayers = Players.useAllPlayers(undefined, undefined);
-  var match = livePlayers.length;
-  var players = match !== 0 ? livePlayers : props.players;
-  var match$1 = React.useState(function () {
+  var match = React.useState(function () {
+        return "Foosball";
+      });
+  var gameMode = match[0];
+  var livePlayers = Players.useAllPlayers("games", false);
+  var match$1 = livePlayers.length;
+  var players = match$1 !== 0 ? livePlayers : props.players;
+  var match$2 = React.useState(function () {
         
       });
-  var setSelectedUsers = match$1[1];
-  var selectedUsers = match$1[0];
-  var match$2 = React.useState(function () {
+  var setSelectedUsers = match$2[1];
+  var selectedUsers = match$2[0];
+  var match$3 = React.useState(function () {
         return "UserSelection";
       });
-  var setStep = match$2[1];
-  var match$3 = React.useState(function () {
-        return -1;
-      });
-  var setRedState = match$3[1];
-  var redState = match$3[0];
+  var setStep = match$3[1];
   var match$4 = React.useState(function () {
         return -1;
       });
-  var setBlueState = match$4[1];
-  var blueState = match$4[0];
+  var setRedState = match$4[1];
+  var redState = match$4[0];
   var match$5 = React.useState(function () {
+        return -1;
+      });
+  var setBlueState = match$5[1];
+  var blueState = match$5[0];
+  var match$6 = React.useState(function () {
         return 0;
       });
-  var setEarnedPoints = match$5[1];
-  var match$6 = React.useState(function () {
-        return "Foosball";
-      });
-  var gameMode = match$6[0];
+  var setEarnedPoints = match$6[1];
   var reset = function () {
     setStep(function (param) {
           return "UserSelection";
@@ -66,7 +66,7 @@ function Logger(props) {
               return value === winnerTeam;
             })));
   var stepComponent;
-  switch (match$2[0]) {
+  switch (match$3[0]) {
     case "UserSelection" :
         stepComponent = JsxRuntime.jsx(UserGrid.make, {
               selectedUsers: selectedUsers,
@@ -75,7 +75,7 @@ function Logger(props) {
               setStep: setStep,
               players: players,
               gameMode: gameMode,
-              setGameMode: match$6[1]
+              setGameMode: match[1]
             });
         break;
     case "ScoreForm" :
@@ -101,7 +101,7 @@ function Logger(props) {
         break;
     case "Confirmation" :
         stepComponent = JsxRuntime.jsx(ConfirmationStep.make, {
-              score: match$5[0],
+              score: match$6[0],
               winners: winners,
               reset: reset,
               players: players

@@ -181,6 +181,8 @@ let make = (
       setShowQueueButtons={_ => ()}
       gameMode
       setGameMode={None}
+      searchQuery={None}
+      setSearchQuery={None}
     />
     <div className="flex flex-wrap content-padding gap-20">
       <div>

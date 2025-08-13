@@ -8,6 +8,12 @@
   flex-grow: 1;
 }
 
+@media (max-width: 1024px) {
+  .addCreeper {
+    height: 160px;
+  }
+}
+
 .addCreeperButton {
   text-align: center;
   align-items: center;
@@ -21,6 +27,12 @@
   overflow: visible;
   width: 100%;
   height: 100%;
+}
+
+@media (max-width: 1024px) {
+  .addCreeperButton {
+    font-size: 90px;
+  }
 }
 
 .form {

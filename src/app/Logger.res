@@ -4,17 +4,16 @@ type nextFont = {className: string}
 
 @react.component
 let make = (~players: array<Players.player>) => {
-  let livePlayers = Players.useAllPlayers()
-  let players = switch Array.length(livePlayers) {
-  | 0 => players
-  | _ => livePlayers
-  }
+  let (gameMode, setGameMode) = React.useState(_ => Games.Foosball)
+  let livePlayers = Players.useAllPlayers(~orderBy=#games, ~asc=false)
+  let ssrPlayers = players
+  let useLive = Array.length(livePlayers) >= Array.length(ssrPlayers)
+  let players = useLive ? livePlayers : ssrPlayers
   let (selectedUsers, setSelectedUsers) = React.useState(_ => Belt.Map.String.empty)
   let (step, setStep) = React.useState(_ => LoggerStep.UserSelection)
   let (redState, setRedState) = React.useState(_ => -1)
   let (blueState, setBlueState) = React.useState(_ => -1)
   let (earnedPoints, setEarnedPoints) = React.useState(_ => 0)
-  let (gameMode, setGameMode) = React.useState(_ => Games.Foosball)
 
   let reset = () => {
     setStep(_ => LoggerStep.UserSelection)

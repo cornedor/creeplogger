@@ -125,13 +125,10 @@ external snapshotToArray: dataSnapshot => array<dataSnapshot> = "%identity"
 
 let useAllPlayers = (~orderBy: playersOrder=#rating, ~asc=false) => {
   let (players, setPlayers) = React.useState(_ => [])
-  let playersRef = Firebase.Database.query1(
-    Firebase.Database.refPath(Database.database, bucket),
-    Firebase.Database.orderByChild("games"),
-  )
+  let playersRef = Firebase.Database.refPath(Database.database, bucket)
   React.useEffect(() => {
     let unsubscribe = Firebase.Database.onValue(
-      playersRef,
+      Firebase.Database.query1(playersRef, Firebase.Database.orderByChild("games")),
       snapshot => {
         let newPlayers = []
         Array.forEach(snapshotToArray(snapshot), snap => {
@@ -152,14 +149,30 @@ let useAllPlayers = (~orderBy: playersOrder=#rating, ~asc=false) => {
     Some(unsubscribe)
   }, [setPlayers])
 
+  let cmpInsensitive = (a, b) => {
+    let al = Js.String2.toLowerCase(a)
+    let bl = Js.String2.toLowerCase(b)
+    if al < bl { -1 } else if al > bl { 1 } else { 0 }
+  }
+
   React.useMemo(() =>
     players->Array.toSorted((a, b) => {
-      let (a, b) = asc ? (a, b) : (b, a)
-      switch orderBy {
-      | #games => Int.toFloat(a.games - b.games)
-      | #elo => a.elo -. b.elo
-      | #rating => a.ordinal -. b.ordinal
-      | #dartsElo => a.dartsElo -. b.dartsElo
+      let (x, y) = asc ? (a, b) : (b, a)
+      let primary = switch orderBy {
+      | #games => Int.toFloat(x.games - y.games)
+      | #elo => x.elo -. y.elo
+      | #rating => x.ordinal -. y.ordinal
+      | #dartsElo => x.dartsElo -. y.dartsElo
+      }
+      if primary == 0.0 {
+        let nameCmp = cmpInsensitive(x.name, y.name)
+        if nameCmp == 0 {
+          Int.toFloat(cmpInsensitive(x.key, y.key))
+        } else {
+          Int.toFloat(nameCmp)
+        }
+      } else {
+        primary
       }
     })
   , (players, asc, orderBy))

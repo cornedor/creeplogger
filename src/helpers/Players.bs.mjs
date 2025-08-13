@@ -94,9 +94,9 @@ function useAllPlayers(orderByOpt, ascOpt) {
       });
   var setPlayers = match[1];
   var players = match[0];
-  var playersRef = Database$1.query(Database$1.ref(Database.database, "players"), Database$1.orderByChild("games"));
+  var playersRef = Database$1.ref(Database.database, "players");
   React.useEffect((function () {
-          return Database$1.onValue(playersRef, (function (snapshot) {
+          return Database$1.onValue(Database$1.query(playersRef, Database$1.orderByChild("games")), (function (snapshot) {
                         var newPlayers = [];
                         snapshot.forEach(function (snap) {
                               var val = snap.val();
@@ -114,6 +114,17 @@ function useAllPlayers(orderByOpt, ascOpt) {
                             });
                       }), undefined);
         }), [setPlayers]);
+  var cmpInsensitive = function (a, b) {
+    var al = a.toLowerCase();
+    var bl = b.toLowerCase();
+    if (al < bl) {
+      return -1;
+    } else if (al > bl) {
+      return 1;
+    } else {
+      return 0;
+    }
+  };
   return React.useMemo((function () {
                 return players.toSorted(function (a, b) {
                             var match = asc ? [
@@ -123,16 +134,21 @@ function useAllPlayers(orderByOpt, ascOpt) {
                                 b,
                                 a
                               ];
-                            var b$1 = match[1];
-                            var a$1 = match[0];
-                            if (orderBy === "elo") {
-                              return a$1.elo - b$1.elo;
-                            } else if (orderBy === "games") {
-                              return a$1.games - b$1.games | 0;
-                            } else if (orderBy === "rating") {
-                              return a$1.ordinal - b$1.ordinal;
+                            var y = match[1];
+                            var x = match[0];
+                            var primary = orderBy === "elo" ? x.elo - y.elo : (
+                                orderBy === "games" ? x.games - y.games | 0 : (
+                                    orderBy === "rating" ? x.ordinal - y.ordinal : x.dartsElo - y.dartsElo
+                                  )
+                              );
+                            if (primary !== 0.0) {
+                              return primary;
+                            }
+                            var nameCmp = cmpInsensitive(x.name, y.name);
+                            if (nameCmp === 0) {
+                              return cmpInsensitive(x.key, y.key);
                             } else {
-                              return a$1.dartsElo - b$1.dartsElo;
+                              return nameCmp;
                             }
                           });
               }), [
