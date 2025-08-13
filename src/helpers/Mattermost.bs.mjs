@@ -47,8 +47,6 @@ async function sendCreepsUpdate(bluePlayers, redPlayers, blueScore, redScore, po
             return player.name;
           }
         }).join(", ");
-  var bluePoints = blueScore < redScore ? -points | 0 : points;
-  var redPoints = blueScore > redScore ? -points | 0 : points;
   var winningTeam = blueScore > redScore ? "Blue" : "Red";
   var match;
   if (winningTeam === "Blue") {
@@ -89,7 +87,7 @@ async function sendCreepsUpdate(bluePlayers, redPlayers, blueScore, redScore, po
   var redProbRounded = Math.round(redWinProb * 10.0) / 10.0;
   var blueProbStr = blueProbRounded.toString();
   var redProbStr = redProbRounded.toString();
-  var message = "### Nieuw potje geregistreerd!\n\n| Team | Goals | OpenSkill Δ |\n| ---- | ----- | ----------- |\n| " + blueNames + " | " + blueScore.toString() + " | " + bluePoints.toString() + " |\n| " + redNames + " | " + redScore.toString() + " | " + redPoints.toString() + " |\n\nIndividueel:\n- Blauw: " + blueIndividuals + "\n- Rood: " + redIndividuals + "\n\nOpenSkill winstkans (pre-game): Blauw " + blueProbStr + "% vs Rood " + redProbStr + "%\n";
+  var message = "### Nieuw potje geregistreerd!\n\n| Team | Spelers | Goals |\n| ---- | ------- | ----- |\n| Blauw | " + blueNames + " | " + blueScore.toString() + " |\n| Rood | " + redNames + " | " + redScore.toString() + " |\n\nIndividueel:\n- Blauw: " + blueIndividuals + "\n- Rood: " + redIndividuals + "\n\nOpenSkill winstkans (pre-game): Blauw " + blueProbStr + "% vs Rood " + redProbStr + "%\n";
   var promise = publishMessage(message);
   if (promise !== undefined) {
     await Caml_option.valFromOption(promise);
