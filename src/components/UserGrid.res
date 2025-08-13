@@ -39,7 +39,7 @@ let make = (
   let players = filtered->Array.toSorted((a, b) => {
     // Keep filtered order deterministic
     let nameCmp = Js.String2.toLowerCase(a.name) < Js.String2.toLowerCase(b.name) ? -1 : (Js.String2.toLowerCase(a.name) > Js.String2.toLowerCase(b.name) ? 1 : 0)
-    if nameCmp == 0 { Int.toFloat(Js.String2.localeCompare(a.key, b.key)) } else { Int.toFloat(nameCmp) }
+    if nameCmp == 0 { Js.String2.localeCompare(a.key, b.key) } else { nameCmp }
   })->Js.Array2.map(item =>
     <GridItem
       key={item.key}
