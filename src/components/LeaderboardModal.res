@@ -3,7 +3,7 @@ let make = (~show, ~setShow, ~gameMode, ~setGameMode) => {
   let (ascOrder, setOrder) = React.useState(_ => false)
   let players = Players.useAllPlayers(
     ~orderBy=gameMode == Games.Darts ? #dartsElo : #rating,
-    ~asc=ascOrder,
+    ~asc=false,
   )
 
   // Prepare filtered, visible players once
@@ -63,17 +63,29 @@ let make = (~show, ~setShow, ~gameMode, ~setGameMode) => {
     posByKey
   }
 
-  // Current positions follow the already sorted order in visiblePlayers
-  let currentPositions = React.useMemo(() => computePositions(visiblePlayers, getCurrentCompareValue), (visiblePlayers, gameMode))
+  // Canonical DESC ordering for rank computation (independent of UI sort)
+  let sortDescBy = (getValue: Players.player => int, a: Players.player, b: Players.player) =>
+    Int.toFloat(getValue(b) - getValue(a))
 
-  // Previous positions: sort by previous compare value with same asc/desc
+  // Current positions: based on canonical DESC ranking
+  let currentPositions = React.useMemo(() => {
+    let sortedCur = visiblePlayers->Array.toSorted((a, b) => sortDescBy(getCurrentCompareValue, a, b))
+    computePositions(sortedCur, getCurrentCompareValue)
+  }, (visiblePlayers, gameMode))
+
+  // Previous positions: also canonical DESC ranking
   let previousPositions = React.useMemo(() => {
-    let sortedPrev = visiblePlayers->Array.toSorted((a, b) => {
-      let (a1, b1) = ascOrder ? (a, b) : (b, a)
-      Int.toFloat(getPreviousCompareValue(a1) - getPreviousCompareValue(b1))
-    })
+    let sortedPrev = visiblePlayers->Array.toSorted((a, b) => sortDescBy(getPreviousCompareValue, a, b))
     computePositions(sortedPrev, getPreviousCompareValue)
-  }, (visiblePlayers, ascOrder, gameMode))
+  }, (visiblePlayers, gameMode))
+
+  // List used for display respects the UI sort toggle, without affecting ranks
+  let displayPlayers = React.useMemo(() =>
+    visiblePlayers->Array.toSorted((a, b) => {
+      let (a1, b1) = ascOrder ? (a, b) : (b, a)
+      Int.toFloat(getCurrentCompareValue(a1) - getCurrentCompareValue(b1))
+    })
+  , (visiblePlayers, ascOrder, gameMode))
 
   // Helper for formatting floats to 2 decimals
   let round2 = v => (v *. 100.0)->Js.Math.round /. 100.0
@@ -137,7 +149,7 @@ let make = (~show, ~setShow, ~gameMode, ~setGameMode) => {
         </tr>
       </thead>
       <tbody>
-        {visiblePlayers
+        {displayPlayers
         ->Array.map(player => {
           let (_, _lastChange, lastGames, wins, games) = switch gameMode {
           | Games.Darts => (
@@ -156,7 +168,7 @@ let make = (~show, ~setShow, ~gameMode, ~setGameMode) => {
             )
           }
 
-          // Derive current and previous positions
+          // Derive current and previous positions (canonical ranks)
           let currentPos = Js.Dict.get(currentPositions, player.key)->Option.getOr(0)
           let previousPos = Js.Dict.get(previousPositions, player.key)->Option.getOr(currentPos)
           let delta = previousPos - currentPos

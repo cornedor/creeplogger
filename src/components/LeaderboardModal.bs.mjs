@@ -21,7 +21,7 @@ function LeaderboardModal(props) {
       });
   var setOrder = match[1];
   var ascOrder = match[0];
-  var players = Players.useAllPlayers(gameMode === "Darts" ? "dartsElo" : "rating", ascOrder);
+  var players = Players.useAllPlayers(gameMode === "Darts" ? "dartsElo" : "rating", false);
   var visiblePlayers = React.useMemo((function () {
           return players.filter(function (player) {
                       var match;
@@ -90,24 +90,38 @@ function LeaderboardModal(props) {
         });
     return posByKey;
   };
+  var sortDescBy = function (getValue, a, b) {
+    return getValue(b) - getValue(a) | 0;
+  };
   var currentPositions = React.useMemo((function () {
-          return computePositions(visiblePlayers, getCurrentCompareValue);
+          var sortedCur = visiblePlayers.toSorted(function (a, b) {
+                return sortDescBy(getCurrentCompareValue, a, b);
+              });
+          return computePositions(sortedCur, getCurrentCompareValue);
         }), [
         visiblePlayers,
         gameMode
       ]);
   var previousPositions = React.useMemo((function () {
           var sortedPrev = visiblePlayers.toSorted(function (a, b) {
-                var match = ascOrder ? [
-                    a,
-                    b
-                  ] : [
-                    b,
-                    a
-                  ];
-                return getPreviousCompareValue(match[0]) - getPreviousCompareValue(match[1]) | 0;
+                return sortDescBy(getPreviousCompareValue, a, b);
               });
           return computePositions(sortedPrev, getPreviousCompareValue);
+        }), [
+        visiblePlayers,
+        gameMode
+      ]);
+  var displayPlayers = React.useMemo((function () {
+          return visiblePlayers.toSorted(function (a, b) {
+                      var match = ascOrder ? [
+                          a,
+                          b
+                        ] : [
+                          b,
+                          a
+                        ];
+                      return getCurrentCompareValue(match[0]) - getCurrentCompareValue(match[1]) | 0;
+                    });
         }), [
         visiblePlayers,
         ascOrder,
@@ -232,7 +246,7 @@ function LeaderboardModal(props) {
                                   })
                             }),
                         JsxRuntime.jsx("tbody", {
-                              children: visiblePlayers.map(function (player) {
+                              children: displayPlayers.map(function (player) {
                                     var match;
                                     match = gameMode === "Foosball" ? [
                                         player.ordinal,
