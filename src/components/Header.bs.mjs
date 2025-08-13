@@ -153,7 +153,9 @@ function Header(props) {
                                     children: [
                                       mounted ? JsxRuntime.jsx("span", {
                                               className: isConnected ? styles.connected : styles.disconnected
-                                            }) : JsxRuntime.jsx(JsxRuntime.Fragment, {}),
+                                            }) : JsxRuntime.jsx("span", {
+                                              className: styles.disconnected
+                                            }),
                                       JsxRuntime.jsx(Button.make, {
                                             variant: "Grey",
                                             onClick: (function (param) {
@@ -163,7 +165,7 @@ function Header(props) {
                                           }),
                                       JsxRuntime.jsx(Button.make, {
                                             className: "plausible-event-name=NextStep",
-                                            variant: "Glass",
+                                            variant: "Blue",
                                             onClick: (function (param) {
                                                 onNextStep();
                                               }),

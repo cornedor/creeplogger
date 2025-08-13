@@ -24,19 +24,10 @@ function UserGrid(props) {
       });
   var searchQuery = match$1[0];
   var sorted = React.useMemo((function () {
-          if (gameMode === "Foosball") {
-            return players.toSorted(function (a, b) {
-                        return b.games - a.games | 0;
-                      });
-          } else {
-            return players.toSorted(function (a, b) {
-                        return b.dartsGames - a.dartsGames | 0;
-                      });
-          }
-        }), [
-        players,
-        gameMode
-      ]);
+          return players.toSorted(function (a, b) {
+                      return b.games - a.games | 0;
+                    });
+        }), players);
   var queryLower = searchQuery.toLowerCase();
   var filtered = sorted.filter(function (item) {
         if (queryLower === "") {

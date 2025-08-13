@@ -101,10 +101,10 @@ let make = (
           }}
         </div>
         <div className="fixed lg:relative top-[calc(100vh_-_100%_+_1rem)] right-8 lg:bottom-0 flex items-center gap-5">
-          {mounted ? <span className={isConnected ? styles["connected"] : styles["disconnected"]} /> : <> </>}
+          {mounted ? <span className={isConnected ? styles["connected"] : styles["disconnected"]} /> : <span className={styles["disconnected"]}> </span>}
           <Button variant={Grey} onClick={_ => onReset()}> {React.string("Reset")} </Button>
           <Button
-            variant={Glass}
+            variant={Blue}
             onClick={_ => onNextStep()}
             disabled={!isConnected || disabled}
             className="plausible-event-name=NextStep">
