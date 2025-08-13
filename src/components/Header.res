@@ -104,7 +104,7 @@ let make = (
           {mounted ? <span className={isConnected ? styles["connected"] : styles["disconnected"]} /> : <> </>}
           <Button variant={Grey} onClick={_ => onReset()}> {React.string("Reset")} </Button>
           <Button
-            variant={Glass}
+            variant={Blue}
             onClick={_ => onNextStep()}
             disabled={!isConnected || disabled}
             className="plausible-event-name=NextStep">
