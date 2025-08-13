@@ -40,9 +40,12 @@ function Logger(props) {
       });
   var setEarnedPoints = match$5[1];
   var match$6 = React.useState(function () {
+        return {};
+      });
+  var match$7 = React.useState(function () {
         return "Foosball";
       });
-  var gameMode = match$6[0];
+  var gameMode = match$7[0];
   var reset = function () {
     setStep(function (param) {
           return "UserSelection";
@@ -75,7 +78,7 @@ function Logger(props) {
               setStep: setStep,
               players: players,
               gameMode: gameMode,
-              setGameMode: match$6[1]
+              setGameMode: match$7[1]
             });
         break;
     case "ScoreForm" :
@@ -88,6 +91,7 @@ function Logger(props) {
                 redState: redState,
                 setRedState: setRedState,
                 setEarnedPoints: setEarnedPoints,
+                setPerPlayerDeltas: match$6[1],
                 players: players,
                 gameMode: gameMode
               }) : JsxRuntime.jsx(DartsGameModeStep.make, {
@@ -104,7 +108,8 @@ function Logger(props) {
               score: match$5[0],
               winners: winners,
               reset: reset,
-              players: players
+              players: players,
+              perPlayerDeltas: match$6[0]
             });
         break;
     

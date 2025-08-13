@@ -55,6 +55,55 @@ let sendCreepsUpdate = async (
   let bluePoints = blueScore < redScore ? 0 - points : points
   let redPoints = blueScore > redScore ? 0 - points : points
 
+  // Determine winning team and compute per-player OpenSkill deltas
+  let winningTeam = if blueScore > redScore { Players.Blue } else { Players.Red }
+
+  let (winnersOS, losersOS, _avgWinnerChange) = switch winningTeam {
+  | Blue => OpenSkillRating.calculateScore(bluePlayers, redPlayers, ~gameMode=Games.Foosball)
+  | Red => {
+      let (red, blue, avg) = OpenSkillRating.calculateScore(
+        redPlayers,
+        bluePlayers,
+        ~gameMode=Games.Foosball,
+      )
+      (red, blue, avg)
+    }
+  }
+
+  let formatHandleOrName = (player: Players.player) =>
+    switch player.mattermostHandle {
+    | Some(handle) => `@${handle}`
+    | None => player.name
+    }
+
+  let winnersStr =
+    winnersOS
+    ->Array.map(player => {
+      let delta = OpenSkillRating.toDisplayDelta(player.lastOpenSkillChange)
+      let sign = delta >= 0 ? "+" : ""
+      `${formatHandleOrName(player)} (${sign}${delta->Int.toString})`
+    })
+    ->Array.join(", ")
+
+  let losersStr =
+    losersOS
+    ->Array.map(player => {
+      let delta = OpenSkillRating.toDisplayDelta(player.lastOpenSkillChange)
+      let sign = delta >= 0 ? "+" : ""
+      `${formatHandleOrName(player)} (${sign}${delta->Int.toString})`
+    })
+    ->Array.join(", ")
+
+  let blueIndividuals = switch winningTeam {
+  | Blue => winnersStr
+  | Red => losersStr
+  }
+
+  let redIndividuals = switch winningTeam {
+  | Blue => losersStr
+  | Red => winnersStr
+  }
+
   // Pre-game win probability based on OpenSkill
   let blueWinProb = OpenSkillRating.getWinProbability(bluePlayers, redPlayers) *. 100.0
   let redWinProb = 100.0 -. blueWinProb
@@ -69,6 +118,10 @@ let sendCreepsUpdate = async (
 | ---- | ----- | ----------- |
 | ${blueNames} | ${blueScore->Int.toString} | ${bluePoints->Int.toString} |
 | ${redNames} | ${redScore->Int.toString} | ${redPoints->Int.toString} |
+
+Individueel:
+- Blauw: ${blueIndividuals}
+- Rood: ${redIndividuals}
 
 OpenSkill winstkans (pre-game): Blauw ${blueProbStr}% vs Rood ${redProbStr}%
 `

@@ -17,6 +17,7 @@ let make = (
   ~redState,
   ~setRedState,
   ~setEarnedPoints,
+  ~setPerPlayerDeltas,
   ~players,
   ~gameMode,
 ) => {
@@ -121,6 +122,18 @@ let make = (
     let roundedPoints = OpenSkillRating.toDisplayDelta(osPoints)
 
     setEarnedPoints(_ => roundedPoints)
+
+    // Collect per-player display deltas for winners and losers
+    let deltas: Js.Dict.t<int> = Js.Dict.empty()
+    blueOS->Array.forEach(player => {
+      let delta = OpenSkillRating.toDisplayDelta(player.lastOpenSkillChange)
+      Js.Dict.set(deltas, player.key, delta)
+    })
+    redOS->Array.forEach(player => {
+      let delta = OpenSkillRating.toDisplayDelta(player.lastOpenSkillChange)
+      Js.Dict.set(deltas, player.key, delta)
+    })
+    setPerPlayerDeltas(_ => deltas)
 
     // Persist OpenSkill fields
     let _ = await Promise.all(

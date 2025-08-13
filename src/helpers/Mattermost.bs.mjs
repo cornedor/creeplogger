@@ -49,13 +49,47 @@ async function sendCreepsUpdate(bluePlayers, redPlayers, blueScore, redScore, po
         }).join(", ");
   var bluePoints = blueScore < redScore ? -points | 0 : points;
   var redPoints = blueScore > redScore ? -points | 0 : points;
+  var winningTeam = blueScore > redScore ? "Blue" : "Red";
+  var match;
+  if (winningTeam === "Blue") {
+    match = OpenSkillRating.calculateScore(bluePlayers, redPlayers, "Foosball");
+  } else {
+    var match$1 = OpenSkillRating.calculateScore(redPlayers, bluePlayers, "Foosball");
+    match = [
+      match$1[0],
+      match$1[1],
+      match$1[2]
+    ];
+  }
+  var formatHandleOrName = function (player) {
+    var handle = player.mattermostHandle;
+    if (handle !== undefined) {
+      return "@" + handle;
+    } else {
+      return player.name;
+    }
+  };
+  var winnersStr = match[0].map(function (player) {
+          var delta = OpenSkillRating.toDisplayDelta(player.lastOpenSkillChange);
+          var sign = delta >= 0 ? "+" : "";
+          return formatHandleOrName(player) + " (" + sign + delta.toString() + ")";
+        }).join(", ");
+  var losersStr = match[1].map(function (player) {
+          var delta = OpenSkillRating.toDisplayDelta(player.lastOpenSkillChange);
+          var sign = delta >= 0 ? "+" : "";
+          return formatHandleOrName(player) + " (" + sign + delta.toString() + ")";
+        }).join(", ");
+  var blueIndividuals;
+  blueIndividuals = winningTeam === "Blue" ? winnersStr : losersStr;
+  var redIndividuals;
+  redIndividuals = winningTeam === "Blue" ? losersStr : winnersStr;
   var blueWinProb = OpenSkillRating.getWinProbability(bluePlayers, redPlayers) * 100.0;
   var redWinProb = 100.0 - blueWinProb;
   var blueProbRounded = Math.round(blueWinProb * 10.0) / 10.0;
   var redProbRounded = Math.round(redWinProb * 10.0) / 10.0;
   var blueProbStr = blueProbRounded.toString();
   var redProbStr = redProbRounded.toString();
-  var message = "### Nieuw potje geregistreerd!\n\n| Team | Goals | OpenSkill Δ |\n| ---- | ----- | ----------- |\n| " + blueNames + " | " + blueScore.toString() + " | " + bluePoints.toString() + " |\n| " + redNames + " | " + redScore.toString() + " | " + redPoints.toString() + " |\n\nOpenSkill winstkans (pre-game): Blauw " + blueProbStr + "% vs Rood " + redProbStr + "%\n";
+  var message = "### Nieuw potje geregistreerd!\n\n| Team | Goals | OpenSkill Δ |\n| ---- | ----- | ----------- |\n| " + blueNames + " | " + blueScore.toString() + " | " + bluePoints.toString() + " |\n| " + redNames + " | " + redScore.toString() + " | " + redPoints.toString() + " |\n\nIndividueel:\n- Blauw: " + blueIndividuals + "\n- Rood: " + redIndividuals + "\n\nOpenSkill winstkans (pre-game): Blauw " + blueProbStr + "% vs Rood " + redProbStr + "%\n";
   var promise = publishMessage(message);
   if (promise !== undefined) {
     await Caml_option.valFromOption(promise);

@@ -14,6 +14,7 @@ let make = (~players: array<Players.player>) => {
   let (redState, setRedState) = React.useState(_ => -1)
   let (blueState, setBlueState) = React.useState(_ => -1)
   let (earnedPoints, setEarnedPoints) = React.useState(_ => 0)
+  let (perPlayerDeltas, setPerPlayerDeltas) = React.useState(_ => Js.Dict.empty())
   let (gameMode, setGameMode) = React.useState(_ => Games.Foosball)
 
   let reset = () => {
@@ -47,10 +48,18 @@ let make = (~players: array<Players.player>) => {
       blueState
       setBlueState
       setEarnedPoints
+      setPerPlayerDeltas
       players
       gameMode
     />
-  | (Confirmation, _) => <ConfirmationStep winners={winners} score={earnedPoints} reset players />
+  | (Confirmation, _) =>
+    <ConfirmationStep
+      winners={winners}
+      score={earnedPoints}
+      reset
+      players
+      perPlayerDeltas={Some(perPlayerDeltas)}
+    />
   }
 
   <div
