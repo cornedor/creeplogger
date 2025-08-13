@@ -125,28 +125,33 @@ external snapshotToArray: dataSnapshot => array<dataSnapshot> = "%identity"
 
 let useAllPlayers = (~orderBy: playersOrder=#rating, ~asc=false) => {
   let (players, setPlayers) = React.useState(_ => [])
-  let playersRef = Firebase.Database.refPath(Database.database, bucket)
   React.useEffect(() => {
-    let unsubscribe = Firebase.Database.onValue(
-      Firebase.Database.query1(playersRef, Firebase.Database.orderByChild("games")),
-      snapshot => {
-        let newPlayers = []
-        Array.forEach(snapshotToArray(snapshot), snap => {
-          switch Firebase.Database.Snapshot.val(snap)->Nullable.toOption {
-          | Some(val) =>
-            switch val->Schema.parseWith(playerSchema) {
-            | Ok(player) => Array.push(newPlayers, player)
-            | Error(_e) => ()
+    let isClient: bool = %raw("typeof window !== 'undefined'")
+    if !isClient {
+      None
+    } else {
+      let playersRef = Firebase.Database.refPath(Database.database, bucket)
+      let unsubscribe = Firebase.Database.onValue(
+        Firebase.Database.query1(playersRef, Firebase.Database.orderByChild("games")),
+        snapshot => {
+          let newPlayers = []
+          Array.forEach(snapshotToArray(snapshot), snap => {
+            switch Firebase.Database.Snapshot.val(snap)->Nullable.toOption {
+            | Some(val) =>
+              switch val->Schema.parseWith(playerSchema) {
+              | Ok(player) => Array.push(newPlayers, player)
+              | Error(_e) => ()
+              }
+            | None => ()
             }
-          | None => ()
-          }
-        })
-                setPlayers(_ => newPlayers)
-      },
-      (),
-    )
+          })
+                  setPlayers(_ => newPlayers)
+        },
+        (),
+      )
 
-    Some(unsubscribe)
+      Some(unsubscribe)
+    }
   }, [setPlayers])
 
   let cmpInsensitive = (a, b) => {

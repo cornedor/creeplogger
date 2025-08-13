@@ -1,4 +1,4 @@
-type variant = Blue | Grey | Red
+type variant = Blue | Grey | Red | Glass
 
 @react.component
 let make: (

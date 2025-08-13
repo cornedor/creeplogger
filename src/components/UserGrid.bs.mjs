@@ -24,19 +24,30 @@ function UserGrid(props) {
       });
   var searchQuery = match$1[0];
   var sorted = React.useMemo((function () {
-          if (gameMode === "Foosball") {
-            return players.toSorted(function (a, b) {
-                        return b.games - a.games | 0;
-                      });
-          } else {
-            return players.toSorted(function (a, b) {
-                        return b.dartsGames - a.dartsGames | 0;
-                      });
-          }
-        }), [
-        players,
-        gameMode
-      ]);
+          var cmpInsensitive = function (a, b) {
+            var al = a.toLowerCase();
+            var bl = b.toLowerCase();
+            if (al < bl) {
+              return -1;
+            } else if (al > bl) {
+              return 1;
+            } else {
+              return 0;
+            }
+          };
+          return players.toSorted(function (a, b) {
+                      var primary = b.games - a.games | 0;
+                      if (primary !== 0.0) {
+                        return primary;
+                      }
+                      var nameCmp = cmpInsensitive(a.name, b.name);
+                      if (nameCmp === 0) {
+                        return cmpInsensitive(a.key, b.key);
+                      } else {
+                        return nameCmp;
+                      }
+                    });
+        }), players);
   var queryLower = searchQuery.toLowerCase();
   var filtered = sorted.filter(function (item) {
         if (queryLower === "") {
@@ -45,7 +56,25 @@ function UserGrid(props) {
         var nameLower = item.name.toLowerCase();
         return nameLower.includes(queryLower);
       });
-  var players$1 = filtered.map(function (item) {
+  var cmpInsensitive = function (a, b) {
+    var al = a.toLowerCase();
+    var bl = b.toLowerCase();
+    if (al < bl) {
+      return -1;
+    } else if (al > bl) {
+      return 1;
+    } else {
+      return 0;
+    }
+  };
+  var players$1 = filtered.toSorted(function (a, b) {
+          var nameCmp = cmpInsensitive(a.name, b.name);
+          if (nameCmp === 0) {
+            return cmpInsensitive(a.key, b.key);
+          } else {
+            return nameCmp;
+          }
+        }).map(function (item) {
         var tmp;
         tmp = showQueueButtons ? JsxRuntime.jsxs("div", {
                 children: [

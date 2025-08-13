@@ -36,10 +36,15 @@ let make = (
       Js.String2.includes(nameLower, queryLower)
     }
   )
+  let cmpInsensitive = (a, b) => {
+    let al = Js.String2.toLowerCase(a)
+    let bl = Js.String2.toLowerCase(b)
+    if al < bl { -1 } else if al > bl { 1 } else { 0 }
+  }
   let players = filtered->Array.toSorted((a, b) => {
     // Keep filtered order deterministic
-    let nameCmp = Js.String2.toLowerCase(a.name) < Js.String2.toLowerCase(b.name) ? -1 : (Js.String2.toLowerCase(a.name) > Js.String2.toLowerCase(b.name) ? 1 : 0)
-    if nameCmp == 0 { Int.toFloat(Js.String2.localeCompare(a.key, b.key)) } else { Int.toFloat(nameCmp) }
+    let nameCmp = cmpInsensitive(a.name, b.name)
+    if nameCmp == 0 { Int.toFloat(cmpInsensitive(a.key, b.key)) } else { Int.toFloat(nameCmp) }
   })->Js.Array2.map(item =>
     <GridItem
       key={item.key}

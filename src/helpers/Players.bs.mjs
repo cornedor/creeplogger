@@ -94,8 +94,12 @@ function useAllPlayers(orderByOpt, ascOpt) {
       });
   var setPlayers = match[1];
   var players = match[0];
-  var playersRef = Database$1.ref(Database.database, "players");
   React.useEffect((function () {
+          var isClient = (typeof window !== 'undefined');
+          if (!isClient) {
+            return ;
+          }
+          var playersRef = Database$1.ref(Database.database, "players");
           return Database$1.onValue(Database$1.query(playersRef, Database$1.orderByChild("games")), (function (snapshot) {
                         var newPlayers = [];
                         snapshot.forEach(function (snap) {

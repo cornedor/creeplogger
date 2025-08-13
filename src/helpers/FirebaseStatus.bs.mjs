@@ -13,6 +13,10 @@ function useFirebaseStatus() {
   var setStatus = match[1];
   FirebaseNetworkFix.useFirebaseNetworkFix();
   React.useEffect((function () {
+          var isClient = (typeof window !== 'undefined');
+          if (!isClient) {
+            return ;
+          }
           var ref = Database$1.ref(Database.database, ".info/connected");
           return Database$1.onValue(ref, (function (snap) {
                         var value = snap.val();

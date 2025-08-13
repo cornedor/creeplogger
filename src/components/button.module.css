@@ -41,6 +41,15 @@
   box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25), 0px 2px 0px #980054;
 }
 
+/* New glass button style */
+.buttonGlass {
+  color: white;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 8px 30px rgba(0, 0, 0, 0.12);
+  backdrop-filter: blur(8px) saturate(150%);
+}
+
 .buttonBlue:hover,
 .buttonBlue:active {
   transform: translateY(2px);
@@ -57,4 +66,11 @@
 .buttonRed:active {
   transform: translateY(2px);
   box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25), 0px 0px 0px #003d55;
+}
+
+/* Hover/active for glass */
+.buttonGlass:hover,
+.buttonGlass:active {
+  transform: translateY(2px);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 6px 20px rgba(0, 0, 0, 0.18);
 }

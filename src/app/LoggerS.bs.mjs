@@ -9,17 +9,45 @@ import * as Caml_option from "rescript/lib/es6/caml_option.js";
 import * as JsxRuntime from "react/jsx-runtime";
 
 async function make(param) {
-  var players = await fetch(Database.databaseURL + "/" + Players.bucket + ".json", {
-        method: "GET"
-      });
-  var players$1 = Schema.parseWith(await players.json(), Players.playersSchema);
-  var players$2;
-  players$2 = players$1.TAG === "Ok" ? Js_dict.values(players$1._0).toReversed().toSorted(function (a, b) {
-          return b.games - a.games | 0;
-        }) : [];
+  var players;
+  if (Database.databaseURL.startsWith("http")) {
+    var players$1 = await fetch(Database.databaseURL + "/" + Players.bucket + ".json", {
+          method: "GET"
+        });
+    var players$2 = Schema.parseWith(await players$1.json(), Players.playersSchema);
+    if (players$2.TAG === "Ok") {
+      var cmpInsensitive = function (a, b) {
+        var al = a.toLowerCase();
+        var bl = b.toLowerCase();
+        if (al < bl) {
+          return -1;
+        } else if (al > bl) {
+          return 1;
+        } else {
+          return 0;
+        }
+      };
+      players = Js_dict.values(players$2._0).toSorted(function (a, b) {
+            var primary = b.games - a.games | 0;
+            if (primary !== 0.0) {
+              return primary;
+            }
+            var nameCmp = cmpInsensitive(a.name, b.name);
+            if (nameCmp === 0) {
+              return cmpInsensitive(a.key, b.key);
+            } else {
+              return nameCmp;
+            }
+          });
+    } else {
+      players = [];
+    }
+  } else {
+    players = [];
+  }
   return JsxRuntime.jsx(JsxRuntime.Fragment, {
               children: Caml_option.some(JsxRuntime.jsx(Logger.make, {
-                        players: players$2
+                        players: players
                       }))
             });
 }

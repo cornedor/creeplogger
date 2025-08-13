@@ -93,8 +93,12 @@ function useLastGames() {
         return empty;
       });
   var setGames = match[1];
-  var gamesRef = Database$1.query(Database$1.ref(Database.database, "games"), Database$1.orderByChild("date"));
   React.useEffect((function () {
+          var isClient = (typeof window !== 'undefined');
+          if (!isClient) {
+            return ;
+          }
+          var gamesRef = Database$1.query(Database$1.ref(Database.database, "games"), Database$1.orderByChild("date"));
           return Database$1.onValue(gamesRef, (function (snapshot) {
                         var val = snapshot.val();
                         var games;

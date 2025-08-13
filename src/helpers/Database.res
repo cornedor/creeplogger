@@ -13,25 +13,45 @@ let config: firebaseOptions = {
   "measurementId": %raw(`process.env.NEXT_PUBLIC_MEASUREMENT_ID`),
 }
 
-let app = Firebase.initializeApp(config)
+/* Avoid initializing Firebase during build/SSR to prevent invalid URL errors */
+let isClient: bool = %raw("typeof window !== 'undefined'")
+external unsafeCast: 'a => 'b = "%identity"
 
-let database = Firebase.Database.getDatabase1(app)
+let app = if isClient {
+  Firebase.initializeApp(config)
+} else {
+  unsafeCast(())
+}
 
-let auth = Firebase.Auth.getAuth()
+let database = if isClient {
+  Firebase.Database.getDatabase1(app)
+} else {
+  unsafeCast(())
+}
+
+let auth = if isClient {
+  Firebase.Auth.getAuth()
+} else {
+  unsafeCast(())
+}
 
 let useUser = () => {
-  let (user, setUser) = React.useState(_ => auth["currentUser"])
+  let initialUser = if isClient { auth["currentUser"] } else { Js.Nullable.null }
+  let (user, setUser) = React.useState(_ => initialUser)
 
   React.useEffect(() => {
-    let unsubscribe = Firebase.Auth.onAuthStateChanged(
-      auth,
-      user => {
-        setUser(_ => user)
-      },
-      (),
-    )
-
-    Some(unsubscribe)
+    if isClient {
+      let unsubscribe = Firebase.Auth.onAuthStateChanged(
+        auth,
+        user => {
+          setUser(_ => user)
+        },
+        (),
+      )
+      Some(unsubscribe)
+    } else {
+      None
+    }
   }, [])
 
   user

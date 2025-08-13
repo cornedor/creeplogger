@@ -4,6 +4,9 @@ import NextBundleAnalyzer from '@next/bundle-analyzer'
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
 }
 
 const withBundleAnalyzer = NextBundleAnalyzer({

@@ -1,6 +1,6 @@
 @module external styles: {..} = "./button.module.css"
 
-type variant = Blue | Grey | Red
+type variant = Blue | Grey | Red | Glass
 
 @react.component
 let make = (~className="", ~variant, ~onClick=?, ~children, ~type_="button", ~disabled=false) => {
@@ -14,6 +14,7 @@ let make = (~className="", ~variant, ~onClick=?, ~children, ~type_="button", ~di
       | Blue => styles["buttonBlue"]
       | Grey => styles["buttonGrey"]
       | Red => styles["buttonRed"]
+      | Glass => styles["buttonGlass"]
       },
       className,
     ])}>

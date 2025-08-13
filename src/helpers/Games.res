@@ -92,31 +92,36 @@ let getTimePeriod = async period => {
 let empty: Js.Dict.t<game> = Js.Dict.empty()
 let useLastGames = () => {
   let (games, setGames) = React.useState(_ => empty)
-  let gamesRef = Firebase.Database.query1(
-    Firebase.Database.refPath(Database.database, "games"),
-    Firebase.Database.orderByChild("date"),
-  )
   React.useEffect(() => {
-    let unsubscribe = Firebase.Database.onValue(
-      gamesRef,
-      snapshot => {
-        let games = switch Firebase.Database.Snapshot.val(snapshot)->Nullable.toOption {
-        | Some(val) =>
-          switch val->Schema.parseWith(Schema.dict(gameSchema)) {
-          | Ok(val) => val
-          | Error(e) => {
-              Js.log(e)
-              Js.Dict.empty()
+    let isClient: bool = %raw("typeof window !== 'undefined'")
+    if !isClient {
+      None
+    } else {
+      let gamesRef = Firebase.Database.query1(
+        Firebase.Database.refPath(Database.database, "games"),
+        Firebase.Database.orderByChild("date"),
+      )
+      let unsubscribe = Firebase.Database.onValue(
+        gamesRef,
+        snapshot => {
+          let games = switch Firebase.Database.Snapshot.val(snapshot)->Nullable.toOption {
+          | Some(val) =>
+            switch val->Schema.parseWith(Schema.dict(gameSchema)) {
+            | Ok(val) => val
+            | Error(e) => {
+                Js.log(e)
+                Js.Dict.empty()
+              }
             }
+          | None => empty
           }
-        | None => empty
-        }
-        setGames(_ => games)
-      },
-      (),
-    )
+          setGames(_ => games)
+        },
+        (),
+      )
 
-    Some(unsubscribe)
+      Some(unsubscribe)
+    }
   }, [setGames])
 
   games

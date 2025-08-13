@@ -1,5 +1,3 @@
-import { sendDailyUpdate } from "@/helpers/Mattermost.bs.mjs";
-import { getDailyOverview, toAPIObject } from "@/helpers/Summary.bs.mjs";
 import { NextRequest } from "next/server";
 
 let periodOptions = {
@@ -10,6 +8,7 @@ let periodOptions = {
 };
 
 export async function GET(request: NextRequest) {
+  const { getDailyOverview, toAPIObject } = await import("@/helpers/Summary.bs.mjs");
   let period = request.nextUrl.searchParams.get("period") ?? "daily";
   if (!(period in periodOptions)) {
     return Response.json({ success: false, message: "Invalid period param" });

@@ -18,23 +18,29 @@ var config = {
   measurementId: process.env.NEXT_PUBLIC_MEASUREMENT_ID
 };
 
-var app = App.initializeApp(config);
+var isClient = (typeof window !== 'undefined');
 
-var database = Database.getDatabase(app);
+var app = isClient ? App.initializeApp(config) : undefined;
 
-var auth = Auth.getAuth();
+var database = isClient ? Database.getDatabase(app) : undefined;
+
+var auth = isClient ? Auth.getAuth() : undefined;
 
 function useUser() {
+  var initialUser = isClient ? auth.currentUser : null;
   var match = React.useState(function () {
-        return auth.currentUser;
+        return initialUser;
       });
   var setUser = match[1];
   React.useEffect((function () {
-          return Auth.onAuthStateChanged(auth, (function (user) {
-                        setUser(function (param) {
-                              return user;
-                            });
-                      }), undefined, undefined);
+          if (isClient) {
+            return Auth.onAuthStateChanged(auth, (function (user) {
+                          setUser(function (param) {
+                                return user;
+                              });
+                        }), undefined, undefined);
+          }
+          
         }), []);
   return match[0];
 }

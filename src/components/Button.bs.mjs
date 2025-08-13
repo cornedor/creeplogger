@@ -24,6 +24,9 @@ function Button(props) {
     case "Red" :
         tmp = styles.buttonRed;
         break;
+    case "Glass" :
+        tmp = styles.buttonGlass;
+        break;
     
   }
   return JsxRuntime.jsx("button", {
