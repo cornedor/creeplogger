@@ -121,7 +121,17 @@ let sendCreepsUpdate = async (
   | Red => redWinProb
   }
 
+  let losersProb = switch winningTeam {
+  | Blue => redWinProb
+  | Red => blueWinProb
+  }
+
   let sprokkelTitle = winnersProb > 80.0 ? "**SPROKKEL ALERT!** 🚨🚨🚨\n\n" : ""
+
+  let losingFavoriteImage =
+    losersProb > 80.0
+      ? "\n\n![](https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExMDg4OXM2NDViaTU3Y21lZWFxam93YThyeXNkNzBkeGl0cTlucWhtYiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/mcH0upG1TeEak/giphy.gif)\n"
+      : ""
 
   let message = sprokkelTitle ++ `### Nieuw potje geregistreerd!
 
@@ -135,7 +145,7 @@ Individueel:
 - Rood: ${redIndividuals}
 
 OpenSkill winstkans (pre-game): Blauw ${blueProbStr}% vs Rood ${redProbStr}%
-`
+` ++ losingFavoriteImage
 
   switch publishMessage(message) {
   | Some(promise) =>

@@ -89,8 +89,11 @@ async function sendCreepsUpdate(bluePlayers, redPlayers, blueScore, redScore, po
   var redProbStr = redProbRounded.toString();
   var winnersProb;
   winnersProb = winningTeam === "Blue" ? blueWinProb : redWinProb;
+  var losersProb;
+  losersProb = winningTeam === "Blue" ? redWinProb : blueWinProb;
   var sprokkelTitle = winnersProb > 80.0 ? "**SPROKKEL ALERT!** 🚨🚨🚨\n\n" : "";
-  var message = sprokkelTitle + ("### Nieuw potje geregistreerd!\n\n| Team | Spelers | Goals |\n| ---- | ------- | ----- |\n| Blauw | " + blueNames + " | " + blueScore.toString() + " |\n| Rood | " + redNames + " | " + redScore.toString() + " |\n\nIndividueel:\n- Blauw: " + blueIndividuals + "\n- Rood: " + redIndividuals + "\n\nOpenSkill winstkans (pre-game): Blauw " + blueProbStr + "% vs Rood " + redProbStr + "%\n");
+  var losingFavoriteImage = losersProb > 80.0 ? "\n\n![](https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExMDg4OXM2NDViaTU3Y21lZWFxam93YThyeXNkNzBkeGl0cTlucWhtYiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/mcH0upG1TeEak/giphy.gif)\n" : "";
+  var message = sprokkelTitle + ("### Nieuw potje geregistreerd!\n\n| Team | Spelers | Goals |\n| ---- | ------- | ----- |\n| Blauw | " + blueNames + " | " + blueScore.toString() + " |\n| Rood | " + redNames + " | " + redScore.toString() + " |\n\nIndividueel:\n- Blauw: " + blueIndividuals + "\n- Rood: " + redIndividuals + "\n\nOpenSkill winstkans (pre-game): Blauw " + blueProbStr + "% vs Rood " + redProbStr + "%\n") + losingFavoriteImage;
   var promise = publishMessage(message);
   if (promise !== undefined) {
     await Caml_option.valFromOption(promise);
