@@ -1,5 +1,5 @@
 @@directive("'use server';")
-open OpenSkillRating
+
 let url = %raw(`process.env.MATTERMOST_URL`)
 let isEnabled = %raw(`process.env.MATTERMOST_ENABLED`) == "true"
 
@@ -52,11 +52,15 @@ let sendCreepsUpdate = async (
     )
     ->Array.join(", ")
 
-  let bluePoints = blueScore < redScore ? 0 - points : points
-  let redPoints = blueScore > redScore ? 0 - points : points
+  let _bluePoints = blueScore < redScore ? 0 - points : points
+  let _redPoints = blueScore > redScore ? 0 - points : points
 
   // Determine winning team and compute per-player OpenSkill deltas
-  let winningTeam = if blueScore > redScore { Players.Blue } else { Players.Red }
+  let winningTeam = if blueScore > redScore {
+    Players.Blue
+  } else {
+    Players.Red
+  }
 
   let (winnersOS, losersOS, _avgWinnerChange) = switch winningTeam {
   | Blue => OpenSkillRating.calculateScore(bluePlayers, redPlayers, ~gameMode=Games.Foosball)

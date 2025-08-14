@@ -19,13 +19,20 @@ function UserGrid(props) {
         return false;
       });
   var showQueueButtons = match[0];
+  var match$1 = React.useState(function () {
+        return "";
+      });
+  var searchQuery = match$1[0];
   var sorted;
   sorted = gameMode === "Foosball" ? players.toSorted(function (a, b) {
           return b.games - a.games | 0;
         }) : players.toSorted(function (a, b) {
           return b.dartsGames - a.dartsGames | 0;
         });
-  var players$1 = sorted.map(function (item) {
+  var sorted$1 = sorted.filter(function (item) {
+        return item.name.toLowerCase().includes(searchQuery.toLowerCase());
+      });
+  var players$1 = sorted$1.map(function (item) {
         var tmp;
         tmp = showQueueButtons ? JsxRuntime.jsxs("div", {
                 children: [
@@ -72,7 +79,7 @@ function UserGrid(props) {
                     children: [
                       JsxRuntime.jsx("button", {
                             children: "Blauw",
-                            className: "bg-[#86b7ff] border-none cursor-pointer text-3xl rounded-bl text-black plausible-event-name=SelectBlue",
+                            className: "bg-[#86b7ff] border-none cursor-pointer text-xl lg:text-3xl rounded-bl text-black plausible-event-name=SelectBlue",
                             onClick: (function (param) {
                                 setSelectedUsers(function (s) {
                                       return Belt_MapString.set(s, item.key, "Blue");
@@ -81,7 +88,7 @@ function UserGrid(props) {
                           }),
                       JsxRuntime.jsx("button", {
                             children: "Rood",
-                            className: "bg-[#ff8686] border-none cursor-pointer text-3xl rounded-br text-black plausible-event-name=SelectRed",
+                            className: "bg-[#ff8686] border-none cursor-pointer text-xl lg:text-3xl rounded-br text-black plausible-event-name=SelectRed",
                             onClick: (function (param) {
                                 setSelectedUsers(function (s) {
                                       return Belt_MapString.set(s, item.key, "Red");
@@ -127,9 +134,9 @@ function UserGrid(props) {
                       JsxRuntime.jsx("button", {
                             children: JsxRuntime.jsx("b", {
                                   children: item.name,
-                                  className: "text-ellipsis max-w-full overflow-hidden inline-block p-2"
+                                  className: "text-ellipsis max-w-full overflow-hidden inline-block p-2 lg:p-3"
                                 }),
-                            className: "text-black text-3xl min-w-0 max-w-full plausible-event-name=ResetUser",
+                            className: "text-white text-2xl lg:text-3xl min-w-0 max-w-full plausible-event-name=ResetUser",
                             onClick: (function (param) {
                                 setSelectedUsers(function (s) {
                                       return Belt_MapString.remove(s, item.key);
@@ -139,7 +146,7 @@ function UserGrid(props) {
                       tmp
                     ],
                     className: Cn.make([
-                          "rounded bg-white grid grid-rows-user auto-rows-[1fr] h-[220px] transition-all relative",
+                          "rounded-2xl bg-white/10 border border-white/10 backdrop-blur-md shadow-lg hover:shadow-2xl hover:-translate-y-1 transform grid grid-rows-user auto-rows-[1fr] h-[160px] lg:h-[220px] transition-all duration-200 ease-out relative overflow-hidden",
                           tmp$1
                         ])
                   }, item.key);
@@ -157,7 +164,9 @@ function UserGrid(props) {
                       disabled: Belt_MapString.size(selectedUsers) <= 1,
                       setShowQueueButtons: match[1],
                       gameMode: gameMode,
-                      setGameMode: props.setGameMode
+                      setGameMode: props.setGameMode,
+                      searchQuery: searchQuery,
+                      setSearchQuery: match$1[1]
                     }),
                 JsxRuntime.jsxs("div", {
                       children: [
@@ -167,7 +176,7 @@ function UserGrid(props) {
                               children: JsxRuntime.jsx(NewPlayerForm.make, {})
                             })
                       ],
-                      className: "grid 2xl:grid-cols-5 xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-3 grid-cols-2 gap-10 mt-8 content-padding"
+                      className: "grid 2xl:grid-cols-5 xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-3 grid-cols-2 gap-4 lg:gap-10 mt-4 lg:mt-8 px-4 lg:content-padding"
                     })
               ]
             });
