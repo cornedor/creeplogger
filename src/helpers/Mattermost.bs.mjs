@@ -89,8 +89,9 @@ async function sendCreepsUpdate(bluePlayers, redPlayers, blueScore, redScore, po
   var redProbStr = redProbRounded.toString();
   var winnersProb;
   winnersProb = winningTeam === "Blue" ? blueWinProb : redWinProb;
+  var reverseSprokkelImage = winnersProb <= 20.0 ? "![](https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExMDg4OXM2NDViaTU3Y21lZWFxam93YThyeXNkNzBkeGl0cTlucWhtYiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/mcH0upG1TeEak/giphy.gif)\n\n" : "";
   var sprokkelTitle = winnersProb > 80.0 ? "**SPROKKEL ALERT!** 🚨🚨🚨\n\n" : "";
-  var message = sprokkelTitle + ("### Nieuw potje geregistreerd!\n\n| Team | Spelers | Goals |\n| ---- | ------- | ----- |\n| Blauw | " + blueNames + " | " + blueScore.toString() + " |\n| Rood | " + redNames + " | " + redScore.toString() + " |\n\nIndividueel:\n- Blauw: " + blueIndividuals + "\n- Rood: " + redIndividuals + "\n\nOpenSkill winstkans (pre-game): Blauw " + blueProbStr + "% vs Rood " + redProbStr + "%\n");
+  var message = sprokkelTitle + reverseSprokkelImage + ("### Nieuw potje geregistreerd!\n\n| Team | Spelers | Goals |\n| ---- | ------- | ----- |\n| Blauw | " + blueNames + " | " + blueScore.toString() + " |\n| Rood | " + redNames + " | " + redScore.toString() + " |\n\nIndividueel:\n- Blauw: " + blueIndividuals + "\n- Rood: " + redIndividuals + "\n\nOpenSkill winstkans (pre-game): Blauw " + blueProbStr + "% vs Rood " + redProbStr + "%\n");
   var promise = publishMessage(message);
   if (promise !== undefined) {
     await Caml_option.valFromOption(promise);

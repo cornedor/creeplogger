@@ -120,10 +120,12 @@ let sendCreepsUpdate = async (
   | Blue => blueWinProb
   | Red => redWinProb
   }
-
+ 
+  let reverseSprokkelImage = winnersProb <= 20.0 ? "![](https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExMDg4OXM2NDViaTU3Y21lZWFxam93YThyeXNkNzBkeGl0cTlucWhtYiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/mcH0upG1TeEak/giphy.gif)\n\n" : ""
+  
   let sprokkelTitle = winnersProb > 80.0 ? "**SPROKKEL ALERT!** 🚨🚨🚨\n\n" : ""
-
-  let message = sprokkelTitle ++ `### Nieuw potje geregistreerd!
+  
+  let message = (sprokkelTitle ++ reverseSprokkelImage) ++ `### Nieuw potje geregistreerd!
 
 | Team | Spelers | Goals |
 | ---- | ------- | ----- |
