@@ -87,7 +87,10 @@ async function sendCreepsUpdate(bluePlayers, redPlayers, blueScore, redScore, po
   var redProbRounded = Math.round(redWinProb * 10.0) / 10.0;
   var blueProbStr = blueProbRounded.toString();
   var redProbStr = redProbRounded.toString();
-  var message = "### Nieuw potje geregistreerd!\n\n| Team | Spelers | Goals |\n| ---- | ------- | ----- |\n| Blauw | " + blueNames + " | " + blueScore.toString() + " |\n| Rood | " + redNames + " | " + redScore.toString() + " |\n\nIndividueel:\n- Blauw: " + blueIndividuals + "\n- Rood: " + redIndividuals + "\n\nOpenSkill winstkans (pre-game): Blauw " + blueProbStr + "% vs Rood " + redProbStr + "%\n";
+  var winnersProb;
+  winnersProb = winningTeam === "Blue" ? blueWinProb : redWinProb;
+  var sprokkelTitle = winnersProb > 80.0 ? "**SPROKKEL ALERT!** 🚨🚨🚨\n\n" : "";
+  var message = sprokkelTitle + ("### Nieuw potje geregistreerd!\n\n| Team | Spelers | Goals |\n| ---- | ------- | ----- |\n| Blauw | " + blueNames + " | " + blueScore.toString() + " |\n| Rood | " + redNames + " | " + redScore.toString() + " |\n\nIndividueel:\n- Blauw: " + blueIndividuals + "\n- Rood: " + redIndividuals + "\n\nOpenSkill winstkans (pre-game): Blauw " + blueProbStr + "% vs Rood " + redProbStr + "%\n");
   var promise = publishMessage(message);
   if (promise !== undefined) {
     await Caml_option.valFromOption(promise);
