@@ -116,7 +116,14 @@ let sendCreepsUpdate = async (
   let blueProbStr = blueProbRounded->Float.toString
   let redProbStr = redProbRounded->Float.toString
 
-  let message = `### Nieuw potje geregistreerd!
+  let winnersProb = switch winningTeam {
+  | Blue => blueWinProb
+  | Red => redWinProb
+  }
+
+  let sprokkelTitle = winnersProb > 80.0 ? "**SPROKKEL ALERT!** 🚨🚨🚨\n\n" : ""
+
+  let message = sprokkelTitle ++ `### Nieuw potje geregistreerd!
 
 | Team | Spelers | Goals |
 | ---- | ------- | ----- |
