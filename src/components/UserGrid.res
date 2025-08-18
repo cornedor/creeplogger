@@ -101,6 +101,7 @@ let make = (
       setShowQueueButtons={setShowQueueButtons}
       gameMode
       setGameMode={Some(setGameMode)}
+      setSelectedUsers={Some(setSelectedUsers)}
       searchQuery={Some(searchQuery)}
       setSearchQuery={Some(setSearchQuery)}
     />

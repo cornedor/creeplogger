@@ -12,6 +12,7 @@ import * as StatsModal from "./StatsModal.bs.mjs";
 import * as TicketIcon from "./TicketIcon.bs.mjs";
 import * as PieChartIcon from "./PieChartIcon.bs.mjs";
 import * as FirebaseStatus from "../helpers/FirebaseStatus.bs.mjs";
+import * as MatchMakerModal from "./MatchMakerModal.bs.mjs";
 import * as LeaderboardModal from "./LeaderboardModal.bs.mjs";
 import * as JsxRuntime from "react/jsx-runtime";
 import * as HeaderModuleCss from "./header.module.css";
@@ -37,6 +38,10 @@ function Header(props) {
         return false;
       });
   var setShowStats = match$1[1];
+  var match$2 = React.useState(function () {
+        return false;
+      });
+  var setShowMatchMaker = match$2[1];
   var isConnected = FirebaseStatus.useFirebaseStatus();
   var nextLabel;
   switch (props.step) {
@@ -87,6 +92,12 @@ function Header(props) {
                       show: match$1[0],
                       setShow: setShowStats
                     }),
+                JsxRuntime.jsx(MatchMakerModal.make, {
+                      show: match$2[0],
+                      setShow: setShowMatchMaker,
+                      setSelectedUsers: props.setSelectedUsers,
+                      setGameMode: setGameMode
+                    }),
                 JsxRuntime.jsxs("div", {
                       children: [
                         JsxRuntime.jsx("div", {
@@ -113,6 +124,15 @@ function Header(props) {
                                               className: "text-white w-[44px] aspect-square text-[26px] flex justify-center items-center -ml-3 rounded-full bg-black/0 transition-all ease-in-out duration-200 shadow-none hover:bg-black/20 hover:shadow-icon-button hover:ring-8 ring-black/20 active:bg-black/20 active:shadow-icon-button active:ring-8 plausible-event-name=ShowStats",
                                               onClick: (function (param) {
                                                   setShowStats(function (param) {
+                                                        return true;
+                                                      });
+                                                })
+                                            }),
+                                        JsxRuntime.jsx("button", {
+                                              children: JsxRuntime.jsx(TicketIcon.make, {}),
+                                              className: "text-white w-[44px] aspect-square text-[26px] flex justify-center items-center -ml-3 rounded-full bg-black/0 transition-all ease-in-out duration-200 shadow-none hover:bg-black/20 hover:shadow-icon-button hover:ring-8 ring-black/20 active:bg-black/20 active:shadow-icon-button active:ring-8 plausible-event-name=ShowMatchMaker",
+                                              onClick: (function (param) {
+                                                  setShowMatchMaker(function (param) {
                                                         return true;
                                                       });
                                                 })

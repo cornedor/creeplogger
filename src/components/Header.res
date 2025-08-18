@@ -11,10 +11,12 @@ let make = (
   ~setGameMode,
   ~searchQuery,
   ~setSearchQuery,
+  ~setSelectedUsers: option<((Belt.Map.String.t<Players.team> => Belt.Map.String.t<Players.team>) => unit)>,
 ) => {
   let user = Database.useUser()
   let (showScores, setShowScores) = React.useState(_ => false)
   let (showStats, setShowStats) = React.useState(_ => false)
+  let (showMatchMaker, setShowMatchMaker) = React.useState(_ => false)
 
   let isConnected = FirebaseStatus.useFirebaseStatus()
 
@@ -28,6 +30,12 @@ let make = (
       show={showScores} setShow={setShowScores} gameMode={gameMode} setGameMode={setGameMode}
     />
     <StatsModal show={showStats} setShow={setShowStats} />
+    <MatchMakerModal
+      show={showMatchMaker}
+      setShow={setShowMatchMaker}
+      setSelectedUsers
+      setGameMode
+    />
     <div
       className={styles["glassHeader"] ++ " px-4 lg:px-10 py-5 sticky top-2 ml-2 mr-2 z-40 rounded shadow-[inset_0_1px_0_rgba(255,255,255,0.1)]"}>
       <div className={styles["backdrop"]} />
@@ -43,6 +51,11 @@ let make = (
             className="text-white w-[44px] aspect-square text-[26px] flex justify-center items-center -ml-3 rounded-full bg-black/0 transition-all ease-in-out duration-200 shadow-none hover:bg-black/20 hover:shadow-icon-button hover:ring-8 ring-black/20 active:bg-black/20 active:shadow-icon-button active:ring-8 plausible-event-name=ShowStats"
             onClick={_ => setShowStats(_ => true)}>
             <PieChartIcon />
+          </button>
+          <button
+            className="text-white w-[44px] aspect-square text-[26px] flex justify-center items-center -ml-3 rounded-full bg-black/0 transition-all ease-in-out duration-200 shadow-none hover:bg-black/20 hover:shadow-icon-button hover:ring-8 ring-black/20 active:bg-black/20 active:shadow-icon-button active:ring-8 plausible-event-name=ShowMatchMaker"
+            onClick={_ => setShowMatchMaker(_ => true)}>
+            <TicketIcon />
           </button>
           {switch setGameMode {
           | Some(setGameMode) =>

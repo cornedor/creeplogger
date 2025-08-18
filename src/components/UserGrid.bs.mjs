@@ -166,7 +166,8 @@ function UserGrid(props) {
                       gameMode: gameMode,
                       setGameMode: props.setGameMode,
                       searchQuery: searchQuery,
-                      setSearchQuery: match$1[1]
+                      setSearchQuery: match$1[1],
+                      setSelectedUsers: setSelectedUsers
                     }),
                 JsxRuntime.jsxs("div", {
                       children: [

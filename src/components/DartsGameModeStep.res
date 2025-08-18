@@ -110,6 +110,7 @@ let make = (~selectedUsers, ~setStep, ~reset, ~setEarnedPoints, ~players, ~gameM
       setShowQueueButtons={_ => ()}
       gameMode
       setGameMode={None}
+      setSelectedUsers={None}
       searchQuery={None}
       setSearchQuery={None}
     />
