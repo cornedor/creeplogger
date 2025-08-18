@@ -4,6 +4,7 @@ let make = (
   ~setShow,
   ~setSelectedUsers: option<((Belt.Map.String.t<Players.team> => Belt.Map.String.t<Players.team>) => unit)>,
   ~setGameMode: option<((Games.gameMode => Games.gameMode) => unit)>,
+  ~onMatchFound: option<(array<Players.player>, array<Players.player>, float) => unit>=?,
 ) => {
   let players = Players.useAllPlayers(~orderBy=#rating, ~asc=false)
   let stats = Stats.useStats()
@@ -135,6 +136,13 @@ let make = (
 
         // Ensure Foosball mode
         switch setGameMode { | Some(setGM) => setGM(_ => Games.Foosball) | None => () }
+
+        // Notify about match with win percentages for display
+        let pBlue = OpenSkill.getWinProbability(
+          blueTeam->Array.map(playerToRating),
+          redTeam->Array.map(playerToRating),
+        )
+        switch onMatchFound { | Some(cb) => cb(blueTeam, redTeam, pBlue) | None => () }
 
         // Close and clear for next use
         clearSelection()

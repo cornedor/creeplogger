@@ -1,3 +1,5 @@
+@module external headerStyles: {..} = "./header.module.css"
+
 @react.component
 let make = (
   ~selectedUsers,
@@ -10,6 +12,8 @@ let make = (
 ) => {
   let (showQueueButtons, setShowQueueButtons) = React.useState(_ => false)
   let (searchQuery, setSearchQuery) = React.useState(_ => "")
+  let (banner, setBanner) = React.useState(() => (None: option<(array<Players.player>, array<Players.player>, float)>))
+  let closeBanner = () => setBanner(_ => None)
   let sorted = switch gameMode {
   | Games.Foosball => players->Array.toSorted((a, b) => Int.toFloat(b.games - a.games))
   | Games.Darts => players->Array.toSorted((a, b) => Int.toFloat(b.dartsGames - a.dartsGames))
@@ -104,6 +108,7 @@ let make = (
       setSelectedUsers={Some(setSelectedUsers)}
       searchQuery={Some(searchQuery)}
       setSearchQuery={Some(setSearchQuery)}
+      onMatchFound={Some((blueTeam, redTeam, pBlue) => setBanner(_ => Some((blueTeam, redTeam, pBlue))))}
     />
     <div
       className="grid 2xl:grid-cols-5 xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-3 grid-cols-2 gap-4 lg:gap-10 mt-4 lg:mt-8 px-4 lg:content-padding pb-20 md:pb-4">
@@ -112,5 +117,24 @@ let make = (
         <NewPlayerForm />
       </GridItem>
     </div>
+    {switch banner {
+    | Some((_blue, _red, pBlue)) =>
+      <div className="md:hidden fixed bottom-16 left-2 right-2 z-50">
+        <div className={headerStyles["glassHeader"] ++ " px-4 py-4 rounded shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] flex items-center justify-between"}>
+          <div className={headerStyles["backdrop"]} />
+          <div className={headerStyles["backdropEdge"]} />
+          <div className="text-white">
+            <strong> {React.string("Match found")} </strong>
+            <div className="text-white/80 text-sm">
+              {let pctBlue = (pBlue *. 100.0)->Js.Math.round
+              ; let pctRed = (100.0 -. pctBlue)->Js.Math.round
+              ; React.string("Blue " ++ Js.Int.toString(pctBlue->Float.toInt) ++ "% · Red " ++ Js.Int.toString(pctRed->Float.toInt) ++ "%")}
+            </div>
+          </div>
+          <Button variant={Blue} onClick={_ => closeBanner()}> {React.string("OK")} </Button>
+        </div>
+      </div>
+    | None => React.null
+    }}
   </>
 }

@@ -20,6 +20,7 @@ import * as HeaderModuleCss from "./header.module.css";
 var styles = HeaderModuleCss;
 
 function Header(props) {
+  var onMatchFound = props.onMatchFound;
   var setSearchQuery = props.setSearchQuery;
   var searchQuery = props.searchQuery;
   var setGameMode = props.setGameMode;
@@ -96,7 +97,10 @@ function Header(props) {
                       show: match$2[0],
                       setShow: setShowMatchMaker,
                       setSelectedUsers: props.setSelectedUsers,
-                      setGameMode: setGameMode
+                      setGameMode: setGameMode,
+                      onMatchFound: onMatchFound !== undefined ? onMatchFound : (function (param, param$1, param$2) {
+                            
+                          })
                     }),
                 JsxRuntime.jsxs("div", {
                       children: [

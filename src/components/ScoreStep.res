@@ -197,6 +197,7 @@ let make = (
       setSelectedUsers={None}
       searchQuery={None}
       setSearchQuery={None}
+      onMatchFound={None}
     />
     <div className="flex flex-wrap content-padding gap-20">
       <div>

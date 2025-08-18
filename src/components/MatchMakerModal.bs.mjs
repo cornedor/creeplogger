@@ -12,6 +12,7 @@ import * as OpenSkillRating from "../helpers/OpenSkillRating.bs.mjs";
 import * as JsxRuntime from "react/jsx-runtime";
 
 function MatchMakerModal(props) {
+  var onMatchFound = props.onMatchFound;
   var setGameMode = props.setGameMode;
   var setSelectedUsers = props.setSelectedUsers;
   var setShow = props.setShow;
@@ -227,6 +228,10 @@ function MatchMakerModal(props) {
       setGameMode(function (param) {
             return "Foosball";
           });
+    }
+    var pBlue = OpenSkill.getWinProbability(blueTeam.map(playerToRating), redTeam.map(playerToRating));
+    if (onMatchFound !== undefined) {
+      onMatchFound(blueTeam, redTeam, pBlue);
     }
     setSelected(function (param) {
           

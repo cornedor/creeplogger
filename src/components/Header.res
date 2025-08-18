@@ -12,6 +12,7 @@ let make = (
   ~searchQuery,
   ~setSearchQuery,
   ~setSelectedUsers: option<((Belt.Map.String.t<Players.team> => Belt.Map.String.t<Players.team>) => unit)>,
+  ~onMatchFound: option<(array<Players.player>, array<Players.player>, float) => unit>,
 ) => {
   let user = Database.useUser()
   let (showScores, setShowScores) = React.useState(_ => false)
@@ -35,6 +36,7 @@ let make = (
       setShow={setShowMatchMaker}
       setSelectedUsers
       setGameMode
+      onMatchFound={switch onMatchFound { | Some(cb) => cb | None => (_,_ ,_) => () }}
     />
     <div
       className={styles["glassHeader"] ++ " px-4 lg:px-10 py-5 sticky top-2 ml-2 mr-2 z-40 rounded shadow-[inset_0_1px_0_rgba(255,255,255,0.1)]"}>
