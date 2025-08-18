@@ -176,16 +176,18 @@ function UserGrid(props) {
                   JsxRuntime.jsxs("div", {
                         children: [
                           JsxRuntime.jsx("strong", {
-                                children: "Match found"
+                                children: "Match found",
+                                className: "text-xl"
                               }),
                           JsxRuntime.jsx("div", {
                                 children: "Blue " + (pctBlue | 0).toString() + "% · Red " + (pctRed | 0).toString() + "%",
-                                className: "text-white/80 text-sm"
+                                className: "text-white/80 text-base md:text-lg"
                               })
                         ],
-                        className: "text-white"
+                        className: "relative z-10 text-white"
                       }),
                   JsxRuntime.jsx(Button.make, {
+                        className: "relative z-10",
                         variant: "Blue",
                         onClick: (function (param) {
                             setBanner(function (param) {
@@ -195,9 +197,9 @@ function UserGrid(props) {
                         children: "OK"
                       })
                 ],
-                className: headerStyles.glassHeader + " px-4 py-4 rounded shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] flex items-center justify-between"
+                className: headerStyles.glassHeader + " relative px-4 py-4 rounded shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] flex items-center justify-between"
               }),
-          className: "md:hidden fixed bottom-16 left-2 right-2 z-50"
+          className: "fixed left-2 right-2 z-50 bottom-16 md:bottom-4"
         });
   } else {
     tmp = null;

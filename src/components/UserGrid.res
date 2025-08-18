@@ -119,19 +119,19 @@ let make = (
     </div>
     {switch banner {
     | Some((_blue, _red, pBlue)) =>
-      <div className="md:hidden fixed bottom-16 left-2 right-2 z-50">
-        <div className={headerStyles["glassHeader"] ++ " px-4 py-4 rounded shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] flex items-center justify-between"}>
+      <div className="fixed left-2 right-2 z-50 bottom-16 md:bottom-4">
+        <div className={headerStyles["glassHeader"] ++ " relative px-4 py-4 rounded shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] flex items-center justify-between"}>
           <div className={headerStyles["backdrop"]} />
           <div className={headerStyles["backdropEdge"]} />
-          <div className="text-white">
-            <strong> {React.string("Match found")} </strong>
-            <div className="text-white/80 text-sm">
+          <div className="relative z-10 text-white">
+            <strong className="text-xl"> {React.string("Match found")} </strong>
+            <div className="text-white/80 text-base md:text-lg">
               {let pctBlue = (pBlue *. 100.0)->Js.Math.round
               ; let pctRed = (100.0 -. pctBlue)->Js.Math.round
               ; React.string("Blue " ++ Js.Int.toString(pctBlue->Float.toInt) ++ "% · Red " ++ Js.Int.toString(pctRed->Float.toInt) ++ "%")}
             </div>
           </div>
-          <Button variant={Blue} onClick={_ => closeBanner()}> {React.string("OK")} </Button>
+          <Button className="relative z-10" variant={Blue} onClick={_ => closeBanner()}> {React.string("OK")} </Button>
         </div>
       </div>
     | None => React.null
