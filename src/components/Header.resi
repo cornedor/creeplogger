@@ -9,4 +9,6 @@ let make: (
   ~setGameMode: option<(Games.gameMode => Games.gameMode) => unit>,
   ~searchQuery: option<string>,
   ~setSearchQuery: option<(string => string) => unit>,
+  ~setSelectedUsers: option<((Belt.Map.String.t<Players.team> => Belt.Map.String.t<Players.team>) => unit)>,
+  ~onMatchFound: option<(array<Players.player>, array<Players.player>, float) => unit>,
 ) => React.element

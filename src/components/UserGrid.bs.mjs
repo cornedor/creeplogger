@@ -2,12 +2,16 @@
 
 import * as Cn from "rescript-classnames/src/Cn.bs.mjs";
 import * as React from "react";
+import * as Button from "./Button.bs.mjs";
 import * as Header from "./Header.bs.mjs";
 import * as GridItem from "./GridItem.bs.mjs";
 import * as LoggerStep from "../helpers/LoggerStep.bs.mjs";
 import * as NewPlayerForm from "./NewPlayerForm.bs.mjs";
 import * as Belt_MapString from "rescript/lib/es6/belt_MapString.js";
 import * as JsxRuntime from "react/jsx-runtime";
+import * as HeaderModuleCss from "./header.module.css";
+
+var headerStyles = HeaderModuleCss;
 
 function UserGrid(props) {
   var gameMode = props.gameMode;
@@ -23,6 +27,11 @@ function UserGrid(props) {
         return "";
       });
   var searchQuery = match$1[0];
+  var match$2 = React.useState(function () {
+        
+      });
+  var setBanner = match$2[1];
+  var banner = match$2[0];
   var sorted;
   sorted = gameMode === "Foosball" ? players.toSorted(function (a, b) {
           return b.games - a.games | 0;
@@ -151,6 +160,50 @@ function UserGrid(props) {
                         ])
                   }, item.key);
       });
+  var tmp;
+  if (banner !== undefined) {
+    var pctBlue = Math.round(banner[2] * 100.0);
+    var pctRed = Math.round(100.0 - pctBlue);
+    tmp = JsxRuntime.jsx("div", {
+          children: JsxRuntime.jsxs("div", {
+                children: [
+                  JsxRuntime.jsx("div", {
+                        className: headerStyles.backdrop
+                      }),
+                  JsxRuntime.jsx("div", {
+                        className: headerStyles.backdropEdge
+                      }),
+                  JsxRuntime.jsxs("div", {
+                        children: [
+                          JsxRuntime.jsx("strong", {
+                                children: "Match found",
+                                className: "text-xl"
+                              }),
+                          JsxRuntime.jsx("div", {
+                                children: "Blue " + (pctBlue | 0).toString() + "% · Red " + (pctRed | 0).toString() + "%",
+                                className: "text-white/80 text-base md:text-lg"
+                              })
+                        ],
+                        className: "relative z-10 text-white"
+                      }),
+                  JsxRuntime.jsx(Button.make, {
+                        className: "relative z-10",
+                        variant: "Blue",
+                        onClick: (function (param) {
+                            setBanner(function (param) {
+                                  
+                                });
+                          }),
+                        children: "OK"
+                      })
+                ],
+                className: headerStyles.glassHeader + " relative px-4 py-4 rounded shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] flex items-center justify-between"
+              }),
+          className: "fixed left-2 right-2 z-50 bottom-16 md:bottom-4"
+        });
+  } else {
+    tmp = null;
+  }
   return JsxRuntime.jsxs(JsxRuntime.Fragment, {
               children: [
                 JsxRuntime.jsx(Header.make, {
@@ -166,7 +219,17 @@ function UserGrid(props) {
                       gameMode: gameMode,
                       setGameMode: props.setGameMode,
                       searchQuery: searchQuery,
-                      setSearchQuery: match$1[1]
+                      setSearchQuery: match$1[1],
+                      setSelectedUsers: setSelectedUsers,
+                      onMatchFound: (function (blueTeam, redTeam, pBlue) {
+                          setBanner(function (param) {
+                                return [
+                                        blueTeam,
+                                        redTeam,
+                                        pBlue
+                                      ];
+                              });
+                        })
                     }),
                 JsxRuntime.jsxs("div", {
                       children: [
@@ -177,7 +240,8 @@ function UserGrid(props) {
                             })
                       ],
                       className: "grid 2xl:grid-cols-5 xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-3 grid-cols-2 gap-4 lg:gap-10 mt-4 lg:mt-8 px-4 lg:content-padding pb-20 md:pb-4"
-                    })
+                    }),
+                tmp
               ]
             });
 }
@@ -187,4 +251,4 @@ var make = UserGrid;
 export {
   make ,
 }
-/* react Not a pure module */
+/* headerStyles Not a pure module */
