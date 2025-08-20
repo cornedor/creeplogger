@@ -17,7 +17,8 @@ async function getDailyOverview(period) {
                     name: "",
                     creeps: 0,
                     games: 0,
-                    score: 0
+                    score: 0,
+                    goalDiff: 0
                   });
               var score = match.score;
               var games = match.games;
@@ -26,23 +27,25 @@ async function getDailyOverview(period) {
               match$1 = winner === "Blue" ? [
                   creeps + 0 | 0,
                   games + 1 | 0,
-                  score + game.blueScore | 0
+                  score + 16 | 0
                 ] : (
                   isAbsolute ? [
                       creeps + 2 | 0,
                       games + 1 | 0,
-                      score - game.redScore | 0
+                      score - 16 | 0
                     ] : [
                       creeps + 1 | 0,
                       games + 1 | 0,
-                      score - game.redScore | 0
+                      score - 16 | 0
                     ]
                 );
+              var goalDiff = match.goalDiff + (game.blueScore - game.redScore | 0) | 0;
               creepsMap.set(player, {
                     name: players[player].name,
                     creeps: match$1[0],
                     games: match$1[1],
-                    score: match$1[2]
+                    score: match$1[2],
+                    goalDiff: goalDiff
                   });
             });
         game.redTeam.forEach(function (player) {
@@ -50,7 +53,8 @@ async function getDailyOverview(period) {
                     name: "",
                     creeps: 0,
                     games: 0,
-                    score: 0
+                    score: 0,
+                    goalDiff: 0
                   });
               var score = match.score;
               var games = match.games;
@@ -60,22 +64,24 @@ async function getDailyOverview(period) {
                   isAbsolute ? [
                       creeps + 2 | 0,
                       games + 1 | 0,
-                      score - game.blueScore | 0
+                      score - 16 | 0
                     ] : [
                       creeps + 1 | 0,
                       games + 1 | 0,
-                      score - game.blueScore | 0
+                      score - 16 | 0
                     ]
                 ) : [
                   creeps + 0 | 0,
                   games + 1 | 0,
-                  score + game.redScore | 0
+                  score + 16 | 0
                 ];
+              var goalDiff = match.goalDiff + (game.redScore - game.blueScore | 0) | 0;
               creepsMap.set(player, {
                     name: players[player].name,
                     creeps: match$1[0],
                     games: match$1[1],
-                    score: match$1[2]
+                    score: match$1[2],
+                    goalDiff: goalDiff
                   });
             });
       });
