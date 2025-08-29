@@ -40,20 +40,25 @@ function toDisplayDelta(delta) {
   return Math.round(delta * 60.0) | 0;
 }
 
-function calculateScore(winners, losers, gameModeOpt) {
+function calculateScore(winners, losers, winnerScoreOpt, loserScoreOpt, gameModeOpt) {
+  var winnerScore = winnerScoreOpt !== undefined ? winnerScoreOpt : 7;
+  var loserScore = loserScoreOpt !== undefined ? loserScoreOpt : 4;
   var winnerRatings = winners.map(getOpenSkillRating);
   var loserRatings = losers.map(getOpenSkillRating);
   var match = OpenSkill.rateGame(winnerRatings, loserRatings);
   var newLoserRatings = match[1];
   var newWinnerRatings = match[0];
-  var dampeningFactor = OpenSkill.applyVarianceDampening(winnerRatings, loserRatings, 1.0);
+  var winProbability = OpenSkill.getWinProbability(winnerRatings, loserRatings);
+  var smartMultiplier = OpenSkill.calculateSmartMultiplier(winnerRatings, loserRatings);
+  var scoreMultiplier = OpenSkill.calculateExpectationAwareScoreMultiplier(winnerScore, loserScore, winProbability);
+  var finalMultiplier = smartMultiplier * scoreMultiplier;
   var updatedWinners = winners.map(function (player, index) {
         var newRating = newWinnerRatings[index];
-        return updatePlayerRating(player, newRating, dampeningFactor, undefined);
+        return updatePlayerRating(player, newRating, finalMultiplier, undefined);
       });
   var updatedLosers = losers.map(function (player, index) {
         var newRating = newLoserRatings[index];
-        return updatePlayerRating(player, newRating, dampeningFactor, undefined);
+        return updatePlayerRating(player, newRating, finalMultiplier, undefined);
       });
   var avgWinnerChange = Core__Array.reduce(updatedWinners, 0.0, (function (acc, player) {
           return acc + player.lastOpenSkillChange;

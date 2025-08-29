@@ -71,11 +71,66 @@ let getTeamAverageRating = (team: array<rating>) => {
   }
 }
 
-// Apply margin multiplier based on score difference (similar to the Python PoC)
-let applyMarginMultiplier = (scoreA: int, scoreB: int, baseChange: float) => {
-  let scoreDiff = abs(scoreA - scoreB)->Int.toFloat
-  let margin = Math.max(1.0, scoreDiff *. 0.5)
-  baseChange *. margin
+// Calculate expectation-aware score margin multiplier
+let calculateExpectationAwareScoreMultiplier = (
+  winnerScore: int, 
+  loserScore: int,
+  winProbability: float  // Winner's pre-match win probability
+) => {
+  let scoreDiff = winnerScore - loserScore
+  let loserScoreRatio = Int.toFloat(loserScore) /. 7.0  // How close loser got to winning
+  
+  // Base score impact: gradual curve where every point matters
+  // 7-6: base 0.7, 7-4: base 1.0, 7-2: base 1.2, 7-0: base 1.5
+  let baseMultiplier = 0.7 +. (Int.toFloat(scoreDiff) -. 1.0) *. 0.1
+  
+  // Adjust based on expectations
+  let expectationAdjustment = if winProbability > 0.8 {
+    // Heavy favorite winning
+    if loserScoreRatio > 0.7 {
+      // Almost lost to underdog! (7-6, 7-5)
+      0.5  // Massive reduction - lucky to win
+    } else if loserScoreRatio > 0.4 {
+      // Closer than expected (7-4, 7-3)
+      0.8  // Some reduction
+    } else {
+      // Dominated as expected (7-2, 7-0)
+      1.0  // Normal
+    }
+  } else if winProbability > 0.6 {
+    // Moderate favorite
+    if loserScoreRatio > 0.7 {
+      // Very close
+      0.7  // Significant reduction
+    } else if loserScoreRatio < 0.3 {
+      // Dominated underdog
+      1.2  // Bonus for dominance
+    } else {
+      1.0  // Normal
+    }
+  } else if winProbability < 0.3 {
+    // Underdog winning
+    if loserScoreRatio < 0.3 {
+      // Dominated the favorite! (7-2, 7-0)
+      1.5  // Big bonus for dominant upset
+    } else if loserScoreRatio > 0.7 {
+      // Barely won (7-6)
+      1.1  // Small bonus - still an upset
+    } else {
+      1.3  // Good upset bonus
+    }
+  } else {
+    // Balanced match (30-70% range)
+    if scoreDiff == 1 {
+      0.9  // Close games less impactful
+    } else if scoreDiff >= 6 {
+      1.3  // Spankings more impactful
+    } else {
+      1.0  // Normal impact
+    }
+  }
+  
+  baseMultiplier *. expectationAdjustment
 }
 
 // Calculate team skill variance to identify mismatched teams
@@ -109,42 +164,51 @@ let calculateSmartMultiplier = (winnerTeam: array<rating>, loserTeam: array<rati
   let maxInternalVariance = Math.max(winnerVariance, loserVariance)
   let teamStrengthDiff = calculateTeamStrengthDifference(winnerTeam, loserTeam)
   
-  // Classify the type of imbalance
-  let imbalanceType = if maxInternalVariance > 8.0 && teamStrengthDiff < 5.0 {
-    // High internal variance, small team difference = Internal Mismatch (like Jasper+Twan)
-    "internal"
-  } else if maxInternalVariance < 6.0 && teamStrengthDiff > 8.0 {
-    // Low internal variance, large team difference = Team Imbalance (Strong vs Weak teams)
-    "team"
+  // Calculate continuous imbalance factors using tanh for smooth transitions
+  // Internal imbalance factor (0 = balanced teams internally, 1 = maximum internal imbalance)
+  let internalImbalanceFactor = Math.tanh(maxInternalVariance /. 10.0)
+  
+  // Team strength imbalance factor (0 = equal team strengths, 1 = maximum difference)
+  let teamImbalanceFactor = Math.tanh(teamStrengthDiff /. 15.0)
+  
+  // Calculate relative weights of internal vs team imbalance
+  // When internal variance is high relative to team difference, we weight it more
+  let totalImbalance = internalImbalanceFactor +. teamImbalanceFactor +. 0.1
+  let internalWeight = internalImbalanceFactor /. totalImbalance
+  let teamWeight = 1.0 -. internalWeight
+  
+  // Check if winner was favored
+  let isWinnerFavored = winProbability > 0.5
+  
+  let multiplier = if internalWeight > 0.6 {
+    // Primarily internal mismatch - reduce impact significantly
+    // The more internal imbalance, the more we dampen (minimum 0.3x for extreme cases)
+    let baseDampening = 1.0 -. (0.7 *. internalImbalanceFactor)
+    
+    // If the internally mismatched team was expected to lose anyway, dampen even more
+    if isWinnerFavored && winProbability > 0.7 {
+      baseDampening *. 0.8  // Additional 20% reduction for expected results
+    } else {
+      baseDampening
+    }
+  } else if teamWeight > 0.6 {
+    // Primarily team strength difference
+    if winProbability < 0.3 {
+      // Upset victory - amplify based on team difference
+      1.0 +. (0.5 *. teamImbalanceFactor)
+    } else if winProbability > 0.7 {
+      // Expected result - slight dampening
+      1.0 -. (0.2 *. teamImbalanceFactor)
+    } else {
+      1.0  // Balanced probability
+    }
   } else {
-    // Mixed or balanced
-    "mixed"
+    // Mixed scenario - proportional adjustments
+    // The more balanced the win probability, the more we consider internal imbalance
+    let balanceFactor = 1.0 -. Math.abs(0.5 -. winProbability) *. 2.0
+    1.0 -. (0.3 *. internalImbalanceFactor *. balanceFactor)
   }
   
-  let multiplier = switch imbalanceType {
-  | "internal" => {
-      // Internal mismatch: always dampen to protect individuals in unfair team compositions
-      // Stronger dampening for higher variance (more unfair the composition)
-      Math.max(0.4, 1.0 -. (maxInternalVariance -. 8.0) *. 0.12)
-    }
-  | "team" when winProbability < 0.3 => {
-      // True team upset: full amplification
-      Math.min(2.0, 1.0 +. (0.3 -. winProbability) *. 3.0)
-    }
-  | "team" when winProbability > 0.7 => {
-      // Expected team result: slight dampening
-      Math.max(0.9, 1.0 -. (winProbability -. 0.7) *. 0.3)
-    }
-  | "mixed" when winProbability < 0.3 => {
-      // Mixed upset: moderate amplification
-      Math.min(1.5, 1.0 +. (0.3 -. winProbability) *. 1.5)
-    }
-  | "mixed" when winProbability > 0.7 => {
-      // Mixed expected: moderate dampening
-      Math.max(0.7, 1.0 -. (winProbability -. 0.7) *. 0.8)
-    }
-  | _ => 1.0 // Balanced match or team category with balanced probability
-  }
-  
-  multiplier
+  // Ensure multiplier stays within reasonable bounds [0.3, 1.5]
+  Math.max(0.3, Math.min(1.5, multiplier))
 }

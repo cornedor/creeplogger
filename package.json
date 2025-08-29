@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "concurrently \"npm run res:start\" \"npm run next:dev\"",
+    "dev:emulator": "concurrently \"npm run res:start\" \"npm run next:dev\" \"npm run emulator\"",
     "tsc": "tsc",
     "build": "rescript && next build",
     "next:dev": "next dev",
@@ -14,7 +15,10 @@
     "res:clean": "rescript clean",
     "res:start": "rescript build -w",
     "rescript": "rescript",
-    "firebase": "firebase"
+    "firebase": "firebase",
+    "emulator": "firebase emulators:start --project demo-creeplogger",
+    "emulator:ui": "echo \"🎨 Emulator UI: http://localhost:4000\" && echo \"📊 Database: http://localhost:9000\" && npm run emulator",
+    "import-data": "node scripts/import-data.js"
   },
   "dependencies": {
     "@dck/rescript-date-fns": "^1.0.0",

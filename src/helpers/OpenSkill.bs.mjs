@@ -2,7 +2,6 @@
 
 import * as Openskill from "openskill";
 import * as Core__Array from "@rescript/core/src/Core__Array.bs.mjs";
-import * as PervasivesU from "rescript/lib/es6/pervasivesU.js";
 import * as RescriptCore from "@rescript/core/src/RescriptCore.bs.mjs";
 
 function createRating(muOpt, sigmaOpt, param) {
@@ -77,10 +76,32 @@ function getTeamAverageRating(team) {
             });
 }
 
-function applyMarginMultiplier(scoreA, scoreB, baseChange) {
-  var scoreDiff = PervasivesU.abs(scoreA - scoreB | 0);
-  var margin = Math.max(1.0, scoreDiff * 0.5);
-  return baseChange * margin;
+function calculateExpectationAwareScoreMultiplier(winnerScore, loserScore, winProbability) {
+  var scoreDiff = winnerScore - loserScore | 0;
+  var loserScoreRatio = loserScore / 7.0;
+  var baseMultiplier = 0.7 + (scoreDiff - 1.0) * 0.1;
+  var expectationAdjustment = winProbability > 0.8 ? (
+      loserScoreRatio > 0.7 ? 0.5 : (
+          loserScoreRatio > 0.4 ? 0.8 : 1.0
+        )
+    ) : (
+      winProbability > 0.6 ? (
+          loserScoreRatio > 0.7 ? 0.7 : (
+              loserScoreRatio < 0.3 ? 1.2 : 1.0
+            )
+        ) : (
+          winProbability < 0.3 ? (
+              loserScoreRatio < 0.3 ? 1.5 : (
+                  loserScoreRatio > 0.7 ? 1.1 : 1.3
+                )
+            ) : (
+              scoreDiff === 1 ? 0.9 : (
+                  scoreDiff >= 6 ? 1.3 : 1.0
+                )
+            )
+        )
+    );
+  return baseMultiplier * expectationAdjustment;
 }
 
 function calculateTeamVariance(team) {
@@ -100,15 +121,41 @@ function calculateTeamVariance(team) {
                   })) / teamSize);
 }
 
-function applyVarianceDampening(teamA, teamB, ratingChange) {
-  var varianceA = calculateTeamVariance(teamA);
-  var varianceB = calculateTeamVariance(teamB);
-  var maxVariance = Math.max(varianceA, varianceB);
-  if (maxVariance <= 3.0) {
-    return ratingChange;
+function calculateTeamStrengthDifference(teamA, teamB) {
+  var avgA = Core__Array.reduce(teamA, 0.0, (function (acc, rating) {
+          return acc + Openskill.ordinal(rating);
+        })) / teamA.length;
+  var avgB = Core__Array.reduce(teamB, 0.0, (function (acc, rating) {
+          return acc + Openskill.ordinal(rating);
+        })) / teamB.length;
+  return Math.abs(avgA - avgB);
+}
+
+function calculateSmartMultiplier(winnerTeam, loserTeam) {
+  var winProbability = getWinProbability(winnerTeam, loserTeam);
+  var winnerVariance = calculateTeamVariance(winnerTeam);
+  var loserVariance = calculateTeamVariance(loserTeam);
+  var maxInternalVariance = Math.max(winnerVariance, loserVariance);
+  var teamStrengthDiff = calculateTeamStrengthDifference(winnerTeam, loserTeam);
+  var internalImbalanceFactor = Math.tanh(maxInternalVariance / 10.0);
+  var teamImbalanceFactor = Math.tanh(teamStrengthDiff / 15.0);
+  var totalImbalance = internalImbalanceFactor + teamImbalanceFactor + 0.1;
+  var internalWeight = internalImbalanceFactor / totalImbalance;
+  var teamWeight = 1.0 - internalWeight;
+  var isWinnerFavored = winProbability > 0.5;
+  var multiplier;
+  if (internalWeight > 0.6) {
+    var baseDampening = 1.0 - 0.7 * internalImbalanceFactor;
+    multiplier = isWinnerFavored && winProbability > 0.7 ? baseDampening * 0.8 : baseDampening;
+  } else if (teamWeight > 0.6) {
+    multiplier = winProbability < 0.3 ? 1.0 + 0.5 * teamImbalanceFactor : (
+        winProbability > 0.7 ? 1.0 - 0.2 * teamImbalanceFactor : 1.0
+      );
+  } else {
+    var balanceFactor = 1.0 - Math.abs(0.5 - winProbability) * 2.0;
+    multiplier = 1.0 - 0.3 * internalImbalanceFactor * balanceFactor;
   }
-  var dampening = Math.max(0.3, 1.0 - (maxVariance - 3.0) * 0.2);
-  return ratingChange * dampening;
+  return Math.max(0.3, Math.min(1.5, multiplier));
 }
 
 export {
@@ -119,8 +166,9 @@ export {
   getWinProbability ,
   playerToRating ,
   getTeamAverageRating ,
-  applyMarginMultiplier ,
+  calculateExpectationAwareScoreMultiplier ,
   calculateTeamVariance ,
-  applyVarianceDampening ,
+  calculateTeamStrengthDifference ,
+  calculateSmartMultiplier ,
 }
 /* openskill Not a pure module */

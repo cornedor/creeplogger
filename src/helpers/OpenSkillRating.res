@@ -41,7 +41,13 @@ let toDisplayDelta = (delta: float) => (delta *. 60.0)->Js.Math.round->Float.toI
 
 // Calculate new ratings for both teams after a game
 // Returns (updated winners, updated losers, points change for display)
-let calculateScore = (winners: team, losers: team, ~gameMode: Games.gameMode=Games.Foosball) => {
+let calculateScore = (
+  winners: team, 
+  losers: team, 
+  ~winnerScore: int=7, 
+  ~loserScore: int=4,
+  ~gameMode: Games.gameMode=Games.Foosball
+) => {
   // Convert teams to OpenSkill ratings
   let winnerRatings = teamToRatings(winners)
   let loserRatings = teamToRatings(losers)
@@ -51,18 +57,31 @@ let calculateScore = (winners: team, losers: team, ~gameMode: Games.gameMode=Gam
   // Calculate new ratings
   let (newWinnerRatings, newLoserRatings) = OpenSkill.rateGame(winnerRatings, loserRatings)
 
+  // Calculate win probability for expectation-aware scoring
+  let winProbability = OpenSkill.getWinProbability(winnerRatings, loserRatings)
+  
   // Calculate smart multiplier that handles different imbalance types
   let smartMultiplier = OpenSkill.calculateSmartMultiplier(winnerRatings, loserRatings)
+  
+  // Calculate expectation-aware score margin multiplier
+  let scoreMultiplier = OpenSkill.calculateExpectationAwareScoreMultiplier(
+    winnerScore, 
+    loserScore,
+    winProbability
+  )
+  
+  // Combine multipliers
+  let finalMultiplier = smartMultiplier *. scoreMultiplier
 
-  // Update players with new ratings, applying smart multiplier
+  // Update players with new ratings, applying combined multiplier
   let updatedWinners = Array.mapWithIndex(winners, (player, index) => {
     let newRating = Array.getUnsafe(newWinnerRatings, index)
-    updatePlayerRating(player, newRating, ~dampening=smartMultiplier, ())
+    updatePlayerRating(player, newRating, ~dampening=finalMultiplier, ())
   })
 
   let updatedLosers = Array.mapWithIndex(losers, (player, index) => {
     let newRating = Array.getUnsafe(newLoserRatings, index)
-    updatePlayerRating(player, newRating, ~dampening=smartMultiplier, ())
+    updatePlayerRating(player, newRating, ~dampening=finalMultiplier, ())
   })
 
   // Calculate average rating change for display (using OpenSkill delta)
