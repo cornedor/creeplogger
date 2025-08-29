@@ -16,14 +16,19 @@ function teamToRatings(team) {
   return team.map(getOpenSkillRating);
 }
 
-function updatePlayerRating(player, newRating) {
+function updatePlayerRating(player, newRating, dampeningOpt, param) {
+  var dampening = dampeningOpt !== undefined ? dampeningOpt : 1.0;
   var newOrdinal = newRating.mu - 3.0 * newRating.sigma;
-  var osDelta = newOrdinal - player.ordinal;
+  var rawDelta = newOrdinal - player.ordinal;
+  var dampenedDelta = rawDelta * dampening;
+  var dampenedMu = player.mu + (newRating.mu - player.mu) * dampening;
+  var dampenedSigma = player.sigma + (newRating.sigma - player.sigma) * dampening;
+  var dampenedOrdinal = player.ordinal + dampenedDelta;
   var newrecord = Caml_obj.obj_dup(player);
-  newrecord.lastOpenSkillChange = osDelta;
-  newrecord.ordinal = newOrdinal;
-  newrecord.sigma = newRating.sigma;
-  newrecord.mu = newRating.mu;
+  newrecord.lastOpenSkillChange = dampenedDelta;
+  newrecord.ordinal = dampenedOrdinal;
+  newrecord.sigma = dampenedSigma;
+  newrecord.mu = dampenedMu;
   return newrecord;
 }
 
@@ -41,13 +46,14 @@ function calculateScore(winners, losers, gameModeOpt) {
   var match = OpenSkill.rateGame(winnerRatings, loserRatings);
   var newLoserRatings = match[1];
   var newWinnerRatings = match[0];
+  var dampeningFactor = OpenSkill.applyVarianceDampening(winnerRatings, loserRatings, 1.0);
   var updatedWinners = winners.map(function (player, index) {
         var newRating = newWinnerRatings[index];
-        return updatePlayerRating(player, newRating);
+        return updatePlayerRating(player, newRating, dampeningFactor, undefined);
       });
   var updatedLosers = losers.map(function (player, index) {
         var newRating = newLoserRatings[index];
-        return updatePlayerRating(player, newRating);
+        return updatePlayerRating(player, newRating, dampeningFactor, undefined);
       });
   var avgWinnerChange = Core__Array.reduce(updatedWinners, 0.0, (function (acc, player) {
           return acc + player.lastOpenSkillChange;

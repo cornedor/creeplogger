@@ -83,6 +83,34 @@ function applyMarginMultiplier(scoreA, scoreB, baseChange) {
   return baseChange * margin;
 }
 
+function calculateTeamVariance(team) {
+  var teamSize = team.length;
+  if (teamSize <= 1.0) {
+    return 0.0;
+  }
+  var ordinals = team.map(function (rating) {
+        return Openskill.ordinal(rating);
+      });
+  var mean = Core__Array.reduce(ordinals, 0.0, (function (acc, ord) {
+          return acc + ord;
+        })) / teamSize;
+  return Math.sqrt(Core__Array.reduce(ordinals, 0.0, (function (acc, ord) {
+                    var diff = ord - mean;
+                    return acc + diff * diff;
+                  })) / teamSize);
+}
+
+function applyVarianceDampening(teamA, teamB, ratingChange) {
+  var varianceA = calculateTeamVariance(teamA);
+  var varianceB = calculateTeamVariance(teamB);
+  var maxVariance = Math.max(varianceA, varianceB);
+  if (maxVariance <= 3.0) {
+    return ratingChange;
+  }
+  var dampening = Math.max(0.3, 1.0 - (maxVariance - 3.0) * 0.2);
+  return ratingChange * dampening;
+}
+
 export {
   createRating ,
   defaultRating ,
@@ -92,5 +120,7 @@ export {
   playerToRating ,
   getTeamAverageRating ,
   applyMarginMultiplier ,
+  calculateTeamVariance ,
+  applyVarianceDampening ,
 }
 /* openskill Not a pure module */

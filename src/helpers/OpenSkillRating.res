@@ -12,17 +12,23 @@ let calculateOrdinal = (mu: float, sigma: float) => mu -. 3.0 *. sigma
 // Convert team of players to array of OpenSkill ratings
 let teamToRatings = (team: team) => Array.map(team, getOpenSkillRating)
 
-// Update a player with new OpenSkill values
-let updatePlayerRating = (player: Players.player, newRating: OpenSkill.rating) => {
+// Update a player with new OpenSkill values, with optional dampening
+let updatePlayerRating = (player: Players.player, newRating: OpenSkill.rating, ~dampening: float=1.0, ()) => {
   let newOrdinal = calculateOrdinal(newRating.mu, newRating.sigma)
-  let osDelta = newOrdinal -. player.ordinal
+  let rawDelta = newOrdinal -. player.ordinal
+  let dampenedDelta = rawDelta *. dampening
+
+  // Apply dampening by interpolating between old and new ratings
+  let dampenedMu = player.mu +. (newRating.mu -. player.mu) *. dampening
+  let dampenedSigma = player.sigma +. (newRating.sigma -. player.sigma) *. dampening
+  let dampenedOrdinal = player.ordinal +. dampenedDelta
 
   {
     ...player,
-    mu: newRating.mu,
-    sigma: newRating.sigma,
-    ordinal: newOrdinal,
-    lastOpenSkillChange: osDelta,
+    mu: dampenedMu,
+    sigma: dampenedSigma,
+    ordinal: dampenedOrdinal,
+    lastOpenSkillChange: dampenedDelta,
   }
 }
 
@@ -45,15 +51,18 @@ let calculateScore = (winners: team, losers: team, ~gameMode: Games.gameMode=Gam
   // Calculate new ratings
   let (newWinnerRatings, newLoserRatings) = OpenSkill.rateGame(winnerRatings, loserRatings)
 
-  // Update players with new ratings
+  // Calculate smart multiplier that handles different imbalance types
+  let smartMultiplier = OpenSkill.calculateSmartMultiplier(winnerRatings, loserRatings)
+
+  // Update players with new ratings, applying smart multiplier
   let updatedWinners = Array.mapWithIndex(winners, (player, index) => {
     let newRating = Array.getUnsafe(newWinnerRatings, index)
-    updatePlayerRating(player, newRating)
+    updatePlayerRating(player, newRating, ~dampening=smartMultiplier, ())
   })
 
   let updatedLosers = Array.mapWithIndex(losers, (player, index) => {
     let newRating = Array.getUnsafe(newLoserRatings, index)
-    updatePlayerRating(player, newRating)
+    updatePlayerRating(player, newRating, ~dampening=smartMultiplier, ())
   })
 
   // Calculate average rating change for display (using OpenSkill delta)
