@@ -251,25 +251,16 @@ let updateGameStats = (key, myTeamPoints, opponentTeamPoints, team: team, elo) =
   })
 }
 
-// Update stats using OpenSkill values, while preserving Elo field untouched here
+// Update OpenSkill stats only, without modifying general game statistics
 let updateOpenSkillGameStats = (
   key,
-  myTeamPoints,
-  opponentTeamPoints,
-  team: team,
+  _myTeamPoints,
+  _opponentTeamPoints,
+  _team: team,
   mu,
   sigma,
   ordinal,
 ) => {
-  let isAbsolute = Rules.isAbsolute(myTeamPoints, opponentTeamPoints)
-
-  let isWin = myTeamPoints > opponentTeamPoints
-  let isAbsoluteWin = isAbsolute && isWin
-  let isLoss = myTeamPoints < opponentTeamPoints
-  let isAbsoluteLoss = isAbsolute && isLoss
-  let isRedWin = team == Red && isWin
-  let isBlueWin = team == Blue && isWin
-
   let playerRef = Firebase.Database.refPath(Database.database, bucket ++ "/" ++ key)
   Firebase.Database.runTransaction(playerRef, data => {
     switch data->Schema.parseWith(playerSchema) {
@@ -277,26 +268,11 @@ let updateOpenSkillGameStats = (
       switch Schema.serializeWith(
         {
           ...player,
-          games: player.games + 1,
-          teamGoals: player.teamGoals + myTeamPoints,
-          teamGoalsAgainst: player.teamGoalsAgainst + opponentTeamPoints,
-          redGames: team == Red ? player.redGames + 1 : player.redGames,
-          blueGames: team == Blue ? player.blueGames + 1 : player.blueGames,
-          wins: isWin ? player.wins + 1 : player.wins,
-          losses: isLoss ? player.losses + 1 : player.losses,
-          absoluteLosses: isAbsoluteLoss ? player.absoluteLosses + 1 : player.absoluteLosses,
-          absoluteWins: isAbsoluteWin ? player.absoluteWins + 1 : player.absoluteWins,
-          redWins: isRedWin ? player.redWins + 1 : player.redWins,
-          blueWins: isBlueWin ? player.blueWins + 1 : player.blueWins,
-          // Do not touch Elo deltas here; Elo updates elsewhere
-          lastEloChange: player.lastEloChange,
+          // Do not modify general game statistics - those are handled by updateGameStats
           mu,
           sigma,
           ordinal,
           lastOpenSkillChange: ordinal -. player.ordinal,
-          // Keep existing Elo untouched
-          elo: player.elo,
-          lastGames: getLastGames(player.lastGames, isWin),
         },
         playerSchema,
       ) {

@@ -213,14 +213,7 @@ function updateGameStats(key, myTeamPoints, opponentTeamPoints, team, elo) {
               }));
 }
 
-function updateOpenSkillGameStats(key, myTeamPoints, opponentTeamPoints, team, mu, sigma, ordinal) {
-  var isAbsolute = Rules.isAbsolute(myTeamPoints, opponentTeamPoints);
-  var isWin = myTeamPoints > opponentTeamPoints;
-  var isAbsoluteWin = isAbsolute && isWin;
-  var isLoss = myTeamPoints < opponentTeamPoints;
-  var isAbsoluteLoss = isAbsolute && isLoss;
-  var isRedWin = team === "Red" && isWin;
-  var isBlueWin = team === "Blue" && isWin;
+function updateOpenSkillGameStats(key, _myTeamPoints, _opponentTeamPoints, _team, mu, sigma, ordinal) {
   var playerRef = Database$1.ref(Database.database, "players/" + key);
   return Database$1.runTransaction(playerRef, (function (data) {
                 var player = Schema.parseWith(data, playerSchema);
@@ -229,7 +222,7 @@ function updateOpenSkillGameStats(key, myTeamPoints, opponentTeamPoints, team, m
                 }
                 var player$1 = player._0;
                 var newrecord = Caml_obj.obj_dup(player$1);
-                var res = Schema.serializeWith((newrecord.lastOpenSkillChange = ordinal - player$1.ordinal, newrecord.ordinal = ordinal, newrecord.sigma = sigma, newrecord.mu = mu, newrecord.lastGames = getLastGames(player$1.lastGames, isWin), newrecord.lastEloChange = player$1.lastEloChange, newrecord.elo = player$1.elo, newrecord.redWins = isRedWin ? player$1.redWins + 1 | 0 : player$1.redWins, newrecord.blueWins = isBlueWin ? player$1.blueWins + 1 | 0 : player$1.blueWins, newrecord.redGames = team === "Red" ? player$1.redGames + 1 | 0 : player$1.redGames, newrecord.blueGames = team === "Blue" ? player$1.blueGames + 1 | 0 : player$1.blueGames, newrecord.teamGoalsAgainst = player$1.teamGoalsAgainst + opponentTeamPoints | 0, newrecord.teamGoals = player$1.teamGoals + myTeamPoints | 0, newrecord.games = player$1.games + 1 | 0, newrecord.absoluteLosses = isAbsoluteLoss ? player$1.absoluteLosses + 1 | 0 : player$1.absoluteLosses, newrecord.absoluteWins = isAbsoluteWin ? player$1.absoluteWins + 1 | 0 : player$1.absoluteWins, newrecord.losses = isLoss ? player$1.losses + 1 | 0 : player$1.losses, newrecord.wins = isWin ? player$1.wins + 1 | 0 : player$1.wins, newrecord), playerSchema);
+                var res = Schema.serializeWith((newrecord.lastOpenSkillChange = ordinal - player$1.ordinal, newrecord.ordinal = ordinal, newrecord.sigma = sigma, newrecord.mu = mu, newrecord), playerSchema);
                 if (res.TAG === "Ok") {
                   return res._0;
                 } else {
