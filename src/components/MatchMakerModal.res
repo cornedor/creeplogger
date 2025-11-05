@@ -108,12 +108,12 @@ let make = (
     let total = stats.totalBlueWins + stats.totalRedWins
     let blueStronger = if total > 0 { Float.fromInt(stats.totalBlueWins) /. Float.fromInt(total) > 0.5 } else { false }
 
-    // Assign stronger team to the historically stronger color
+    // Assign weaker team to the historically stronger color to compensate for positional advantage
     switch (blueStronger, teamAIsStronger) {
-    | (true, true) => (/*Blue*/ teamA, /*Red*/ teamB)
-    | (true, false) => (/*Blue*/ teamB, /*Red*/ teamA)
-    | (false, true) => (/*Blue*/ teamB, /*Red*/ teamA)
-    | (false, false) => (/*Blue*/ teamA, /*Red*/ teamB)
+    | (true, true) => (/*Blue*/ teamB, /*Red*/ teamA)
+    | (true, false) => (/*Blue*/ teamA, /*Red*/ teamB)
+    | (false, true) => (/*Blue*/ teamA, /*Red*/ teamB)
+    | (false, false) => (/*Blue*/ teamB, /*Red*/ teamA)
     }
   }
 
