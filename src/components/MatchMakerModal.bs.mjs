@@ -184,24 +184,24 @@ function MatchMakerModal(props) {
     if (blueStronger) {
       if (teamAIsStronger) {
         return [
-                teamA,
-                teamB
+                teamB,
+                teamA
               ];
       } else {
         return [
-                teamB,
-                teamA
+                teamA,
+                teamB
               ];
       }
     } else if (teamAIsStronger) {
       return [
-              teamB,
-              teamA
+              teamA,
+              teamB
             ];
     } else {
       return [
-              teamA,
-              teamB
+              teamB,
+              teamA
             ];
     }
   };
