@@ -3,6 +3,8 @@
 /* eslint-disable */
 /* tslint:disable */
 
+import type {t as Nullable_t} from './Nullable.gen';
+
 export type firebaseOptions = {
   readonly apiKey: string; 
   readonly authDomain: string; 
@@ -29,61 +31,34 @@ export type authConfig = {
   readonly authDomain: string
 };
 
-export type emulatorConfig = {
-  readonly protocol: string; 
-  readonly host: string; 
-  readonly port: (null | undefined | number)
-};
-
 export type authSettings = { readonly appVerificationDisabledForTesting: boolean };
-
-export type userMetadata = { readonly creationTime: (null | undefined | string); readonly lastSignInTime: (null | undefined | string) };
-
-export type userInfo = {
-  readonly displayName: (null | undefined | string); 
-  readonly email: (null | undefined | string); 
-  readonly phoneNumber: (null | undefined | string); 
-  readonly photoURL: (null | undefined | string); 
-  readonly providerId: string; 
-  readonly uid: string
-};
-
-export type user = {
-  readonly Inherit: userInfo; 
-  readonly emailVerified: boolean; 
-  readonly isAnonymous: boolean; 
-  readonly metadata: userMetadata; 
-  readonly providerData: userInfo[]; 
-  readonly refreshToken: string; 
-  readonly tenantId: (null | undefined | string)
-};
 
 export type auth = {
   readonly app: firebaseApp; 
   readonly name: string; 
   readonly config: authConfig; 
-  readonly languageCode: (null | undefined | string); 
-  readonly tenantId: (null | undefined | string); 
+  readonly languageCode: Nullable_t<string>; 
+  readonly tenantId: Nullable_t<string>; 
   readonly settings: authSettings; 
-  readonly currentUser: (null | undefined | user); 
-  readonly emulatorConfig: (null | undefined | emulatorConfig)
+  readonly currentUser: Nullable_t<user>; 
+  readonly emulatorConfig: Nullable_t<emulatorConfig>
 };
 
 export type database = { readonly app: firebaseApp; readonly type: "database" };
 
 export type databaseReference = {
   readonly ref: databaseReference; 
-  readonly isEqual: (_1:(null | undefined | query)) => boolean; 
+  readonly isEqual: (_1:Nullable_t<query>) => boolean; 
   readonly toJSON: () => string; 
   readonly toString: () => string; 
-  readonly key: (null | undefined | string); 
-  readonly parent: (null | undefined | databaseReference); 
-  readonly root: (null | undefined | databaseReference)
+  readonly key: Nullable_t<string>; 
+  readonly parent: Nullable_t<databaseReference>; 
+  readonly root: Nullable_t<databaseReference>
 };
 
 export type query = {
   readonly ref: databaseReference; 
-  readonly isEqual: (_1:(null | undefined | query)) => boolean; 
+  readonly isEqual: (_1:Nullable_t<query>) => boolean; 
   readonly toJSON: () => string; 
   readonly toString: () => string
 };

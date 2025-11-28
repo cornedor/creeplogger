@@ -65,9 +65,11 @@ let dartsGameSchema = Schema.object(s => {
 let addDartsGame = dartsGame => {
   let dartsGamesRef = Firebase.Database.refPath(Database.database, "dartsGames")
 
-  switch Schema.serializeWith(dartsGame, dartsGameSchema) {
-  | Ok(data) => Firebase.Database.pushValue(dartsGamesRef, data)
-  | Error(_) => panic("Could not create darts game")
+  try {
+    let data = dartsGame->Schema.convertToJsonOrThrow(dartsGameSchema)
+    Firebase.Database.pushValue(dartsGamesRef, data)
+  } catch {
+  | _ => panic("Could not create darts game")
   }
 }
 
@@ -84,9 +86,11 @@ let fetchAllGames = async () => {
   Array.forEach(snapshotToArray(games), snap => {
     switch snap->Firebase.Database.Snapshot.val->Nullable.toOption {
     | Some(val) =>
-      switch val->Schema.parseWith(dartsGameSchema) {
-      | Ok(val) => orderedGames->Array.push(val)
-      | Error(e) => Js.log(e)
+      try {
+        let val = val->Schema.parseOrThrow(dartsGameSchema)
+        orderedGames->Array.push(val)
+      } catch {
+      | e => Js.log(e)
       }
     | None => ()
     }
@@ -100,7 +104,7 @@ let removeGame = gameKey => {
   Firebase.Database.remove(gameRef)
 }
 
-let empty: Js.Dict.t<dartsGame> = Js.Dict.empty()
+let empty: dict<dartsGame> = {}
 let useLastGames = () => {
   let (games, setGames) = React.useState(_ => empty)
   let gamesRef = Firebase.Database.query1(
@@ -113,11 +117,12 @@ let useLastGames = () => {
       snapshot => {
         let games = switch Firebase.Database.Snapshot.val(snapshot)->Nullable.toOption {
         | Some(val) =>
-          switch val->Schema.parseWith(Schema.dict(dartsGameSchema)) {
-          | Ok(val) => val
-          | Error(e) => {
+          try {
+            val->Schema.parseOrThrow(Schema.dict(dartsGameSchema))
+          } catch {
+          | e => {
               Js.log(e)
-              Js.Dict.empty()
+              empty
             }
           }
         | None => empty

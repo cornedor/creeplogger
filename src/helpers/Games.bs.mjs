@@ -6,132 +6,122 @@ import * as Database from "./Database.bs.mjs";
 import * as RescriptCore from "@rescript/core/src/RescriptCore.bs.mjs";
 import * as FirebaseSchema from "./FirebaseSchema.bs.mjs";
 import * as Database$1 from "firebase/database";
+import * as Primitive_exceptions from "@rescript/runtime/lib/es6/Primitive_exceptions.js";
 
-var modifierSchema = Schema.union([
-      Schema.object(function (s) {
-            s.tag("kind", "handicap");
-            return {
-                    TAG: "Handicap",
-                    _0: s.f("blue", Schema.$$int),
-                    _1: s.f("red", Schema.$$int)
-                  };
-          }),
-      Schema.object(function (s) {
-            s.tag("kind", "one-v-one");
-            return "OneVOne";
-          })
-    ]);
+let modifierSchema = Schema.union([
+  Schema.object(s => {
+    s.tag("kind", "handicap");
+    return {
+      TAG: "Handicap",
+      _0: s.f("blue", Schema.int),
+      _1: s.f("red", Schema.int)
+    };
+  }),
+  Schema.object(s => {
+    s.tag("kind", "one-v-one");
+    return "OneVOne";
+  })
+]);
 
-var gameSchema = Schema.object(function (s) {
-      return {
-              blueScore: s.f("blueScore", Schema.intMin(Schema.$$int, 0, undefined)),
-              redScore: s.f("redScore", Schema.intMin(Schema.$$int, 0, undefined)),
-              blueTeam: s.f("blueTeam", Schema.array(Schema.string)),
-              redTeam: s.f("redTeam", Schema.array(Schema.string)),
-              date: s.f("date", Schema.transform(Schema.$$float, (function (param) {
-                          return {
-                                  p: (function (prim) {
-                                      return new Date(prim);
-                                    }),
-                                  s: (function (prim) {
-                                      return prim.getTime();
-                                    })
-                                };
-                        }))),
-              modifiers: s.f("modifiers", FirebaseSchema.nullableTransform(Schema.option(Schema.array(modifierSchema))))
-            };
-    });
+let gameSchema = Schema.object(s => ({
+  blueScore: s.f("blueScore", Schema.intMin(Schema.int, 0, undefined)),
+  redScore: s.f("redScore", Schema.intMin(Schema.int, 0, undefined)),
+  blueTeam: s.f("blueTeam", Schema.array(Schema.string)),
+  redTeam: s.f("redTeam", Schema.array(Schema.string)),
+  date: s.f("date", Schema.transform(Schema.float, param => ({
+    p: prim => new Date(prim),
+    s: prim => prim.getTime()
+  }))),
+  modifiers: s.f("modifiers", FirebaseSchema.nullableTransform(Schema.option(Schema.array(modifierSchema))))
+}));
 
 function addGame(game) {
-  var gamesRef = Database$1.ref(Database.database, "games");
-  var data = Schema.serializeWith(game, gameSchema);
-  if (data.TAG === "Ok") {
-    return Database$1.push(gamesRef, data._0);
-  } else {
+  let gamesRef = Database$1.ref(Database.database, "games");
+  try {
+    let data = Schema.convertToJsonOrThrow(game, gameSchema);
+    return Database$1.push(gamesRef, data);
+  } catch (exn) {
     return RescriptCore.panic("Could not create game");
   }
 }
 
 async function getTimePeriod(period) {
-  var date = new Date();
+  let date = new Date();
   date.setHours(0, 0, 0, 0);
   switch (period) {
     case "Daily" :
-        break;
+      break;
     case "Weekly" :
-        var x = date.getDay();
-        var newDate = (date.getDate() - (
-            x === 0 ? 7 : x
-          ) | 0) + 1 | 0;
-        date.setDate(newDate);
-        break;
+      let x = date.getDay();
+      let newDate = (date.getDate() - (
+        x === 0 ? 7 : x
+      ) | 0) + 1 | 0;
+      date.setDate(newDate);
+      break;
     case "Monthly" :
-        date.setDate(0);
-        break;
+      date.setDate(0);
+      break;
     case "All" :
-        date.setFullYear(2000);
-        break;
-    
+      date.setFullYear(2000);
+      break;
   }
-  var games = await Database$1.get(Database$1.query(Database$1.ref(Database.database, "games"), Database$1.orderByChild("date"), Database$1.startAt(date.getTime())));
-  var val = games.val();
+  let games = await Database$1.get(Database$1.query(Database$1.ref(Database.database, "games"), Database$1.orderByChild("date"), Database$1.startAt(date.getTime())));
+  let val = games.val();
   if (val == null) {
     return {};
   }
-  var val$1 = Schema.parseWith(val, Schema.dict(gameSchema));
-  if (val$1.TAG === "Ok") {
-    return val$1._0;
+  try {
+    return Schema.parseOrThrow(val, Schema.dict(gameSchema));
+  } catch (raw_e) {
+    let e = Primitive_exceptions.internalToException(raw_e);
+    console.log(e);
+    return {};
   }
-  console.log(val$1._0);
-  return {};
 }
 
-var empty = {};
+let empty = {};
 
 function useLastGames() {
-  var match = React.useState(function () {
-        return empty;
-      });
-  var setGames = match[1];
-  var gamesRef = Database$1.query(Database$1.ref(Database.database, "games"), Database$1.orderByChild("date"));
-  React.useEffect((function () {
-          return Database$1.onValue(gamesRef, (function (snapshot) {
-                        var val = snapshot.val();
-                        var games;
-                        if (val == null) {
-                          games = empty;
-                        } else {
-                          var val$1 = Schema.parseWith(val, Schema.dict(gameSchema));
-                          if (val$1.TAG === "Ok") {
-                            games = val$1._0;
-                          } else {
-                            console.log(val$1._0);
-                            games = {};
-                          }
-                        }
-                        setGames(function (param) {
-                              return games;
-                            });
-                      }), undefined);
-        }), [setGames]);
+  let match = React.useState(() => empty);
+  let setGames = match[1];
+  let gamesRef = Database$1.query(Database$1.ref(Database.database, "games"), Database$1.orderByChild("date"));
+  React.useEffect(() => Database$1.onValue(gamesRef, snapshot => {
+    let val = snapshot.val();
+    let games;
+    if (val == null) {
+      games = empty;
+    } else {
+      try {
+        games = Schema.parseOrThrow(val, Schema.dict(gameSchema));
+      } catch (raw_e) {
+        let e = Primitive_exceptions.internalToException(raw_e);
+        console.log(e);
+        games = empty;
+      }
+    }
+    setGames(param => games);
+  }, undefined), [setGames]);
   return match[0];
 }
 
 async function fetchAllGames() {
-  var games = await Database$1.get(Database$1.query(Database$1.ref(Database.database, "games"), Database$1.orderByChild("date")));
-  var orderedGames = [];
-  games.forEach(function (snap) {
-        var val = snap.val();
-        if (val == null) {
-          return ;
-        }
-        var val$1 = Schema.parseWith(val, gameSchema);
-        if (val$1.TAG === "Ok") {
-          orderedGames.push(val$1._0);
-          return ;
-        }
-        console.log(val$1._0);
-      });
+  let games = await Database$1.get(Database$1.query(Database$1.ref(Database.database, "games"), Database$1.orderByChild("date")));
+  let orderedGames = [];
+  games.forEach(snap => {
+    let val = snap.val();
+    if (val == null) {
+      return;
+    }
+    try {
+      let val$1 = Schema.parseOrThrow(val, gameSchema);
+      orderedGames.push(val$1);
+      return;
+    } catch (raw_e) {
+      let e = Primitive_exceptions.internalToException(raw_e);
+      console.log(e);
+      return;
+    }
+  });
   return orderedGames;
 }
 
@@ -140,10 +130,10 @@ function removeGame(gameKey) {
 }
 
 export {
-  addGame ,
-  getTimePeriod ,
-  fetchAllGames ,
-  removeGame ,
-  useLastGames ,
+  addGame,
+  getTimePeriod,
+  fetchAllGames,
+  removeGame,
+  useLastGames,
 }
 /* modifierSchema Not a pure module */

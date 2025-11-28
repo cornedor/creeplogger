@@ -18,7 +18,9 @@ let make = (~score, ~winners, ~reset, ~players, ~perPlayerDeltas: option<Js.Dict
     <h1 className="text-3xl"> {React.string("Gefeliciteerd, " ++ winnerNames ++ "!")} </h1>
     <div
       className="text-lime-400 text-[160px]"
-      style={ReactDOM.Style.make(~textShadow="0 0 20px rgb(163 230 53)", ())}>
+      style={{
+        textShadow: "0 0 20px rgb(163 230 53)",
+      }}>
       {React.string("+")}
       {React.int(score)}
     </div>

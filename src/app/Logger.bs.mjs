@@ -6,123 +6,96 @@ import * as React from "react";
 import * as Players from "../helpers/Players.bs.mjs";
 import * as UserGrid from "../components/UserGrid.bs.mjs";
 import * as ScoreStep from "../components/ScoreStep.bs.mjs";
-import * as Belt_MapString from "rescript/lib/es6/belt_MapString.js";
+import * as Belt_MapString from "@rescript/runtime/lib/es6/Belt_MapString.js";
 import * as Fonts from "../helpers/fonts";
 import * as ConfirmationStep from "../components/ConfirmationStep.bs.mjs";
 import * as DartsGameModeStep from "../components/DartsGameModeStep.bs.mjs";
 import * as JsxRuntime from "react/jsx-runtime";
 
 function Logger(props) {
-  var livePlayers = Players.useAllPlayers(undefined, undefined);
-  var match = livePlayers.length;
-  var players = match !== 0 ? livePlayers : props.players;
-  var match$1 = React.useState(function () {
-        
-      });
-  var setSelectedUsers = match$1[1];
-  var selectedUsers = match$1[0];
-  var match$2 = React.useState(function () {
-        return "UserSelection";
-      });
-  var setStep = match$2[1];
-  var match$3 = React.useState(function () {
-        return -1;
-      });
-  var setRedState = match$3[1];
-  var redState = match$3[0];
-  var match$4 = React.useState(function () {
-        return -1;
-      });
-  var setBlueState = match$4[1];
-  var blueState = match$4[0];
-  var match$5 = React.useState(function () {
-        return 0;
-      });
-  var setEarnedPoints = match$5[1];
-  var match$6 = React.useState(function () {
-        return {};
-      });
-  var match$7 = React.useState(function () {
-        return "Foosball";
-      });
-  var gameMode = match$7[0];
-  var reset = function () {
-    setStep(function (param) {
-          return "UserSelection";
-        });
-    setSelectedUsers(function (param) {
-          
-        });
-    setBlueState(function (param) {
-          return -1;
-        });
-    setRedState(function (param) {
-          return -1;
-        });
-    setEarnedPoints(function (param) {
-          return 0;
-        });
+  let livePlayers = Players.useAllPlayers(undefined, undefined);
+  let match = livePlayers.length;
+  let players = match !== 0 ? livePlayers : props.players;
+  let match$1 = React.useState(() => {});
+  let setSelectedUsers = match$1[1];
+  let selectedUsers = match$1[0];
+  let match$2 = React.useState(() => "UserSelection");
+  let setStep = match$2[1];
+  let match$3 = React.useState(() => -1);
+  let setRedState = match$3[1];
+  let redState = match$3[0];
+  let match$4 = React.useState(() => -1);
+  let setBlueState = match$4[1];
+  let blueState = match$4[0];
+  let match$5 = React.useState(() => 0);
+  let setEarnedPoints = match$5[1];
+  let match$6 = React.useState(() => ({}));
+  let match$7 = React.useState(() => "Foosball");
+  let gameMode = match$7[0];
+  let reset = () => {
+    setStep(param => "UserSelection");
+    setSelectedUsers(param => {});
+    setBlueState(param => -1);
+    setRedState(param => -1);
+    setEarnedPoints(param => 0);
   };
   Games.getTimePeriod("Daily");
-  var winnerTeam = redState > blueState ? "Red" : "Blue";
-  var winners = Belt_MapString.keysToArray(Belt_MapString.keep(selectedUsers, (function (param, value) {
-              return value === winnerTeam;
-            })));
-  var stepComponent;
+  let winnerTeam = redState > blueState ? "Red" : "Blue";
+  let winners = Belt_MapString.keysToArray(Belt_MapString.keep(selectedUsers, (param, value) => value === winnerTeam));
+  let stepComponent;
   switch (match$2[0]) {
     case "UserSelection" :
-        stepComponent = JsxRuntime.jsx(UserGrid.make, {
-              selectedUsers: selectedUsers,
-              setSelectedUsers: setSelectedUsers,
-              reset: reset,
-              setStep: setStep,
-              players: players,
-              gameMode: gameMode,
-              setGameMode: match$7[1]
-            });
-        break;
+      stepComponent = JsxRuntime.jsx(UserGrid.make, {
+        selectedUsers: selectedUsers,
+        setSelectedUsers: setSelectedUsers,
+        reset: reset,
+        setStep: setStep,
+        players: players,
+        gameMode: gameMode,
+        setGameMode: match$7[1]
+      });
+      break;
     case "ScoreForm" :
-        stepComponent = gameMode === "Foosball" ? JsxRuntime.jsx(ScoreStep.make, {
-                selectedUsers: selectedUsers,
-                setStep: setStep,
-                reset: reset,
-                blueState: blueState,
-                setBlueState: setBlueState,
-                redState: redState,
-                setRedState: setRedState,
-                setEarnedPoints: setEarnedPoints,
-                setPerPlayerDeltas: match$6[1],
-                players: players,
-                gameMode: gameMode
-              }) : JsxRuntime.jsx(DartsGameModeStep.make, {
-                selectedUsers: selectedUsers,
-                setStep: setStep,
-                reset: reset,
-                setEarnedPoints: setEarnedPoints,
-                players: players,
-                gameMode: gameMode
-              });
-        break;
+      stepComponent = gameMode === "Foosball" ? JsxRuntime.jsx(ScoreStep.make, {
+          selectedUsers: selectedUsers,
+          setStep: setStep,
+          reset: reset,
+          blueState: blueState,
+          setBlueState: setBlueState,
+          redState: redState,
+          setRedState: setRedState,
+          setEarnedPoints: setEarnedPoints,
+          setPerPlayerDeltas: match$6[1],
+          players: players,
+          gameMode: gameMode
+        }) : JsxRuntime.jsx(DartsGameModeStep.make, {
+          selectedUsers: selectedUsers,
+          setStep: setStep,
+          reset: reset,
+          setEarnedPoints: setEarnedPoints,
+          players: players,
+          gameMode: gameMode
+        });
+      break;
     case "Confirmation" :
-        stepComponent = JsxRuntime.jsx(ConfirmationStep.make, {
-              score: match$5[0],
-              winners: winners,
-              reset: reset,
-              players: players,
-              perPlayerDeltas: match$6[0]
-            });
-        break;
-    
+      stepComponent = JsxRuntime.jsx(ConfirmationStep.make, {
+        score: match$5[0],
+        winners: winners,
+        reset: reset,
+        players: players,
+        perPlayerDeltas: match$6[0]
+      });
+      break;
   }
   return JsxRuntime.jsx("div", {
-              children: stepComponent,
-              className: "bg-blobs bg-darkbg bg-no-repeat bg-left text-white flex flex-col min-h-screen w-full"
-            });
+    children: stepComponent,
+    className: "bg-blobs bg-darkbg bg-no-repeat bg-left text-white flex flex-col min-h-screen w-full"
+  });
 }
 
-var make = Logger;
+let make = Logger;
 
 export {
-  make ,
+  make,
 }
 /*  Not a pure module */

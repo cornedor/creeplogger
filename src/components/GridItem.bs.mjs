@@ -3,27 +3,34 @@
 import * as JsxRuntime from "react/jsx-runtime";
 
 function GridItem(props) {
-  var __className = props.className;
-  var className = __className !== undefined ? __className : "";
+  let __className = props.className;
+  let className = __className !== undefined ? __className : "";
+  let styleObj_gridColumn = "auto span 1";
+  let styleObj_gridRow = "auto / span 1";
+  let styleObj_transform = `scale(` + (
+    props.active ? "1.02" : "1"
+  ) + `)`;
+  let styleObj_transitionDuration = "0.2s";
+  let styleObj_transitionProperty = "all";
+  let styleObj_transitionTimingFunction = "ease-in-out";
+  let styleObj = {
+    gridColumn: styleObj_gridColumn,
+    gridRow: styleObj_gridRow,
+    transform: styleObj_transform,
+    transitionDuration: styleObj_transitionDuration,
+    transitionProperty: styleObj_transitionProperty,
+    transitionTimingFunction: styleObj_transitionTimingFunction
+  };
   return JsxRuntime.jsx("div", {
-              children: props.children,
-              className: className,
-              style: {
-                gridColumn: "auto span 1",
-                gridRow: "auto / span 1",
-                transitionDuration: "0.2s",
-                transitionProperty: "all",
-                transitionTimingFunction: "ease-in-out",
-                transform: "scale(" + (
-                  props.active ? "1.02" : "1"
-                ) + ")"
-              }
-            });
+    children: props.children,
+    className: className,
+    style: styleObj
+  });
 }
 
-var make = GridItem;
+let make = GridItem;
 
 export {
-  make ,
+  make,
 }
 /* react/jsx-runtime Not a pure module */

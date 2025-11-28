@@ -11,222 +11,179 @@ import * as LoggerStep from "../helpers/LoggerStep.bs.mjs";
 import * as Mattermost from "../helpers/Mattermost.bs.mjs";
 import * as Core__Option from "@rescript/core/src/Core__Option.bs.mjs";
 import * as RescriptCore from "@rescript/core/src/RescriptCore.bs.mjs";
-import * as Belt_MapString from "rescript/lib/es6/belt_MapString.js";
+import * as Belt_MapString from "@rescript/runtime/lib/es6/Belt_MapString.js";
 import * as OpenSkillRating from "../helpers/OpenSkillRating.bs.mjs";
 import * as JsxRuntime from "react/jsx-runtime";
 
 function ScoreStep(props) {
-  var players = props.players;
-  var setPerPlayerDeltas = props.setPerPlayerDeltas;
-  var setEarnedPoints = props.setEarnedPoints;
-  var setRedState = props.setRedState;
-  var redState = props.redState;
-  var setBlueState = props.setBlueState;
-  var blueState = props.blueState;
-  var setStep = props.setStep;
-  var selectedUsers = props.selectedUsers;
-  var match = React.useState(function () {
-        return false;
-      });
-  var setIsSaving = match[1];
-  var redButtons = [];
-  var blueButtons = [];
-  for(var x = 0; x <= 7; ++x){
-    var str = x.toString();
+  let players = props.players;
+  let setPerPlayerDeltas = props.setPerPlayerDeltas;
+  let setEarnedPoints = props.setEarnedPoints;
+  let setRedState = props.setRedState;
+  let redState = props.redState;
+  let setBlueState = props.setBlueState;
+  let blueState = props.blueState;
+  let setStep = props.setStep;
+  let selectedUsers = props.selectedUsers;
+  let match = React.useState(() => false);
+  let setIsSaving = match[1];
+  let redButtons = [];
+  let blueButtons = [];
+  for (let x = 0; x <= 7; ++x) {
+    let str = x.toString();
     redButtons.push(JsxRuntime.jsx(Button.make, {
-              className: "!rounded-full w-[100px] h-[100px] !text-5xl font-semibold",
-              variant: redState === x ? "Red" : "Grey",
-              onClick: (function(x){
-              return function (param) {
-                setRedState(function (param) {
-                      return x;
-                    });
-              }
-              }(x)),
-              children: str
-            }, str));
+      className: "!rounded-full w-[100px] h-[100px] !text-5xl font-semibold",
+      variant: redState === x ? "Red" : "Grey",
+      onClick: param => setRedState(param => x),
+      children: str
+    }, str));
     blueButtons.push(JsxRuntime.jsx(Button.make, {
-              className: "!rounded-full w-[100px] h-[100px] !text-5xl font-semibold",
-              variant: blueState === x ? "Blue" : "Grey",
-              onClick: (function(x){
-              return function (param) {
-                setBlueState(function (param) {
-                      return x;
-                    });
-              }
-              }(x)),
-              children: str
-            }, str));
+      className: "!rounded-full w-[100px] h-[100px] !text-5xl font-semibold",
+      variant: blueState === x ? "Blue" : "Grey",
+      onClick: param => setBlueState(param => x),
+      children: str
+    }, str));
   }
-  var mapUser = function (extra) {
-    var player = Players.playerByKey(players, extra);
+  let mapUser = extra => {
+    let player = Players.playerByKey(players, extra);
     if (player !== undefined) {
       return JsxRuntime.jsx("li", {
-                  children: player.name
-                }, extra);
+        children: player.name
+      }, extra);
     } else {
       return JsxRuntime.jsx("li", {
-                  children: "..."
-                }, extra);
+        children: "..."
+      }, extra);
     }
   };
-  var selectedBlueUsers = Belt_MapString.keysToArray(Belt_MapString.keep(selectedUsers, (function (param, value) {
-              return value === "Blue";
-            })));
-  var selectedRedUsers = Belt_MapString.keysToArray(Belt_MapString.keep(selectedUsers, (function (param, value) {
-              return value === "Red";
-            })));
-  var blueUsers = selectedBlueUsers.map(mapUser);
-  var redUsers = selectedRedUsers.map(mapUser);
-  var redPlayers = selectedRedUsers.map(function (key) {
-        return Core__Option.getExn(Players.playerByKey(players, key), undefined);
-      });
-  var bluePlayers = selectedBlueUsers.map(function (key) {
-        return Core__Option.getExn(Players.playerByKey(players, key), undefined);
-      });
-  var sendCreepsUpdate = function (extra, extra$1, extra$2) {
-    return Mattermost.sendCreepsUpdate(bluePlayers, redPlayers, extra, extra$1, extra$2);
-  };
-  var saveGame = async function () {
-    setIsSaving(function (param) {
-          return true;
-        });
+  let selectedBlueUsers = Belt_MapString.keysToArray(Belt_MapString.keep(selectedUsers, (param, value) => value === "Blue"));
+  let selectedRedUsers = Belt_MapString.keysToArray(Belt_MapString.keep(selectedUsers, (param, value) => value === "Red"));
+  let blueUsers = selectedBlueUsers.map(mapUser);
+  let redUsers = selectedRedUsers.map(mapUser);
+  let redPlayers = selectedRedUsers.map(key => Core__Option.getExn(Players.playerByKey(players, key), undefined));
+  let bluePlayers = selectedBlueUsers.map(key => Core__Option.getExn(Players.playerByKey(players, key), undefined));
+  let sendCreepsUpdate = (extra, extra$1, extra$2) => Mattermost.sendCreepsUpdate(bluePlayers, redPlayers, extra, extra$1, extra$2);
+  let saveGame = async () => {
+    setIsSaving(param => true);
     await Games.addGame({
-          blueScore: blueState,
-          redScore: redState,
-          blueTeam: selectedBlueUsers,
-          redTeam: selectedRedUsers,
-          date: new Date(),
-          modifiers: redPlayers.length === 1 && bluePlayers.length === 1 ? ["OneVOne"] : []
-        });
-    var winningTeam = blueState > redState ? "Blue" : (
+      blueScore: blueState,
+      redScore: redState,
+      blueTeam: selectedBlueUsers,
+      redTeam: selectedRedUsers,
+      date: new Date(),
+      modifiers: redPlayers.length === 1 && bluePlayers.length === 1 ? ["OneVOne"] : []
+    });
+    let winningTeam = blueState > redState ? "Blue" : (
         redState > blueState ? "Red" : RescriptCore.panic("Tie not implemented")
       );
-    var redPlayers$1 = selectedRedUsers.map(function (key) {
-          return Core__Option.getExn(Players.playerByKey(players, key), undefined);
-        });
-    var bluePlayers$1 = selectedBlueUsers.map(function (key) {
-          return Core__Option.getExn(Players.playerByKey(players, key), undefined);
-        });
-    var match;
+    let redPlayers$1 = selectedRedUsers.map(key => Core__Option.getExn(Players.playerByKey(players, key), undefined));
+    let bluePlayers$1 = selectedBlueUsers.map(key => Core__Option.getExn(Players.playerByKey(players, key), undefined));
+    let match;
     if (winningTeam === "Blue") {
       match = OpenSkillRating.calculateScore(bluePlayers$1, redPlayers$1, "Foosball");
     } else {
-      var match$1 = OpenSkillRating.calculateScore(redPlayers$1, bluePlayers$1, "Foosball");
+      let match$1 = OpenSkillRating.calculateScore(redPlayers$1, bluePlayers$1, "Foosball");
       match = [
         match$1[1],
         match$1[0],
         match$1[2]
       ];
     }
-    var redOS = match[1];
-    var blueOS = match[0];
-    var match$2;
+    let redOS = match[1];
+    let blueOS = match[0];
+    let match$2;
     if (winningTeam === "Blue") {
       match$2 = Elo.calculateScore(bluePlayers$1, redPlayers$1, "Foosball");
     } else {
-      var match$3 = Elo.calculateScore(redPlayers$1, bluePlayers$1, "Foosball");
+      let match$3 = Elo.calculateScore(redPlayers$1, bluePlayers$1, "Foosball");
       match$2 = [
         match$3[1],
         match$3[0],
         match$3[2]
       ];
     }
-    var roundedPoints = OpenSkillRating.toDisplayDelta(match[2]);
-    setEarnedPoints(function (param) {
-          return roundedPoints;
-        });
-    var deltas = {};
-    blueOS.forEach(function (player) {
-          var delta = OpenSkillRating.toDisplayDelta(player.lastOpenSkillChange);
-          deltas[player.key] = delta;
-        });
-    redOS.forEach(function (player) {
-          var delta = OpenSkillRating.toDisplayDelta(player.lastOpenSkillChange);
-          deltas[player.key] = delta;
-        });
-    setPerPlayerDeltas(function (param) {
-          return deltas;
-        });
-    await Promise.all(blueOS.map(async function (player) {
-              return Players.updateOpenSkillGameStats(player.key, blueState, redState, "Blue", player.mu, player.sigma, player.ordinal);
-            }));
-    await Promise.all(redOS.map(async function (player) {
-              return Players.updateOpenSkillGameStats(player.key, redState, blueState, "Red", player.mu, player.sigma, player.ordinal);
-            }));
-    await Promise.all(match$2[0].map(async function (player) {
-              return Players.updateGameStats(player.key, blueState, redState, "Blue", player.elo);
-            }));
-    await Promise.all(match$2[1].map(async function (player) {
-              return Players.updateGameStats(player.key, redState, blueState, "Red", player.elo);
-            }));
+    let roundedPoints = OpenSkillRating.toDisplayDelta(match[2]);
+    setEarnedPoints(param => roundedPoints);
+    let deltas = {};
+    blueOS.forEach(player => {
+      let delta = OpenSkillRating.toDisplayDelta(player.lastOpenSkillChange);
+      deltas[player.key] = delta;
+    });
+    redOS.forEach(player => {
+      let delta = OpenSkillRating.toDisplayDelta(player.lastOpenSkillChange);
+      deltas[player.key] = delta;
+    });
+    setPerPlayerDeltas(param => deltas);
+    await Promise.all(blueOS.map(async player => Players.updateOpenSkillGameStats(player.key, blueState, redState, "Blue", player.mu, player.sigma, player.ordinal)));
+    await Promise.all(redOS.map(async player => Players.updateOpenSkillGameStats(player.key, redState, blueState, "Red", player.mu, player.sigma, player.ordinal)));
+    await Promise.all(match$2[0].map(async player => Players.updateGameStats(player.key, blueState, redState, "Blue", player.elo)));
+    await Promise.all(match$2[1].map(async player => Players.updateGameStats(player.key, redState, blueState, "Red", player.elo)));
     await Stats.updateStats(redState, blueState);
     await sendCreepsUpdate(blueState, redState, roundedPoints);
-    setIsSaving(function (param) {
-          return false;
-        });
-    return setStep(function (step) {
-                return LoggerStep.getNextStep(step);
-              });
+    setIsSaving(param => false);
+    return setStep(LoggerStep.getNextStep);
   };
   return JsxRuntime.jsxs(JsxRuntime.Fragment, {
-              children: [
-                JsxRuntime.jsx(Header.make, {
-                      step: "ScoreForm",
-                      onNextStep: (function () {
-                          saveGame();
-                        }),
-                      onReset: props.reset,
-                      disabled: match[0],
-                      setShowQueueButtons: (function (param) {
-                          
-                        }),
-                      gameMode: props.gameMode
-                    }),
-                JsxRuntime.jsxs("div", {
-                      children: [
-                        JsxRuntime.jsxs("div", {
-                              children: [
-                                JsxRuntime.jsx("h2", {
-                                      children: "Team Blauw",
-                                      className: "font-bold text-xl"
-                                    }),
-                                JsxRuntime.jsx("ol", {
-                                      children: blueUsers,
-                                      className: "pl-5 pt-4 pb-8 list-decimal"
-                                    }),
-                                JsxRuntime.jsx("div", {
-                                      children: blueButtons,
-                                      className: "grid gap-5 grid-cols-4"
-                                    })
-                              ]
-                            }),
-                        JsxRuntime.jsxs("div", {
-                              children: [
-                                JsxRuntime.jsx("h2", {
-                                      children: "Team Rood",
-                                      className: "font-bold text-xl"
-                                    }),
-                                JsxRuntime.jsx("ol", {
-                                      children: redUsers,
-                                      className: "pl-5 pt-4 pb-8 list-decimal"
-                                    }),
-                                JsxRuntime.jsx("div", {
-                                      children: redButtons,
-                                      className: "grid gap-5 grid-cols-4"
-                                    })
-                              ]
-                            })
-                      ],
-                      className: "flex flex-wrap content-padding gap-20"
-                    })
-              ]
-            });
+    children: [
+      JsxRuntime.jsx(Header.make, {
+        step: "ScoreForm",
+        onNextStep: () => {
+          saveGame();
+        },
+        onReset: props.reset,
+        disabled: match[0],
+        setShowQueueButtons: param => {},
+        gameMode: props.gameMode,
+        setGameMode: undefined,
+        searchQuery: undefined,
+        setSearchQuery: undefined,
+        setSelectedUsers: undefined,
+        onMatchFound: undefined
+      }),
+      JsxRuntime.jsxs("div", {
+        children: [
+          JsxRuntime.jsxs("div", {
+            children: [
+              JsxRuntime.jsx("h2", {
+                children: "Team Blauw",
+                className: "font-bold text-xl"
+              }),
+              JsxRuntime.jsx("ol", {
+                children: blueUsers,
+                className: "pl-5 pt-4 pb-8 list-decimal"
+              }),
+              JsxRuntime.jsx("div", {
+                children: blueButtons,
+                className: "grid gap-5 grid-cols-4"
+              })
+            ]
+          }),
+          JsxRuntime.jsxs("div", {
+            children: [
+              JsxRuntime.jsx("h2", {
+                children: "Team Rood",
+                className: "font-bold text-xl"
+              }),
+              JsxRuntime.jsx("ol", {
+                children: redUsers,
+                className: "pl-5 pt-4 pb-8 list-decimal"
+              }),
+              JsxRuntime.jsx("div", {
+                children: redButtons,
+                className: "grid gap-5 grid-cols-4"
+              })
+            ]
+          })
+        ],
+        className: "flex flex-wrap content-padding gap-20"
+      })
+    ]
+  });
 }
 
-var make = ScoreStep;
+let make = ScoreStep;
 
 export {
-  make ,
+  make,
 }
 /* Games Not a pure module */

@@ -5,72 +5,63 @@ import * as Schema from "./Schema.bs.mjs";
 import * as Database from "./Database.bs.mjs";
 import * as Mattermost from "./Mattermost.bs.mjs";
 import * as Database$1 from "firebase/database";
+import * as Primitive_exceptions from "@rescript/runtime/lib/es6/Primitive_exceptions.js";
 
-var daysWithoutSchema = Schema.object(function (s) {
-      return {
-              name: s.fieldOr("name", Schema.string, "Days without an accident"),
-              date: s.f("date", Schema.transform(Schema.$$float, (function (param) {
-                          return {
-                                  p: (function (prim) {
-                                      return new Date(prim);
-                                    }),
-                                  s: (function (prim) {
-                                      return prim.getTime();
-                                    })
-                                };
-                        })))
-            };
-    });
+let daysWithoutSchema = Schema.object(s => ({
+  name: s.fieldOr("name", Schema.string, "Days without an accident"),
+  date: s.f("date", Schema.transform(Schema.float, param => ({
+    p: prim => new Date(prim),
+    s: prim => prim.getTime()
+  })))
+}));
 
 function useDaysWithout() {
-  var match = React.useState(function () {
-        return "";
-      });
-  var setName = match[1];
-  var match$1 = React.useState(function () {
-        return new Date();
-      });
-  var setDate = match$1[1];
-  React.useEffect((function () {
-          var daysWithoutRef = Database$1.ref(Database.database, "daysWithout");
-          return Database$1.onValue(daysWithoutRef, (function (snapshot) {
-                        var data = snapshot.val();
-                        if (data == null) {
-                          console.log("No data");
-                          return ;
-                        }
-                        var daysWithout = Schema.parseWith(data, daysWithoutSchema);
-                        if (daysWithout.TAG === "Ok") {
-                          var daysWithout$1 = daysWithout._0;
-                          setName(function (param) {
-                                return daysWithout$1.name;
-                              });
-                          return setDate(function (param) {
-                                      return daysWithout$1.date;
-                                    });
-                        }
-                        console.log(daysWithout._0);
-                      }), undefined);
-        }), []);
+  let match = React.useState(() => "");
+  let setName = match[1];
+  let match$1 = React.useState(() => new Date());
+  let setDate = match$1[1];
+  React.useEffect(() => {
+    let daysWithoutRef = Database$1.ref(Database.database, "daysWithout");
+    return Database$1.onValue(daysWithoutRef, snapshot => {
+      let data = snapshot.val();
+      if (data == null) {
+        console.log("No data");
+        return;
+      }
+      try {
+        let daysWithout = Schema.parseOrThrow(data, daysWithoutSchema);
+        setName(param => daysWithout.name);
+        return setDate(param => daysWithout.date);
+      } catch (raw_error) {
+        let error = Primitive_exceptions.internalToException(raw_error);
+        console.log(error);
+        return;
+      }
+    }, undefined);
+  }, []);
   return [
-          match[0],
-          match$1[0]
-        ];
+    match[0],
+    match$1[0]
+  ];
 }
 
 async function reset() {
-  var daysWithoutRef = Database$1.ref(Database.database, "daysWithout/date");
+  let daysWithoutRef = Database$1.ref(Database.database, "daysWithout/date");
   await Database$1.set(daysWithoutRef, Date.now());
-  var daysWithoutRef$1 = Database$1.ref(Database.database, "daysWithout");
-  var daysWithoutVal = await Database$1.get(daysWithoutRef$1);
-  var daysWithout = Schema.parseWith(daysWithoutVal, daysWithoutSchema);
-  var name;
-  name = daysWithout.TAG === "Ok" ? daysWithout._0.name : "Days without an accident";
+  let daysWithoutRef$1 = Database$1.ref(Database.database, "daysWithout");
+  let daysWithoutVal = await Database$1.get(daysWithoutRef$1);
+  let name;
+  try {
+    let val = daysWithoutVal.val();
+    name = (val == null) ? "Days without an accident" : Schema.parseOrThrow(val, daysWithoutSchema).name;
+  } catch (exn) {
+    name = "Days without an accident";
+  }
   Mattermost.sendDaysWithoutReset(name);
 }
 
 export {
-  reset ,
-  useDaysWithout ,
+  reset,
+  useDaysWithout,
 }
 /* daysWithoutSchema Not a pure module */

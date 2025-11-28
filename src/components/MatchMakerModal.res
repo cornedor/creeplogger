@@ -156,7 +156,9 @@ let make = (
 
   <div
     className="modal flex flex-col"
-    style={ReactDOM.Style.make(~transform=show ? "translateX(0)" : "translateX(-100%)", ())}>
+    style={{
+      transform: show ? "translateX(0)" : "translateX(-100%)",
+    }}>
     <header className="flex items-center gap-4">
       <Button onClick={_ => setShow(s => !s)} variant={Blue}> {React.string("Terug")} </Button>
       <div className="flex-1" />

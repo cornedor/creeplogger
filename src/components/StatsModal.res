@@ -12,7 +12,9 @@ let make = (~show, ~setShow) => {
 
   <div
     className="modal flex flex-col"
-    style={ReactDOM.Style.make(~transform=show ? "translateX(0)" : "translateX(-100%)", ())}>
+    style={{
+      transform: show ? "translateX(0)" : "translateX(-100%)",
+    }}>
     <header>
       <Button onClick={_ => setShow(s => !s)} variant={Blue}> {React.string("Terug")} </Button>
     </header>
@@ -38,10 +40,9 @@ let make = (~show, ~setShow) => {
     <div>
       <div
         className="rounded-full aspect-square w-[300px] my-4 mx-auto shadow-inner shadow-orange-50"
-        style={ReactDOM.Style.make(
-          ~background=`conic-gradient(#86b7ff, #1c77ff ${bluePercentages}%, #ff3e6e ${bluePercentages}%, #ff0055)`,
-          (),
-        )}
+        style={{
+          background: `conic-gradient(#86b7ff, #1c77ff ${bluePercentages}%, #ff3e6e ${bluePercentages}%, #ff0055)`,
+        }}
       />
     </div>
     <hr />

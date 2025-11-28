@@ -92,7 +92,9 @@ let make = (~show, ~setShow, ~gameMode, ~setGameMode) => {
 
   <div
     className="modal"
-    style={ReactDOM.Style.make(~transform=show ? "translateX(0)" : "translateX(-100%)", ())}>
+    style={{
+      transform: show ? "translateX(0)" : "translateX(-100%)",
+    }}>
     <header className="flex items-center gap-5">
       <Button onClick={_ => setShow(s => !s)} variant={Blue}> {React.string("Terug")} </Button>
       {switch setGameMode {
@@ -119,7 +121,7 @@ let make = (~show, ~setShow, ~gameMode, ~setGameMode) => {
     <table className="table-fixed w-full mt-8">
       <thead>
         <tr>
-          <th className="text-lg text-left" style={ReactDOM.Style.make(~width="40px", ())}>
+          <th className="text-lg text-left" style={{ width: "40px" }}>
             {React.string("#")}
           </th>
           <th className="text-lg text-left"> {React.string("Speler")} </th>

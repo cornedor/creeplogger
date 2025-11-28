@@ -21,15 +21,13 @@ let queueSchema = Schema.object(s => {
 
 let enqueuePlayer = async (playerKey, until) => {
   let playersRef = Firebase.Database.refPath(Database.database, bucket)
-  let data = switch Schema.serializeWith(
+  let data = try {
     {
       playerKey,
       until,
-    },
-    queuePlayerSchema,
-  ) {
-  | Ok(data) => data
-  | Error(_) => panic("Could not serialize queue player")
+    }->Schema.convertToJsonOrThrow(queuePlayerSchema)
+  } catch {
+  | _ => panic("Could not serialize queue player")
   }
 
   await Firebase.Database.pushValue(playersRef, data)

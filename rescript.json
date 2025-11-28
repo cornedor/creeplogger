@@ -11,7 +11,7 @@
     }
   ],
   "suffix": ".bs.mjs",
-  "bs-dependencies": [
+  "dependencies": [
     "@rescript/react",
     "@rescript/core",
     "@glennsl/rescript-fetch",
@@ -28,7 +28,7 @@
     "version": 4,
     "mode": "automatic"
   },
-  "bsc-flags": [
+  "compiler-flags": [
     "-open RescriptCore",
     "-open RescriptSchema"
   ],
