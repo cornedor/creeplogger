@@ -3,353 +3,317 @@
 import * as Elo from "../helpers/Elo.bs.mjs";
 import * as React from "react";
 import * as Button from "./Button.bs.mjs";
-import * as Js_dict from "rescript/lib/es6/js_dict.js";
+import * as Js_dict from "@rescript/runtime/lib/es6/Js_dict.js";
 import * as Players from "../helpers/Players.bs.mjs";
 import * as DartsIcon from "./DartsIcon.bs.mjs";
+import * as Pervasives from "@rescript/runtime/lib/es6/Pervasives.js";
 import * as SoccerIcon from "./SoccerIcon.bs.mjs";
-import * as PervasivesU from "rescript/lib/es6/pervasivesU.js";
 import * as Core__Option from "@rescript/core/src/Core__Option.bs.mjs";
 import * as OpenSkillRating from "../helpers/OpenSkillRating.bs.mjs";
 import * as JsxRuntime from "react/jsx-runtime";
 
 function LeaderboardModal(props) {
-  var setGameMode = props.setGameMode;
-  var gameMode = props.gameMode;
-  var setShow = props.setShow;
-  var match = React.useState(function () {
-        return false;
-      });
-  var setOrder = match[1];
-  var ascOrder = match[0];
-  var players = Players.useAllPlayers(gameMode === "Darts" ? "dartsElo" : "rating", false);
-  var visiblePlayers = React.useMemo((function () {
-          return players.filter(function (player) {
-                      var match;
-                      match = gameMode === "Foosball" ? [
-                          player.ordinal,
-                          player.games
-                        ] : [
-                          player.dartsElo,
-                          player.dartsGames
-                        ];
-                      var match$1 = player.hidden;
-                      var isVisible = match$1 !== undefined && match$1 ? false : true;
-                      var hasEnoughGames = match[1] > 5;
-                      if (isVisible) {
-                        return hasEnoughGames;
-                      } else {
-                        return false;
-                      }
-                    });
-        }), [
-        players,
-        gameMode
-      ]);
-  var getCurrentCompareValue = function (player) {
+  let setGameMode = props.setGameMode;
+  let gameMode = props.gameMode;
+  let setShow = props.setShow;
+  let match = React.useState(() => false);
+  let setOrder = match[1];
+  let ascOrder = match[0];
+  let players = Players.useAllPlayers(gameMode === "Darts" ? "dartsElo" : "rating", false);
+  let visiblePlayers = React.useMemo(() => players.filter(player => {
+    let match;
+    match = gameMode === "Foosball" ? [
+        player.ordinal,
+        player.games
+      ] : [
+        player.dartsElo,
+        player.dartsGames
+      ];
+    let match$1 = player.hidden;
+    let isVisible = match$1 !== undefined ? !match$1 : true;
+    let hasEnoughGames = match[1] > 5;
+    if (isVisible) {
+      return hasEnoughGames;
+    } else {
+      return false;
+    }
+  }), [
+    players,
+    gameMode
+  ]);
+  let getCurrentCompareValue = player => {
     if (gameMode === "Foosball") {
       return OpenSkillRating.toDisplayOrdinal(player.ordinal);
     } else {
       return Elo.roundScore(player.dartsElo);
     }
   };
-  var getPreviousCompareValue = function (player) {
+  let getPreviousCompareValue = player => {
     if (gameMode === "Foosball") {
       return OpenSkillRating.toDisplayOrdinal(player.ordinal - player.lastOpenSkillChange);
     } else {
       return Elo.roundScore(player.dartsElo - player.dartsLastEloChange);
     }
   };
-  var computePositions = function (arr, getValue) {
-    var posByKey = {};
-    var position = {
+  let computePositions = (arr, getValue) => {
+    let posByKey = {};
+    let position = {
       contents: 0
     };
-    var skipped = {
+    let skipped = {
       contents: 0
     };
-    var previousValue = {
+    let previousValue = {
       contents: undefined
     };
-    arr.forEach(function (player) {
-          var value = getValue(player);
-          var prev = previousValue.contents;
-          if (prev !== undefined) {
-            if (prev === value) {
-              skipped.contents = skipped.contents + 1 | 0;
-            } else if (skipped.contents > 0) {
-              position.contents = (position.contents + skipped.contents | 0) + 1 | 0;
-              skipped.contents = 0;
-            } else {
-              position.contents = position.contents + 1 | 0;
-            }
-          } else {
-            position.contents = position.contents + 1 | 0;
-          }
-          previousValue.contents = value;
-          posByKey[player.key] = position.contents;
-        });
+    arr.forEach(player => {
+      let value = getValue(player);
+      let prev = previousValue.contents;
+      if (prev !== undefined) {
+        if (prev === value) {
+          skipped.contents = skipped.contents + 1 | 0;
+        } else if (skipped.contents > 0) {
+          position.contents = (position.contents + skipped.contents | 0) + 1 | 0;
+          skipped.contents = 0;
+        } else {
+          position.contents = position.contents + 1 | 0;
+        }
+      } else {
+        position.contents = position.contents + 1 | 0;
+      }
+      previousValue.contents = value;
+      posByKey[player.key] = position.contents;
+    });
     return posByKey;
   };
-  var sortDescBy = function (getValue, a, b) {
-    return getValue(b) - getValue(a) | 0;
-  };
-  var currentPositions = React.useMemo((function () {
-          var sortedCur = visiblePlayers.toSorted(function (a, b) {
-                return sortDescBy(getCurrentCompareValue, a, b);
-              });
-          return computePositions(sortedCur, getCurrentCompareValue);
-        }), [
-        visiblePlayers,
-        gameMode
-      ]);
-  var previousPositions = React.useMemo((function () {
-          var sortedPrev = visiblePlayers.toSorted(function (a, b) {
-                return sortDescBy(getPreviousCompareValue, a, b);
-              });
-          return computePositions(sortedPrev, getPreviousCompareValue);
-        }), [
-        visiblePlayers,
-        gameMode
-      ]);
-  var displayPlayers = React.useMemo((function () {
-          return visiblePlayers.toSorted(function (a, b) {
-                      var match = ascOrder ? [
-                          a,
-                          b
-                        ] : [
-                          b,
-                          a
-                        ];
-                      return getCurrentCompareValue(match[0]) - getCurrentCompareValue(match[1]) | 0;
-                    });
-        }), [
-        visiblePlayers,
-        ascOrder,
-        gameMode
-      ]);
-  var round2 = function (v) {
-    return Math.round(v * 100.0) / 100.0;
-  };
-  var tmp;
+  let sortDescBy = (getValue, a, b) => getValue(b) - getValue(a) | 0;
+  let currentPositions = React.useMemo(() => {
+    let sortedCur = visiblePlayers.toSorted((a, b) => sortDescBy(getCurrentCompareValue, a, b));
+    return computePositions(sortedCur, getCurrentCompareValue);
+  }, [
+    visiblePlayers,
+    gameMode
+  ]);
+  let previousPositions = React.useMemo(() => {
+    let sortedPrev = visiblePlayers.toSorted((a, b) => sortDescBy(getPreviousCompareValue, a, b));
+    return computePositions(sortedPrev, getPreviousCompareValue);
+  }, [
+    visiblePlayers,
+    gameMode
+  ]);
+  let displayPlayers = React.useMemo(() => visiblePlayers.toSorted((a, b) => {
+    let match = ascOrder ? [
+        a,
+        b
+      ] : [
+        b,
+        a
+      ];
+    return getCurrentCompareValue(match[0]) - getCurrentCompareValue(match[1]) | 0;
+  }), [
+    visiblePlayers,
+    ascOrder,
+    gameMode
+  ]);
+  let round2 = v => Math.round(v * 100.0) / 100.0;
+  let tmp;
   tmp = setGameMode !== undefined ? (
       gameMode === "Foosball" ? JsxRuntime.jsx("button", {
-              children: JsxRuntime.jsx(SoccerIcon.make, {}),
-              "aria-label": "Switch to Darts leaderboard",
-              className: "text-white w-[44px] aspect-square text-[26px] flex justify-center items-center rounded-full bg-black/0 transition-all ease-in-out duration-200 shadow-none hover:bg-black/20 hover:shadow-icon-button hover:ring-8 ring-black/20 active:bg-black/20 active:shadow-icon-button active:ring-8",
-              onClick: (function (param) {
-                  setGameMode(function (param) {
-                        return "Darts";
-                      });
-                })
-            }) : JsxRuntime.jsx("button", {
-              children: JsxRuntime.jsx(DartsIcon.make, {}),
-              "aria-label": "Switch to Foosball leaderboard",
-              className: "text-white w-[44px] aspect-square text-[26px] flex justify-center items-center rounded-full bg-black/0 transition-all ease-in-out duration-200 shadow-none hover:bg-black/20 hover:shadow-icon-button hover:ring-8 ring-black/20 active:bg-black/20 active:shadow-icon-button active:ring-8",
-              onClick: (function (param) {
-                  setGameMode(function (param) {
-                        return "Foosball";
-                      });
-                })
-            })
+          children: JsxRuntime.jsx(SoccerIcon.make, {}),
+          "aria-label": "Switch to Darts leaderboard",
+          className: "text-white w-[44px] aspect-square text-[26px] flex justify-center items-center rounded-full bg-black/0 transition-all ease-in-out duration-200 shadow-none hover:bg-black/20 hover:shadow-icon-button hover:ring-8 ring-black/20 active:bg-black/20 active:shadow-icon-button active:ring-8",
+          onClick: param => setGameMode(param => "Darts")
+        }) : JsxRuntime.jsx("button", {
+          children: JsxRuntime.jsx(DartsIcon.make, {}),
+          "aria-label": "Switch to Foosball leaderboard",
+          className: "text-white w-[44px] aspect-square text-[26px] flex justify-center items-center rounded-full bg-black/0 transition-all ease-in-out duration-200 shadow-none hover:bg-black/20 hover:shadow-icon-button hover:ring-8 ring-black/20 active:bg-black/20 active:shadow-icon-button active:ring-8",
+          onClick: param => setGameMode(param => "Foosball")
+        })
     ) : null;
-  var tmp$1;
+  let tmp$1;
   tmp$1 = gameMode === "Foosball" ? JsxRuntime.jsxs(JsxRuntime.Fragment, {
-          children: [
-            JsxRuntime.jsx("th", {
-                  children: JsxRuntime.jsx("button", {
-                        children: "Score " + (
-                          ascOrder ? "↑" : "↓"
-                        ),
-                        "aria-label": "Toggle sort order",
-                        onClick: (function (param) {
-                            setOrder(function (order) {
-                                  return !order;
-                                });
-                          })
-                      }),
-                  className: "text-lg text-left"
-                }),
-            JsxRuntime.jsx("th", {
-                  children: "Δ",
-                  className: "text-lg text-left"
-                })
-          ]
-        }) : JsxRuntime.jsxs(JsxRuntime.Fragment, {
-          children: [
-            JsxRuntime.jsx("th", {
-                  children: JsxRuntime.jsx("button", {
-                        children: "Elo " + (
-                          ascOrder ? "↑" : "↓"
-                        ),
-                        "aria-label": "Toggle sort order",
-                        onClick: (function (param) {
-                            setOrder(function (order) {
-                                  return !order;
-                                });
-                          })
-                      }),
-                  className: "text-lg text-left"
-                }),
-            JsxRuntime.jsx("th", {
-                  children: "Δ",
-                  className: "text-lg text-left"
-                })
-          ]
-        });
+      children: [
+        JsxRuntime.jsx("th", {
+          children: JsxRuntime.jsx("button", {
+            children: "Score " + (
+              ascOrder ? "↑" : "↓"
+            ),
+            "aria-label": "Toggle sort order",
+            onClick: param => setOrder(order => !order)
+          }),
+          className: "text-lg text-left"
+        }),
+        JsxRuntime.jsx("th", {
+          children: "Δ",
+          className: "text-lg text-left"
+        })
+      ]
+    }) : JsxRuntime.jsxs(JsxRuntime.Fragment, {
+      children: [
+        JsxRuntime.jsx("th", {
+          children: JsxRuntime.jsx("button", {
+            children: "Elo " + (
+              ascOrder ? "↑" : "↓"
+            ),
+            "aria-label": "Toggle sort order",
+            onClick: param => setOrder(order => !order)
+          }),
+          className: "text-lg text-left"
+        }),
+        JsxRuntime.jsx("th", {
+          children: "Δ",
+          className: "text-lg text-left"
+        })
+      ]
+    });
   return JsxRuntime.jsxs("div", {
+    children: [
+      JsxRuntime.jsxs("header", {
+        children: [
+          JsxRuntime.jsx(Button.make, {
+            variant: "Blue",
+            onClick: param => setShow(s => !s),
+            children: "Terug"
+          }),
+          tmp
+        ],
+        className: "flex items-center gap-5"
+      }),
+      JsxRuntime.jsxs("table", {
+        children: [
+          JsxRuntime.jsx("thead", {
+            children: JsxRuntime.jsxs("tr", {
               children: [
-                JsxRuntime.jsxs("header", {
-                      children: [
-                        JsxRuntime.jsx(Button.make, {
-                              variant: "Blue",
-                              onClick: (function (param) {
-                                  setShow(function (s) {
-                                        return !s;
-                                      });
-                                }),
-                              children: "Terug"
-                            }),
-                        tmp
-                      ],
-                      className: "flex items-center gap-5"
+                JsxRuntime.jsx("th", {
+                  children: "#",
+                  className: "text-lg text-left",
+                  style: {
+                    width: "40px"
+                  }
+                }),
+                JsxRuntime.jsx("th", {
+                  children: "Speler",
+                  className: "text-lg text-left"
+                }),
+                tmp$1,
+                JsxRuntime.jsx("th", {
+                  children: "Last 5",
+                  className: "text-lg text-left"
+                }),
+                JsxRuntime.jsx("th", {
+                  children: "G/W",
+                  className: "text-lg text-left"
+                }),
+                JsxRuntime.jsx("th", {
+                  children: "Win%",
+                  className: "text-lg text-left"
+                })
+              ]
+            })
+          }),
+          JsxRuntime.jsx("tbody", {
+            children: displayPlayers.map(player => {
+              let match;
+              match = gameMode === "Foosball" ? [
+                  player.ordinal,
+                  player.lastOpenSkillChange,
+                  player.lastGames,
+                  player.wins,
+                  player.games
+                ] : [
+                  player.dartsElo,
+                  player.dartsLastEloChange,
+                  player.dartsLastGames,
+                  player.dartsWins,
+                  player.dartsGames
+                ];
+              let games = match[4];
+              let wins = match[3];
+              let currentPos = Core__Option.getOr(Js_dict.get(currentPositions, player.key), 0);
+              let previousPos = Core__Option.getOr(Js_dict.get(previousPositions, player.key), currentPos);
+              let delta = previousPos - currentPos | 0;
+              let deltaAbs = Pervasives.abs(delta);
+              let deltaColor = delta === 0 ? "text-gray-400" : (
+                  delta > 0 ? "text-green-400" : "text-red-400"
+                );
+              let tmp;
+              tmp = gameMode === "Foosball" ? JsxRuntime.jsxs(JsxRuntime.Fragment, {
+                  children: [
+                    JsxRuntime.jsx("td", {
+                      children: OpenSkillRating.toDisplayOrdinal(player.ordinal),
+                      title: "μ=" + round2(player.mu).toString() + " σ=" + round2(player.sigma).toString() + " ELO=" + round2(player.elo).toString()
                     }),
-                JsxRuntime.jsxs("table", {
-                      children: [
-                        JsxRuntime.jsx("thead", {
-                              children: JsxRuntime.jsxs("tr", {
-                                    children: [
-                                      JsxRuntime.jsx("th", {
-                                            children: "#",
-                                            className: "text-lg text-left",
-                                            style: {
-                                              width: "40px"
-                                            }
-                                          }),
-                                      JsxRuntime.jsx("th", {
-                                            children: "Speler",
-                                            className: "text-lg text-left"
-                                          }),
-                                      tmp$1,
-                                      JsxRuntime.jsx("th", {
-                                            children: "Last 5",
-                                            className: "text-lg text-left"
-                                          }),
-                                      JsxRuntime.jsx("th", {
-                                            children: "G/W",
-                                            className: "text-lg text-left"
-                                          }),
-                                      JsxRuntime.jsx("th", {
-                                            children: "Win%",
-                                            className: "text-lg text-left"
-                                          })
-                                    ]
-                                  })
-                            }),
-                        JsxRuntime.jsx("tbody", {
-                              children: displayPlayers.map(function (player) {
-                                    var match;
-                                    match = gameMode === "Foosball" ? [
-                                        player.ordinal,
-                                        player.lastOpenSkillChange,
-                                        player.lastGames,
-                                        player.wins,
-                                        player.games
-                                      ] : [
-                                        player.dartsElo,
-                                        player.dartsLastEloChange,
-                                        player.dartsLastGames,
-                                        player.dartsWins,
-                                        player.dartsGames
-                                      ];
-                                    var games = match[4];
-                                    var wins = match[3];
-                                    var currentPos = Core__Option.getOr(Js_dict.get(currentPositions, player.key), 0);
-                                    var previousPos = Core__Option.getOr(Js_dict.get(previousPositions, player.key), currentPos);
-                                    var delta = previousPos - currentPos | 0;
-                                    var deltaAbs = PervasivesU.abs(delta);
-                                    var deltaColor = delta === 0 ? "text-gray-400" : (
-                                        delta > 0 ? "text-green-400" : "text-red-400"
-                                      );
-                                    var tmp;
-                                    tmp = gameMode === "Foosball" ? JsxRuntime.jsxs(JsxRuntime.Fragment, {
-                                            children: [
-                                              JsxRuntime.jsx("td", {
-                                                    children: OpenSkillRating.toDisplayOrdinal(player.ordinal),
-                                                    title: "μ=" + round2(player.mu).toString() + " σ=" + round2(player.sigma).toString() + " ELO=" + round2(player.elo).toString()
-                                                  }),
-                                              JsxRuntime.jsx("td", {
-                                                    children: JsxRuntime.jsx("small", {
-                                                          children: delta === 0 ? "-" : deltaAbs,
-                                                          className: deltaColor
-                                                        })
-                                                  })
-                                            ]
-                                          }) : JsxRuntime.jsxs(JsxRuntime.Fragment, {
-                                            children: [
-                                              JsxRuntime.jsx("td", {
-                                                    children: Elo.roundScore(player.dartsElo)
-                                                  }),
-                                              JsxRuntime.jsx("td", {
-                                                    children: JsxRuntime.jsx("small", {
-                                                          children: delta === 0 ? "-" : deltaAbs,
-                                                          className: deltaColor
-                                                        })
-                                                  })
-                                            ]
-                                          });
-                                    return JsxRuntime.jsxs("tr", {
-                                                children: [
-                                                  JsxRuntime.jsx("td", {
-                                                        children: currentPos.toString(),
-                                                        className: "font-semibold"
-                                                      }),
-                                                  JsxRuntime.jsx("td", {
-                                                        children: player.name
-                                                      }),
-                                                  tmp,
-                                                  JsxRuntime.jsx("td", {
-                                                        children: JsxRuntime.jsx("div", {
-                                                              children: match[2].map(function (win, i) {
-                                                                    return JsxRuntime.jsx("span", {
-                                                                                className: "w-1 h-1 rounded block " + (
-                                                                                  win === 1 ? "bg-green-400" : "bg-red-400"
-                                                                                )
-                                                                              }, i.toString());
-                                                                  }),
-                                                              className: "inline-flex gap-1 w-9"
-                                                            })
-                                                      }),
-                                                  JsxRuntime.jsxs("td", {
-                                                        children: [
-                                                          games,
-                                                          ":",
-                                                          wins
-                                                        ]
-                                                      }),
-                                                  JsxRuntime.jsxs("td", {
-                                                        children: [
-                                                          Math.round(games > 0 ? wins / games * 100 : 0.0) | 0,
-                                                          "%"
-                                                        ]
-                                                      })
-                                                ]
-                                              }, player.key);
-                                  })
-                            })
-                      ],
-                      className: "table-fixed w-full mt-8"
+                    JsxRuntime.jsx("td", {
+                      children: JsxRuntime.jsx("small", {
+                        children: delta === 0 ? "-" : deltaAbs,
+                        className: deltaColor
+                      })
                     })
-              ],
-              className: "modal",
-              style: {
-                transform: props.show ? "translateX(0)" : "translateX(-100%)"
-              }
-            });
+                  ]
+                }) : JsxRuntime.jsxs(JsxRuntime.Fragment, {
+                  children: [
+                    JsxRuntime.jsx("td", {
+                      children: Elo.roundScore(player.dartsElo)
+                    }),
+                    JsxRuntime.jsx("td", {
+                      children: JsxRuntime.jsx("small", {
+                        children: delta === 0 ? "-" : deltaAbs,
+                        className: deltaColor
+                      })
+                    })
+                  ]
+                });
+              return JsxRuntime.jsxs("tr", {
+                children: [
+                  JsxRuntime.jsx("td", {
+                    children: currentPos.toString(),
+                    className: "font-semibold"
+                  }),
+                  JsxRuntime.jsx("td", {
+                    children: player.name
+                  }),
+                  tmp,
+                  JsxRuntime.jsx("td", {
+                    children: JsxRuntime.jsx("div", {
+                      children: match[2].map((win, i) => JsxRuntime.jsx("span", {
+                        className: "w-1 h-1 rounded block " + (
+                          win === 1 ? "bg-green-400" : "bg-red-400"
+                        )
+                      }, i.toString())),
+                      className: "inline-flex gap-1 w-9"
+                    })
+                  }),
+                  JsxRuntime.jsxs("td", {
+                    children: [
+                      games,
+                      ":",
+                      wins
+                    ]
+                  }),
+                  JsxRuntime.jsxs("td", {
+                    children: [
+                      Math.round(games > 0 ? wins / games * 100 : 0.0) | 0,
+                      "%"
+                    ]
+                  })
+                ]
+              }, player.key);
+            })
+          })
+        ],
+        className: "table-fixed w-full mt-8"
+      })
+    ],
+    className: "modal",
+    style: {
+      transform: props.show ? "translateX(0)" : "translateX(-100%)"
+    }
+  });
 }
 
-var make = LeaderboardModal;
+let make = LeaderboardModal;
 
 export {
-  make ,
+  make,
 }
 /* react Not a pure module */

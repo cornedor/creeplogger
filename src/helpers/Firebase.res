@@ -25,17 +25,17 @@ type authConfig = {
   "authDomain": string,
 }
 
-type emulatorConfig = {"protocol": string, "host": string, "port": Js.Nullable.t<int>}
+type emulatorConfig = {"protocol": string, "host": string, "port": Nullable.t<int>}
 
 type authSettings = {"appVerificationDisabledForTesting": bool}
 
-type userMetadata = {"creationTime": Js.Nullable.t<string>, "lastSignInTime": Js.Nullable.t<string>}
+type userMetadata = {"creationTime": Nullable.t<string>, "lastSignInTime": Nullable.t<string>}
 
 type userInfo = {
-  "displayName": Js.Nullable.t<string>,
-  "email": Js.Nullable.t<string>,
-  "phoneNumber": Js.Nullable.t<string>,
-  "photoURL": Js.Nullable.t<string>,
+  "displayName": Nullable.t<string>,
+  "email": Nullable.t<string>,
+  "phoneNumber": Nullable.t<string>,
+  "photoURL": Nullable.t<string>,
   "providerId": string,
   "uid": string,
 }
@@ -47,13 +47,13 @@ type user = {
   "metadata": userMetadata,
   "providerData": array<userInfo>,
   "refreshToken": string,
-  "tenantId": Js.Nullable.t<string>,
+  "tenantId": Nullable.t<string>,
 }
 
 type userCredential = {
   "user": user,
-  "providerId": Js.Nullable.t<string>,
-  "operationType": Js.Nullable.t<[#link | #reauthenticate | #signIn]>,
+  "providerId": Nullable.t<string>,
+  "operationType": Nullable.t<[#link | #reauthenticate | #signIn]>,
 }
 
 @genType
@@ -61,11 +61,11 @@ type auth = {
   "app": firebaseApp,
   "name": string,
   "config": authConfig,
-  "languageCode": Js.Nullable.t<string>,
-  "tenantId": Js.Nullable.t<string>,
+  "languageCode": Nullable.t<string>,
+  "tenantId": Nullable.t<string>,
   "settings": authSettings,
-  "currentUser": Js.Nullable.t<user>,
-  "emulatorConfig": Js.Nullable.t<emulatorConfig>,
+  "currentUser": Nullable.t<user>,
+  "emulatorConfig": Nullable.t<emulatorConfig>,
 }
 
 @genType
@@ -74,16 +74,16 @@ type database = {"app": firebaseApp, "type": [#database]}
 @genType
 type rec databaseReference = {
   "ref": databaseReference,
-  "isEqual": Js.Nullable.t<query> => bool,
+  "isEqual": Nullable.t<query> => bool,
   "toJSON": unit => string,
   "toString": unit => string,
-  "key": Js.Nullable.t<string>,
-  "parent": Js.Nullable.t<databaseReference>,
-  "root": Js.Nullable.t<databaseReference>,
+  "key": Nullable.t<string>,
+  "parent": Nullable.t<databaseReference>,
+  "root": Nullable.t<databaseReference>,
 }
 and query = {
   "ref": databaseReference,
-  "isEqual": Js.Nullable.t<query> => bool,
+  "isEqual": Nullable.t<query> => bool,
   "toJSON": unit => string,
   "toString": unit => string,
 }
@@ -107,8 +107,8 @@ type priority = String(string) | Number(int) | Float(float)
 
 type rec dataSnapshot = {
   "ref": databaseReference,
-  "priority": Js.Nullable.t<priority>,
-  "key": Js.Nullable.t<string>,
+  "priority": Nullable.t<priority>,
+  "key": Nullable.t<string>,
   "size": int,
 }
 
@@ -131,34 +131,34 @@ module Firebase = {
     @module("firebase/auth")
     external onAuthStateChanged: (
       auth,
-      Js.Nullable.t<user> => 'a,
+      Nullable.t<user> => 'a,
       ~error: Js.Exn.t => unit=?,
       ~complete: unit => unit=?,
       unit,
     ) => unsubscribe = "onAuthStateChanged"
     @module("firebase/auth")
-    external observeOnAuthStateChange: (auth, observer<Js.Nullable.t<user>>) => unsubscribe =
+    external observeOnAuthStateChange: (auth, observer<Nullable.t<user>>) => unsubscribe =
       "onAuthStateChanged"
     @module("firebase/auth")
     external beforeAuthStateChanged: (
       auth,
-      Js.Nullable.t<user> => unit,
+      Nullable.t<user> => unit,
       ~onAbort: unit => unit=?,
       unit,
     ) => unsubscribe = "onAuthStateChanged"
     @module("firebase/auth")
     external onIdTokenChanged: (
       auth,
-      Js.Nullable.t<user> => 'a,
+      Nullable.t<user> => 'a,
       ~error: Js.Exn.t => unit=?,
       ~complete: unit => unit=?,
       unit,
     ) => unsubscribe = "onIdTokenChanged"
     @module("firebase/auth")
-    external observeOnIdTokenChange: (auth, observer<Js.Nullable.t<user>>) => unsubscribe =
+    external observeOnIdTokenChange: (auth, observer<Nullable.t<user>>) => unsubscribe =
       "onIdTokenChanged"
     @module("firebase/auth")
-    external updateCurrentUser: (auth, Js.Nullable.t<user>) => Js.Promise.t<unit> =
+    external updateCurrentUser: (auth, Nullable.t<user>) => Js.Promise.t<unit> =
       "updateCurrentUser"
     @module("firebase/auth")
     external useDeviceLanguage: auth => unit = "useDeviceLanguage"
@@ -258,12 +258,12 @@ module Firebase = {
 
       @send external child: dataSnapshot => dataSnapshot = "child"
       @send external exists: dataSnapshot => bool = "exists"
-      @send external exportVal: dataSnapshot => Js.Json.t = "exportVal"
+      @send external exportVal: dataSnapshot => JSON.t = "exportVal"
       @send external forEach: (dataSnapshot, dataSnapshot => bool) => bool = "forEach"
       @send external hasChild: (dataSnapshot, string) => bool = "hasChild"
       @send external hasChildren: dataSnapshot => bool = "hasChildren"
-      @send external toJSON: dataSnapshot => Js.Nullable.t<Js.Json.t> = "toJSON"
-      @send external val: dataSnapshot => Js.Nullable.t<Js.Json.t> = "val"
+      @send external toJSON: dataSnapshot => Nullable.t<JSON.t> = "toJSON"
+      @send external val: dataSnapshot => Nullable.t<JSON.t> = "val"
       @val external snapshot: dataSnapshot = "snapshot"
     }
   }

@@ -2,312 +2,291 @@
 
 import * as S$RescriptSchema from "rescript-schema/src/S.bs.mjs";
 
-var Path = S$RescriptSchema.Path;
+let Path = S$RescriptSchema.Path;
 
-var Raised = S$RescriptSchema.Raised;
+let Raised = S$RescriptSchema.Raised;
 
-var $$Error = S$RescriptSchema.$$Error;
+let Flag = S$RescriptSchema.Flag;
 
-var Literal = S$RescriptSchema.Literal;
+let $$Error = S$RescriptSchema.$$Error;
 
-var never = S$RescriptSchema.never;
+let Literal = S$RescriptSchema.Literal;
 
-var unknown = S$RescriptSchema.unknown;
+let never = S$RescriptSchema.never;
 
-var unit = S$RescriptSchema.unit;
+let unknown = S$RescriptSchema.unknown;
 
-var string = S$RescriptSchema.string;
+let unit = S$RescriptSchema.unit;
 
-var bool = S$RescriptSchema.bool;
+let string = S$RescriptSchema.string;
 
-var $$int = S$RescriptSchema.$$int;
+let bool = S$RescriptSchema.bool;
 
-var $$float = S$RescriptSchema.$$float;
+let int = S$RescriptSchema.int;
 
-var bigint = S$RescriptSchema.bigint;
+let float = S$RescriptSchema.float;
 
-var json = S$RescriptSchema.json;
+let bigint = S$RescriptSchema.bigint;
 
-var literal = S$RescriptSchema.literal;
+let json = S$RescriptSchema.json;
 
-var array = S$RescriptSchema.array;
+let literal = S$RescriptSchema.literal;
 
-var list = S$RescriptSchema.list;
+let array = S$RescriptSchema.array;
 
-var dict = S$RescriptSchema.dict;
+let unnest = S$RescriptSchema.unnest;
 
-var option = S$RescriptSchema.option;
+let list = S$RescriptSchema.list;
 
-var $$null = S$RescriptSchema.$$null;
+let dict = S$RescriptSchema.dict;
 
-var nullable = S$RescriptSchema.nullable;
+let option = S$RescriptSchema.option;
 
-var jsonString = S$RescriptSchema.jsonString;
+let $$null = S$RescriptSchema.$$null;
 
-var union = S$RescriptSchema.union;
+let nullable = S$RescriptSchema.nullable;
 
-var $$enum = S$RescriptSchema.$$enum;
+let jsonString = S$RescriptSchema.jsonString;
 
-var Catch = S$RescriptSchema.Catch;
+let union = S$RescriptSchema.union;
 
-var $$catch = S$RescriptSchema.$$catch;
+let $$enum = S$RescriptSchema.$$enum;
 
-var describe = S$RescriptSchema.describe;
+let Catch = S$RescriptSchema.Catch;
 
-var description = S$RescriptSchema.description;
+let $$catch = S$RescriptSchema.$$catch;
 
-var deprecate = S$RescriptSchema.deprecate;
+let describe = S$RescriptSchema.describe;
 
-var deprecation = S$RescriptSchema.deprecation;
+let description = S$RescriptSchema.description;
 
-var transform = S$RescriptSchema.transform;
+let deprecate = S$RescriptSchema.deprecate;
 
-var preprocess = S$RescriptSchema.preprocess;
+let deprecation = S$RescriptSchema.deprecation;
 
-var custom = S$RescriptSchema.custom;
+let transform = S$RescriptSchema.transform;
 
-var refine = S$RescriptSchema.refine;
+let preprocess = S$RescriptSchema.preprocess;
 
-var variant = S$RescriptSchema.variant;
+let custom = S$RescriptSchema.custom;
 
-var to = S$RescriptSchema.to;
+let refine = S$RescriptSchema.refine;
 
-var compile = S$RescriptSchema.compile;
+let to = S$RescriptSchema.to;
 
-var parseWith = S$RescriptSchema.parseWith;
+let shape = S$RescriptSchema.shape;
 
-var parseAnyWith = S$RescriptSchema.parseAnyWith;
+let coerce = S$RescriptSchema.coerce;
 
-var parseJsonStringWith = S$RescriptSchema.parseJsonStringWith;
+let compile = S$RescriptSchema.compile;
 
-var parseOrRaiseWith = S$RescriptSchema.parseOrRaiseWith;
+let parseOrThrow = S$RescriptSchema.parseOrThrow;
 
-var parseAnyOrRaiseWith = S$RescriptSchema.parseAnyOrRaiseWith;
+let parseJsonOrThrow = S$RescriptSchema.parseJsonOrThrow;
 
-var parseAsyncWith = S$RescriptSchema.parseAsyncWith;
+let parseJsonStringOrThrow = S$RescriptSchema.parseJsonStringOrThrow;
 
-var parseAnyAsyncWith = S$RescriptSchema.parseAnyAsyncWith;
+let parseAsyncOrThrow = S$RescriptSchema.parseAsyncOrThrow;
 
-var convertAnyWith = S$RescriptSchema.convertAnyWith;
+let convertOrThrow = S$RescriptSchema.convertOrThrow;
 
-var convertAnyToJsonWith = S$RescriptSchema.convertAnyToJsonWith;
+let convertToJsonOrThrow = S$RescriptSchema.convertToJsonOrThrow;
 
-var convertAnyToJsonStringWith = S$RescriptSchema.convertAnyToJsonStringWith;
+let convertToJsonStringOrThrow = S$RescriptSchema.convertToJsonStringOrThrow;
 
-var convertAnyAsyncWith = S$RescriptSchema.convertAnyAsyncWith;
+let convertAsyncOrThrow = S$RescriptSchema.convertAsyncOrThrow;
 
-var reverseConvertWith = S$RescriptSchema.reverseConvertWith;
+let reverseConvertOrThrow = S$RescriptSchema.reverseConvertOrThrow;
 
-var reverseConvertToJsonWith = S$RescriptSchema.reverseConvertToJsonWith;
+let reverseConvertToJsonOrThrow = S$RescriptSchema.reverseConvertToJsonOrThrow;
 
-var reverseConvertToJsonStringWith = S$RescriptSchema.reverseConvertToJsonStringWith;
+let reverseConvertToJsonStringOrThrow = S$RescriptSchema.reverseConvertToJsonStringOrThrow;
 
-var serializeWith = S$RescriptSchema.serializeWith;
+let assertOrThrow = S$RescriptSchema.assertOrThrow;
 
-var serializeToUnknownWith = S$RescriptSchema.serializeToUnknownWith;
+let isAsync = S$RescriptSchema.isAsync;
 
-var serializeToJsonStringWith = S$RescriptSchema.serializeToJsonStringWith;
+let recursive = S$RescriptSchema.recursive;
 
-var serializeOrRaiseWith = S$RescriptSchema.serializeOrRaiseWith;
+let setName = S$RescriptSchema.setName;
 
-var serializeToUnknownOrRaiseWith = S$RescriptSchema.serializeToUnknownOrRaiseWith;
+let removeTypeValidation = S$RescriptSchema.removeTypeValidation;
 
-var serializeToJsonStringOrRaiseWith = S$RescriptSchema.serializeToJsonStringOrRaiseWith;
+let Schema = S$RescriptSchema.Schema;
 
-var assertOrRaiseWith = S$RescriptSchema.assertOrRaiseWith;
+let schema = S$RescriptSchema.schema;
 
-var assertAnyWith = S$RescriptSchema.assertAnyWith;
+let $$Object = S$RescriptSchema.$$Object;
 
-var assertWith = S$RescriptSchema.assertWith;
+let object = S$RescriptSchema.object;
 
-var isAsyncParse = S$RescriptSchema.isAsyncParse;
+let strip = S$RescriptSchema.strip;
 
-var isAsync = S$RescriptSchema.isAsync;
+let deepStrip = S$RescriptSchema.deepStrip;
 
-var recursive = S$RescriptSchema.recursive;
+let strict = S$RescriptSchema.strict;
 
-var classify = S$RescriptSchema.classify;
+let deepStrict = S$RescriptSchema.deepStrict;
 
-var setName = S$RescriptSchema.setName;
+let Tuple = S$RescriptSchema.Tuple;
 
-var removeTypeValidation = S$RescriptSchema.removeTypeValidation;
+let tuple = S$RescriptSchema.tuple;
 
-var unwrap = S$RescriptSchema.unwrap;
+let tuple1 = S$RescriptSchema.tuple1;
 
-var Schema = S$RescriptSchema.Schema;
+let tuple2 = S$RescriptSchema.tuple2;
 
-var schema = S$RescriptSchema.schema;
+let tuple3 = S$RescriptSchema.tuple3;
 
-var $$Object = S$RescriptSchema.$$Object;
+let Option = S$RescriptSchema.Option;
 
-var object = S$RescriptSchema.object;
+let $$String = S$RescriptSchema.$$String;
 
-var Tuple = S$RescriptSchema.Tuple;
+let Int = S$RescriptSchema.Int;
 
-var tuple = S$RescriptSchema.tuple;
+let Float = S$RescriptSchema.Float;
 
-var tuple1 = S$RescriptSchema.tuple1;
+let $$Array = S$RescriptSchema.$$Array;
 
-var tuple2 = S$RescriptSchema.tuple2;
+let Metadata = S$RescriptSchema.Metadata;
 
-var tuple3 = S$RescriptSchema.tuple3;
+let inline = S$RescriptSchema.inline;
 
-var $$Option = S$RescriptSchema.$$Option;
+let reverse = S$RescriptSchema.reverse;
 
-var $$String = S$RescriptSchema.$$String;
+let intMin = S$RescriptSchema.intMin;
 
-var Int = S$RescriptSchema.Int;
+let intMax = S$RescriptSchema.intMax;
 
-var Float = S$RescriptSchema.Float;
+let port = S$RescriptSchema.port;
 
-var $$Array = S$RescriptSchema.$$Array;
+let floatMin = S$RescriptSchema.floatMin;
 
-var Metadata = S$RescriptSchema.Metadata;
+let floatMax = S$RescriptSchema.floatMax;
 
-var inline = S$RescriptSchema.inline;
+let arrayMinLength = S$RescriptSchema.arrayMinLength;
 
-var reverse = S$RescriptSchema.reverse;
+let arrayMaxLength = S$RescriptSchema.arrayMaxLength;
 
-var intMin = S$RescriptSchema.intMin;
+let arrayLength = S$RescriptSchema.arrayLength;
 
-var intMax = S$RescriptSchema.intMax;
+let stringMinLength = S$RescriptSchema.stringMinLength;
 
-var port = S$RescriptSchema.port;
+let stringMaxLength = S$RescriptSchema.stringMaxLength;
 
-var floatMin = S$RescriptSchema.floatMin;
+let stringLength = S$RescriptSchema.stringLength;
 
-var floatMax = S$RescriptSchema.floatMax;
+let email = S$RescriptSchema.email;
 
-var arrayMinLength = S$RescriptSchema.arrayMinLength;
+let uuid = S$RescriptSchema.uuid;
 
-var arrayMaxLength = S$RescriptSchema.arrayMaxLength;
+let cuid = S$RescriptSchema.cuid;
 
-var arrayLength = S$RescriptSchema.arrayLength;
+let url = S$RescriptSchema.url;
 
-var stringMinLength = S$RescriptSchema.stringMinLength;
+let pattern = S$RescriptSchema.pattern;
 
-var stringMaxLength = S$RescriptSchema.stringMaxLength;
+let datetime = S$RescriptSchema.datetime;
 
-var stringLength = S$RescriptSchema.stringLength;
+let trim = S$RescriptSchema.trim;
 
-var email = S$RescriptSchema.email;
-
-var uuid = S$RescriptSchema.uuid;
-
-var cuid = S$RescriptSchema.cuid;
-
-var url = S$RescriptSchema.url;
-
-var pattern = S$RescriptSchema.pattern;
-
-var datetime = S$RescriptSchema.datetime;
-
-var trim = S$RescriptSchema.trim;
-
-var setGlobalConfig = S$RescriptSchema.setGlobalConfig;
+let setGlobalConfig = S$RescriptSchema.setGlobalConfig;
 
 export {
-  Path ,
-  Raised ,
-  $$Error ,
-  Literal ,
-  never ,
-  unknown ,
-  unit ,
-  string ,
-  bool ,
-  $$int ,
-  $$float ,
-  bigint ,
-  json ,
-  literal ,
-  array ,
-  list ,
-  dict ,
-  option ,
-  $$null ,
-  nullable ,
-  jsonString ,
-  union ,
-  $$enum ,
-  Catch ,
-  $$catch ,
-  describe ,
-  description ,
-  deprecate ,
-  deprecation ,
-  transform ,
-  preprocess ,
-  custom ,
-  refine ,
-  variant ,
-  to ,
-  compile ,
-  parseWith ,
-  parseAnyWith ,
-  parseJsonStringWith ,
-  parseOrRaiseWith ,
-  parseAnyOrRaiseWith ,
-  parseAsyncWith ,
-  parseAnyAsyncWith ,
-  convertAnyWith ,
-  convertAnyToJsonWith ,
-  convertAnyToJsonStringWith ,
-  convertAnyAsyncWith ,
-  reverseConvertWith ,
-  reverseConvertToJsonWith ,
-  reverseConvertToJsonStringWith ,
-  serializeWith ,
-  serializeToUnknownWith ,
-  serializeToJsonStringWith ,
-  serializeOrRaiseWith ,
-  serializeToUnknownOrRaiseWith ,
-  serializeToJsonStringOrRaiseWith ,
-  assertOrRaiseWith ,
-  assertAnyWith ,
-  assertWith ,
-  isAsyncParse ,
-  isAsync ,
-  recursive ,
-  classify ,
-  setName ,
-  removeTypeValidation ,
-  unwrap ,
-  Schema ,
-  schema ,
-  $$Object ,
-  object ,
-  Tuple ,
-  tuple ,
-  tuple1 ,
-  tuple2 ,
-  tuple3 ,
-  $$Option ,
-  $$String ,
-  Int ,
-  Float ,
-  $$Array ,
-  Metadata ,
-  inline ,
-  reverse ,
-  intMin ,
-  intMax ,
-  port ,
-  floatMin ,
-  floatMax ,
-  arrayMinLength ,
-  arrayMaxLength ,
-  arrayLength ,
-  stringMinLength ,
-  stringMaxLength ,
-  stringLength ,
-  email ,
-  uuid ,
-  cuid ,
-  url ,
-  pattern ,
-  datetime ,
-  trim ,
-  setGlobalConfig ,
+  Path,
+  Raised,
+  Flag,
+  $$Error,
+  Literal,
+  never,
+  unknown,
+  unit,
+  string,
+  bool,
+  int,
+  float,
+  bigint,
+  json,
+  literal,
+  array,
+  unnest,
+  list,
+  dict,
+  option,
+  $$null,
+  nullable,
+  jsonString,
+  union,
+  $$enum,
+  Catch,
+  $$catch,
+  describe,
+  description,
+  deprecate,
+  deprecation,
+  transform,
+  preprocess,
+  custom,
+  refine,
+  to,
+  shape,
+  coerce,
+  compile,
+  parseOrThrow,
+  parseJsonOrThrow,
+  parseJsonStringOrThrow,
+  parseAsyncOrThrow,
+  convertOrThrow,
+  convertToJsonOrThrow,
+  convertToJsonStringOrThrow,
+  convertAsyncOrThrow,
+  reverseConvertOrThrow,
+  reverseConvertToJsonOrThrow,
+  reverseConvertToJsonStringOrThrow,
+  assertOrThrow,
+  isAsync,
+  recursive,
+  setName,
+  removeTypeValidation,
+  Schema,
+  schema,
+  $$Object,
+  object,
+  strip,
+  deepStrip,
+  strict,
+  deepStrict,
+  Tuple,
+  tuple,
+  tuple1,
+  tuple2,
+  tuple3,
+  Option,
+  $$String,
+  Int,
+  Float,
+  $$Array,
+  Metadata,
+  inline,
+  reverse,
+  intMin,
+  intMax,
+  port,
+  floatMin,
+  floatMax,
+  arrayMinLength,
+  arrayMaxLength,
+  arrayLength,
+  stringMinLength,
+  stringMaxLength,
+  stringLength,
+  email,
+  uuid,
+  cuid,
+  url,
+  pattern,
+  datetime,
+  trim,
+  setGlobalConfig,
 }
 /* S-RescriptSchema Not a pure module */

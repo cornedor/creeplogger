@@ -32,9 +32,10 @@ let fetchStats = async () => {
   let stats = await Firebase.Database.refPath(Database.database, bucket)->Firebase.Database.get
   switch stats->Firebase.Database.Snapshot.val->Js.toOption {
   | Some(stats) =>
-    switch Schema.parseWith(stats, statsSchema) {
-    | Ok(stats) => Some(stats)
-    | Error(error) => {
+    try {
+      Some(stats->Schema.parseOrThrow(statsSchema))
+    } catch {
+    | error => {
         Console.error(error)
         None
       }
@@ -52,9 +53,10 @@ let useStats = () => {
       snapshot => {
         switch snapshot->Firebase.Database.Snapshot.val->Js.toOption {
         | Some(stats) =>
-          switch Schema.parseWith(stats, statsSchema) {
-          | Ok(stats) => setStats(_ => stats)
-          | Error(error) => Console.error(error)
+          try {
+            setStats(_ => stats->Schema.parseOrThrow(statsSchema))
+          } catch {
+          | error => Console.error(error)
           }
         | None => ()
         }
@@ -74,21 +76,17 @@ let updateStats = async (redScore, blueScore) => {
   let isAbsolute = Rules.isAbsolute(redScore, blueScore)
   let statsRef = Firebase.Database.refPath(Database.database, bucket)
   Firebase.Database.runTransaction(statsRef, data => {
-    switch data->Schema.parseWith(statsSchema) {
-    | Ok(data) => {
-        let newData = Schema.reverseConvertToJsonWith(
-          {
-            ...data,
-            totalGames: data.totalGames + 1,
-            totalRedWins: data.totalRedWins + (redWin ? 1 : 0),
-            totalBlueWins: data.totalBlueWins + (blueWin ? 1 : 0),
-            totalAbsoluteWins: data.totalAbsoluteWins + (isAbsolute ? 1 : 0),
-          },
-          statsSchema,
-        )
-        newData
-      }
-    | Error(_) => panic("Failed parsing stats")
+    try {
+      let parsedData = data->Schema.parseOrThrow(statsSchema)
+      {
+        ...parsedData,
+        totalGames: parsedData.totalGames + 1,
+        totalRedWins: parsedData.totalRedWins + (redWin ? 1 : 0),
+        totalBlueWins: parsedData.totalBlueWins + (blueWin ? 1 : 0),
+        totalAbsoluteWins: parsedData.totalAbsoluteWins + (isAbsolute ? 1 : 0),
+      }->Schema.convertToJsonOrThrow(statsSchema)
+    } catch {
+    | _ => panic("Failed parsing stats")
     }
   })
 }
@@ -96,30 +94,26 @@ let updateStats = async (redScore, blueScore) => {
 let updateDartsStats = async () => {
   let statsRef = Firebase.Database.refPath(Database.database, bucket)
   Firebase.Database.runTransaction(statsRef, data => {
-    switch data->Schema.parseWith(statsSchema) {
-    | Ok(data) => {
-        let newData = Schema.reverseConvertToJsonWith(
-          {
-            ...data,
-            totalDartsGames: data.totalDartsGames + 1,
-          },
-          statsSchema,
-        )
-        newData
-      }
-    | Error(_) => panic("Failed parsing stats")
+    try {
+      let parsedData = data->Schema.parseOrThrow(statsSchema)
+      {
+        ...parsedData,
+        totalDartsGames: parsedData.totalDartsGames + 1,
+      }->Schema.convertToJsonOrThrow(statsSchema)
+    } catch {
+    | _ => panic("Failed parsing stats")
     }
   })
 }
 
 let writeStats = async stats => {
   let statsRef = Firebase.Database.refPath(Database.database, bucket)
-  let data = switch stats->Schema.serializeWith(statsSchema) {
-  | Ok(data) => {
-      Js.log2("Log", data)
-      data
-    }
-  | Error(_) => panic("Could not serialize stats")
+  let data = try {
+    let data = stats->Schema.convertToJsonOrThrow(statsSchema)
+    Js.log2("Log", data)
+    data
+  } catch {
+  | _ => panic("Could not serialize stats")
   }
   await Firebase.Database.set(statsRef, data)
 }

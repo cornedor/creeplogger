@@ -4,16 +4,15 @@
 function getNextStep(step) {
   switch (step) {
     case "UserSelection" :
-        return "ScoreForm";
+      return "ScoreForm";
     case "ScoreForm" :
-        return "Confirmation";
+      return "Confirmation";
     case "Confirmation" :
-        return "UserSelection";
-    
+      return "UserSelection";
   }
 }
 
 export {
-  getNextStep ,
+  getNextStep,
 }
 /* No side effect */

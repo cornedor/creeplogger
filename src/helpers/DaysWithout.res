@@ -27,12 +27,12 @@ let useDaysWithout = () => {
       snapshot => {
         switch Firebase.Database.Snapshot.val(snapshot)->Js.toOption {
         | Some(data) =>
-          switch Schema.parseWith(data, daysWithoutSchema) {
-          | Ok(daysWithout) => {
-              setName(_ => daysWithout.name)
-              setDate(_ => daysWithout.date)
-            }
-          | Error(error) => Js.log(error)
+          try {
+            let daysWithout = data->Schema.parseOrThrow(daysWithoutSchema)
+            setName(_ => daysWithout.name)
+            setDate(_ => daysWithout.date)
+          } catch {
+          | error => Js.log(error)
           }
         | None => Js.log("No data")
         }
@@ -53,9 +53,14 @@ let reset = async () => {
   let daysWithoutRef = Firebase.Database.refPath(Database.database, "daysWithout")
   let daysWithoutVal = await Firebase.Database.get(daysWithoutRef)
 
-  let name = switch Schema.parseWith(daysWithoutVal, daysWithoutSchema) {
-  | Ok(daysWithout) => daysWithout.name
-  | Error(_) => "Days without an accident"
+  let name = try {
+    let val = daysWithoutVal->Firebase.Database.Snapshot.val->Js.toOption
+    switch val {
+    | Some(data) => (data->Schema.parseOrThrow(daysWithoutSchema)).name
+    | None => "Days without an accident"
+    }
+  } catch {
+  | _ => "Days without an accident"
   }
 
   /* Send notification to Mattermost */

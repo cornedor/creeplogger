@@ -4,13 +4,13 @@ import * as JsxRuntime from "react/jsx-runtime";
 
 function QueuePage(props) {
   return JsxRuntime.jsx("div", {
-              children: "Queue"
-            });
+    children: "Queue"
+  });
 }
 
-var make = QueuePage;
+let make = QueuePage;
 
 export {
-  make ,
+  make,
 }
 /* react/jsx-runtime Not a pure module */

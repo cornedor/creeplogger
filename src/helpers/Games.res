@@ -47,9 +47,11 @@ let gameSchema = Schema.object(s => {
 let addGame = game => {
   let gamesRef = Firebase.Database.refPath(Database.database, "games")
 
-  switch Schema.serializeWith(game, gameSchema) {
-  | Ok(data) => Firebase.Database.pushValue(gamesRef, data)
-  | Error(_) => panic("Could not create game")
+  try {
+    let data = Schema.convertToJsonOrThrow(game, gameSchema)
+    Firebase.Database.pushValue(gamesRef, data)
+  } catch {
+  | _ => panic("Could not create game")
   }
 }
 
@@ -78,18 +80,19 @@ let getTimePeriod = async period => {
 
   switch games->Firebase.Database.Snapshot.val->Nullable.toOption {
   | Some(val) =>
-    switch val->Schema.parseWith(Schema.dict(gameSchema)) {
-    | Ok(val) => val
-    | Error(e) => {
+    try {
+      val->Schema.parseOrThrow(Schema.dict(gameSchema))
+    } catch {
+    | e => {
         Js.log(e)
-        Js.Dict.empty()
+        {}
       }
     }
-  | None => Js.Dict.empty()
+  | None => {}
   }
 }
 
-let empty: Js.Dict.t<game> = Js.Dict.empty()
+let empty: dict<game> = {}
 let useLastGames = () => {
   let (games, setGames) = React.useState(_ => empty)
   let gamesRef = Firebase.Database.query1(
@@ -102,11 +105,12 @@ let useLastGames = () => {
       snapshot => {
         let games = switch Firebase.Database.Snapshot.val(snapshot)->Nullable.toOption {
         | Some(val) =>
-          switch val->Schema.parseWith(Schema.dict(gameSchema)) {
-          | Ok(val) => val
-          | Error(e) => {
+          try {
+            val->Schema.parseOrThrow(Schema.dict(gameSchema))
+          } catch {
+          | e => {
               Js.log(e)
-              Js.Dict.empty()
+              empty
             }
           }
         | None => empty
@@ -135,9 +139,11 @@ let fetchAllGames = async () => {
   Array.forEach(snapshotToArray(games), snap => {
     switch snap->Firebase.Database.Snapshot.val->Nullable.toOption {
     | Some(val) =>
-      switch val->Schema.parseWith(gameSchema) {
-      | Ok(val) => orderedGames->Array.push(val)
-      | Error(e) => Js.log(e)
+      try {
+        let val = val->Schema.parseOrThrow(gameSchema)
+        orderedGames->Array.push(val)
+      } catch {
+      | e => Js.log(e)
       }
     | None => ()
     }

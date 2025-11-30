@@ -17,239 +17,196 @@ import * as LeaderboardModal from "./LeaderboardModal.bs.mjs";
 import * as JsxRuntime from "react/jsx-runtime";
 import * as HeaderModuleCss from "./header.module.css";
 
-var styles = HeaderModuleCss;
+let styles = HeaderModuleCss;
 
 function Header(props) {
-  var onMatchFound = props.onMatchFound;
-  var setSearchQuery = props.setSearchQuery;
-  var searchQuery = props.searchQuery;
-  var setGameMode = props.setGameMode;
-  var gameMode = props.gameMode;
-  var setShowQueueButtons = props.setShowQueueButtons;
-  var __disabled = props.disabled;
-  var onReset = props.onReset;
-  var onNextStep = props.onNextStep;
-  var disabled = __disabled !== undefined ? __disabled : false;
-  var user = Database.useUser();
-  var match = React.useState(function () {
-        return false;
-      });
-  var setShowScores = match[1];
-  var match$1 = React.useState(function () {
-        return false;
-      });
-  var setShowStats = match$1[1];
-  var match$2 = React.useState(function () {
-        return false;
-      });
-  var setShowMatchMaker = match$2[1];
-  var isConnected = FirebaseStatus.useFirebaseStatus();
-  var nextLabel;
+  let onMatchFound = props.onMatchFound;
+  let setSearchQuery = props.setSearchQuery;
+  let searchQuery = props.searchQuery;
+  let setGameMode = props.setGameMode;
+  let gameMode = props.gameMode;
+  let setShowQueueButtons = props.setShowQueueButtons;
+  let __disabled = props.disabled;
+  let onReset = props.onReset;
+  let onNextStep = props.onNextStep;
+  let disabled = __disabled !== undefined ? __disabled : false;
+  let user = Database.useUser();
+  let match = React.useState(() => false);
+  let setShowScores = match[1];
+  let match$1 = React.useState(() => false);
+  let setShowStats = match$1[1];
+  let match$2 = React.useState(() => false);
+  let setShowMatchMaker = match$2[1];
+  let isConnected = FirebaseStatus.useFirebaseStatus();
+  let nextLabel;
   switch (props.step) {
     case "ScoreForm" :
-        nextLabel = "Opslaan";
-        break;
+      nextLabel = "Opslaan";
+      break;
     case "UserSelection" :
     case "Confirmation" :
-        nextLabel = "Verder";
-        break;
-    
+      nextLabel = "Verder";
+      break;
   }
-  var tmp;
+  let tmp;
   tmp = setGameMode !== undefined ? (
       gameMode === "Foosball" ? JsxRuntime.jsx("button", {
-              children: JsxRuntime.jsx(SoccerIcon.make, {}),
-              className: "text-white w-[44px] aspect-square text-[26px] flex justify-center items-center -ml-3 rounded-full bg-black/0 transition-all ease-in-out duration-200 shadow-none hover:bg-black/20 hover:shadow-icon-button hover:ring-8 ring-black/20 active:bg-black/20 active:shadow-icon-button active:ring-8  plausible-event-name=GameModeDarts",
-              onClick: (function (param) {
-                  setGameMode(function (param) {
-                        return "Darts";
-                      });
-                })
-            }) : JsxRuntime.jsx("button", {
-              children: JsxRuntime.jsx(DartsIcon.make, {}),
-              className: "text-white w-[44px] aspect-square text-[26px] flex justify-center items-center -ml-3 rounded-full bg-black/0 transition-all ease-in-out duration-200 shadow-none hover:bg-black/20 hover:shadow-icon-button hover:ring-8 ring-black/20 active:bg-black/20 active:shadow-icon-button active:ring-8 ",
-              onClick: (function (param) {
-                  setGameMode(function (param) {
-                        return "Foosball";
-                      });
-                })
-            })
+          children: JsxRuntime.jsx(SoccerIcon.make, {}),
+          className: "text-white w-[44px] aspect-square text-[26px] flex justify-center items-center -ml-3 rounded-full bg-black/0 transition-all ease-in-out duration-200 shadow-none hover:bg-black/20 hover:shadow-icon-button hover:ring-8 ring-black/20 active:bg-black/20 active:shadow-icon-button active:ring-8  plausible-event-name=GameModeDarts",
+          onClick: param => setGameMode(param => "Darts")
+        }) : JsxRuntime.jsx("button", {
+          children: JsxRuntime.jsx(DartsIcon.make, {}),
+          className: "text-white w-[44px] aspect-square text-[26px] flex justify-center items-center -ml-3 rounded-full bg-black/0 transition-all ease-in-out duration-200 shadow-none hover:bg-black/20 hover:shadow-icon-button hover:ring-8 ring-black/20 active:bg-black/20 active:shadow-icon-button active:ring-8 ",
+          onClick: param => setGameMode(param => "Foosball")
+        })
     ) : JsxRuntime.jsx(JsxRuntime.Fragment, {});
-  var tmp$1;
-  tmp$1 = user === null || user === undefined ? JsxRuntime.jsx(JsxRuntime.Fragment, {}) : JsxRuntime.jsx(Link, {
-          href: "/admin",
-          children: JsxRuntime.jsx(AdminIcon.make, {}),
-          className: "text-white w-[44px] aspect-square text-[26px] flex justify-center items-center -ml-3 rounded-full bg-black/0 transition-all ease-in-out duration-200 shadow-none hover:bg-black/20 hover:shadow-icon-button hover:ring-8 ring-black/20 active:bg-black/20 active:shadow-icon-button active:ring-8 "
-        });
+  let tmp$1;
+  tmp$1 = (user == null) ? JsxRuntime.jsx(JsxRuntime.Fragment, {}) : JsxRuntime.jsx(Link, {
+      href: "/admin",
+      children: JsxRuntime.jsx(AdminIcon.make, {}),
+      className: "text-white w-[44px] aspect-square text-[26px] flex justify-center items-center -ml-3 rounded-full bg-black/0 transition-all ease-in-out duration-200 shadow-none hover:bg-black/20 hover:shadow-icon-button hover:ring-8 ring-black/20 active:bg-black/20 active:shadow-icon-button active:ring-8 "
+    });
   return JsxRuntime.jsxs(JsxRuntime.Fragment, {
+    children: [
+      JsxRuntime.jsx(LeaderboardModal.make, {
+        show: match[0],
+        setShow: setShowScores,
+        gameMode: gameMode,
+        setGameMode: setGameMode
+      }),
+      JsxRuntime.jsx(StatsModal.make, {
+        show: match$1[0],
+        setShow: setShowStats
+      }),
+      JsxRuntime.jsx(MatchMakerModal.make, {
+        show: match$2[0],
+        setShow: setShowMatchMaker,
+        setSelectedUsers: props.setSelectedUsers,
+        setGameMode: setGameMode,
+        onMatchFound: onMatchFound !== undefined ? onMatchFound : (param, param$1, param$2) => {}
+      }),
+      JsxRuntime.jsxs("div", {
+        children: [
+          JsxRuntime.jsx("div", {
+            className: styles.backdrop
+          }),
+          JsxRuntime.jsx("div", {
+            className: styles.backdropEdge
+          }),
+          JsxRuntime.jsxs("div", {
+            children: [
+              JsxRuntime.jsxs("div", {
+                children: [
+                  JsxRuntime.jsx("button", {
+                    children: JsxRuntime.jsx(ListIcon.make, {}),
+                    className: "text-white w-[44px] aspect-square text-[26px] flex justify-center items-center -ml-3 rounded-full bg-black/0 transition-all ease-in-out duration-200 shadow-none hover:bg-black/20 hover:shadow-icon-button hover:ring-8 ring-black/20 active:bg-black/20 active:shadow-icon-button active:ring-8 plausible-event-name=ShowScores",
+                    onClick: param => setShowScores(param => true)
+                  }),
+                  JsxRuntime.jsx("button", {
+                    children: JsxRuntime.jsx(PieChartIcon.make, {}),
+                    className: "text-white w-[44px] aspect-square text-[26px] flex justify-center items-center -ml-3 rounded-full bg-black/0 transition-all ease-in-out duration-200 shadow-none hover:bg-black/20 hover:shadow-icon-button hover:ring-8 ring-black/20 active:bg-black/20 active:shadow-icon-button active:ring-8 plausible-event-name=ShowStats",
+                    onClick: param => setShowStats(param => true)
+                  }),
+                  JsxRuntime.jsx("button", {
+                    children: JsxRuntime.jsx(TicketIcon.make, {}),
+                    className: "text-white w-[44px] aspect-square text-[26px] flex justify-center items-center -ml-3 rounded-full bg-black/0 transition-all ease-in-out duration-200 shadow-none hover:bg-black/20 hover:shadow-icon-button hover:ring-8 ring-black/20 active:bg-black/20 active:shadow-icon-button active:ring-8 plausible-event-name=ShowMatchMaker",
+                    onClick: param => setShowMatchMaker(param => true)
+                  }),
+                  tmp,
+                  JsxRuntime.jsx("button", {
+                    children: JsxRuntime.jsx(TicketIcon.make, {}),
+                    className: "text-white w-[44px] aspect-square text-[26px] hidden justify-center items-center -ml-3 rounded-full bg-black/0 transition-all ease-in-out duration-200 shadow-none hover:bg-black/20 hover:shadow-icon-button hover:ring-8 ring-black/20 active:bg-black/20 active:shadow-icon-button active:ring-8",
+                    onClick: param => setShowQueueButtons(show => !show)
+                  }),
+                  tmp$1,
+                  JsxRuntime.jsx("div", {
+                    children: searchQuery !== undefined && setSearchQuery !== undefined ? JsxRuntime.jsx("input", {
+                        className: "w-full max-w-[600px] text-white placeholder-white/70 bg-white/10 border border-white/20 rounded-full px-5 py-2.5 text-lg shadow-inner focus:outline-none focus:ring-2 focus:ring-white/40 focus:border-white/40 backdrop-blur-md",
+                        placeholder: "Zoek speler...",
+                        value: searchQuery,
+                        onChange: event => {
+                          let v = event.target.value;
+                          setSearchQuery(param => v);
+                        }
+                      }) : JsxRuntime.jsx(JsxRuntime.Fragment, {}),
+                    className: "flex-1 flex items-center justify-center"
+                  })
+                ],
+                className: "flex items-center gap-5"
+              }),
+              JsxRuntime.jsxs("div", {
+                children: [
+                  JsxRuntime.jsx("span", {
+                    className: isConnected ? styles.connected : styles.disconnected
+                  }),
+                  JsxRuntime.jsx(Button.make, {
+                    variant: "Grey",
+                    onClick: param => onReset(),
+                    children: "Reset"
+                  }),
+                  JsxRuntime.jsx(Button.make, {
+                    className: "plausible-event-name=NextStep",
+                    variant: "Blue",
+                    onClick: param => onNextStep(),
+                    children: nextLabel,
+                    disabled: !isConnected || disabled
+                  })
+                ],
+                className: "hidden md:flex items-center gap-5"
+              })
+            ],
+            className: "flex justify-between flex-wrap text-white gap-5 relative"
+          })
+        ],
+        className: styles.glassHeader + " px-4 lg:px-10 py-5 sticky top-2 ml-2 mr-2 z-40 rounded shadow-[inset_0_1px_0_rgba(255,255,255,0.1)]"
+      }),
+      JsxRuntime.jsx("div", {
+        children: JsxRuntime.jsxs("div", {
+          children: [
+            JsxRuntime.jsx("div", {
+              className: styles.backdrop
+            }),
+            JsxRuntime.jsx("div", {
+              className: styles.backdropEdge
+            }),
+            JsxRuntime.jsxs("div", {
               children: [
-                JsxRuntime.jsx(LeaderboardModal.make, {
-                      show: match[0],
-                      setShow: setShowScores,
-                      gameMode: gameMode,
-                      setGameMode: setGameMode
-                    }),
-                JsxRuntime.jsx(StatsModal.make, {
-                      show: match$1[0],
-                      setShow: setShowStats
-                    }),
-                JsxRuntime.jsx(MatchMakerModal.make, {
-                      show: match$2[0],
-                      setShow: setShowMatchMaker,
-                      setSelectedUsers: props.setSelectedUsers,
-                      setGameMode: setGameMode,
-                      onMatchFound: onMatchFound !== undefined ? onMatchFound : (function (param, param$1, param$2) {
-                            
-                          })
-                    }),
+                JsxRuntime.jsx("span", {
+                  className: isConnected ? styles.connected : styles.disconnected
+                }),
                 JsxRuntime.jsxs("div", {
-                      children: [
-                        JsxRuntime.jsx("div", {
-                              className: styles.backdrop
-                            }),
-                        JsxRuntime.jsx("div", {
-                              className: styles.backdropEdge
-                            }),
-                        JsxRuntime.jsxs("div", {
-                              children: [
-                                JsxRuntime.jsxs("div", {
-                                      children: [
-                                        JsxRuntime.jsx("button", {
-                                              children: JsxRuntime.jsx(ListIcon.make, {}),
-                                              className: "text-white w-[44px] aspect-square text-[26px] flex justify-center items-center -ml-3 rounded-full bg-black/0 transition-all ease-in-out duration-200 shadow-none hover:bg-black/20 hover:shadow-icon-button hover:ring-8 ring-black/20 active:bg-black/20 active:shadow-icon-button active:ring-8 plausible-event-name=ShowScores",
-                                              onClick: (function (param) {
-                                                  setShowScores(function (param) {
-                                                        return true;
-                                                      });
-                                                })
-                                            }),
-                                        JsxRuntime.jsx("button", {
-                                              children: JsxRuntime.jsx(PieChartIcon.make, {}),
-                                              className: "text-white w-[44px] aspect-square text-[26px] flex justify-center items-center -ml-3 rounded-full bg-black/0 transition-all ease-in-out duration-200 shadow-none hover:bg-black/20 hover:shadow-icon-button hover:ring-8 ring-black/20 active:bg-black/20 active:shadow-icon-button active:ring-8 plausible-event-name=ShowStats",
-                                              onClick: (function (param) {
-                                                  setShowStats(function (param) {
-                                                        return true;
-                                                      });
-                                                })
-                                            }),
-                                        JsxRuntime.jsx("button", {
-                                              children: JsxRuntime.jsx(TicketIcon.make, {}),
-                                              className: "text-white w-[44px] aspect-square text-[26px] flex justify-center items-center -ml-3 rounded-full bg-black/0 transition-all ease-in-out duration-200 shadow-none hover:bg-black/20 hover:shadow-icon-button hover:ring-8 ring-black/20 active:bg-black/20 active:shadow-icon-button active:ring-8 plausible-event-name=ShowMatchMaker",
-                                              onClick: (function (param) {
-                                                  setShowMatchMaker(function (param) {
-                                                        return true;
-                                                      });
-                                                })
-                                            }),
-                                        tmp,
-                                        JsxRuntime.jsx("button", {
-                                              children: JsxRuntime.jsx(TicketIcon.make, {}),
-                                              className: "text-white w-[44px] aspect-square text-[26px] hidden justify-center items-center -ml-3 rounded-full bg-black/0 transition-all ease-in-out duration-200 shadow-none hover:bg-black/20 hover:shadow-icon-button hover:ring-8 ring-black/20 active:bg-black/20 active:shadow-icon-button active:ring-8",
-                                              onClick: (function (param) {
-                                                  setShowQueueButtons(function (show) {
-                                                        return !show;
-                                                      });
-                                                })
-                                            }),
-                                        tmp$1,
-                                        JsxRuntime.jsx("div", {
-                                              children: searchQuery !== undefined && setSearchQuery !== undefined ? JsxRuntime.jsx("input", {
-                                                      className: "w-full max-w-[600px] text-white placeholder-white/70 bg-white/10 border border-white/20 rounded-full px-5 py-2.5 text-lg shadow-inner focus:outline-none focus:ring-2 focus:ring-white/40 focus:border-white/40 backdrop-blur-md",
-                                                      placeholder: "Zoek speler...",
-                                                      value: searchQuery,
-                                                      onChange: (function ($$event) {
-                                                          var v = $$event.target.value;
-                                                          setSearchQuery(function (param) {
-                                                                return v;
-                                                              });
-                                                        })
-                                                    }) : JsxRuntime.jsx(JsxRuntime.Fragment, {}),
-                                              className: "flex-1 flex items-center justify-center"
-                                            })
-                                      ],
-                                      className: "flex items-center gap-5"
-                                    }),
-                                JsxRuntime.jsxs("div", {
-                                      children: [
-                                        JsxRuntime.jsx("span", {
-                                              className: isConnected ? styles.connected : styles.disconnected
-                                            }),
-                                        JsxRuntime.jsx(Button.make, {
-                                              variant: "Grey",
-                                              onClick: (function (param) {
-                                                  onReset();
-                                                }),
-                                              children: "Reset"
-                                            }),
-                                        JsxRuntime.jsx(Button.make, {
-                                              className: "plausible-event-name=NextStep",
-                                              variant: "Blue",
-                                              onClick: (function (param) {
-                                                  onNextStep();
-                                                }),
-                                              children: nextLabel,
-                                              disabled: !isConnected || disabled
-                                            })
-                                      ],
-                                      className: "hidden md:flex items-center gap-5"
-                                    })
-                              ],
-                              className: "flex justify-between flex-wrap text-white gap-5 relative"
-                            })
-                      ],
-                      className: styles.glassHeader + " px-4 lg:px-10 py-5 sticky top-2 ml-2 mr-2 z-40 rounded shadow-[inset_0_1px_0_rgba(255,255,255,0.1)]"
+                  children: [
+                    JsxRuntime.jsx(Button.make, {
+                      className: "relative z-1",
+                      variant: "Grey",
+                      onClick: param => onReset(),
+                      children: "Reset"
                     }),
-                JsxRuntime.jsx("div", {
-                      children: JsxRuntime.jsxs("div", {
-                            children: [
-                              JsxRuntime.jsx("div", {
-                                    className: styles.backdrop
-                                  }),
-                              JsxRuntime.jsx("div", {
-                                    className: styles.backdropEdge
-                                  }),
-                              JsxRuntime.jsxs("div", {
-                                    children: [
-                                      JsxRuntime.jsx("span", {
-                                            className: isConnected ? styles.connected : styles.disconnected
-                                          }),
-                                      JsxRuntime.jsxs("div", {
-                                            children: [
-                                              JsxRuntime.jsx(Button.make, {
-                                                    className: "relative z-1",
-                                                    variant: "Grey",
-                                                    onClick: (function (param) {
-                                                        onReset();
-                                                      }),
-                                                    children: "Reset"
-                                                  }),
-                                              JsxRuntime.jsx(Button.make, {
-                                                    className: "plausible-event-name=NextStep relative z-1",
-                                                    variant: "Blue",
-                                                    onClick: (function (param) {
-                                                        onNextStep();
-                                                      }),
-                                                    children: nextLabel,
-                                                    disabled: !isConnected || disabled
-                                                  })
-                                            ],
-                                            className: "flex items-center gap-4"
-                                          })
-                                    ],
-                                    className: "flex items-center justify-between gap-4 text-white"
-                                  })
-                            ],
-                            className: styles.glassHeader + " px-4 py-4 rounded shadow-[inset_0_1px_0_rgba(255,255,255,0.1)]"
-                          }),
-                      className: "md:hidden fixed bottom-2 left-2 right-2 z-40"
+                    JsxRuntime.jsx(Button.make, {
+                      className: "plausible-event-name=NextStep relative z-1",
+                      variant: "Blue",
+                      onClick: param => onNextStep(),
+                      children: nextLabel,
+                      disabled: !isConnected || disabled
                     })
-              ]
-            });
+                  ],
+                  className: "flex items-center gap-4"
+                })
+              ],
+              className: "flex items-center justify-between gap-4 text-white"
+            })
+          ],
+          className: styles.glassHeader + " px-4 py-4 rounded shadow-[inset_0_1px_0_rgba(255,255,255,0.1)]"
+        }),
+        className: "md:hidden fixed bottom-2 left-2 right-2 z-40"
+      })
+    ]
+  });
 }
 
-var make = Header;
+let make = Header;
 
 export {
-  make ,
+  make,
 }
 /* styles Not a pure module */

@@ -5,9 +5,9 @@ import * as App from "firebase/app";
 import * as Auth from "firebase/auth";
 import * as Database from "firebase/database";
 
-var databaseURL = process.env.NEXT_PUBLIC_DATABASE_URL;
+let databaseURL = process.env.NEXT_PUBLIC_DATABASE_URL;
 
-var config = {
+let config = {
   apiKey: process.env.NEXT_PUBLIC_API_KEY,
   authDomain: process.env.NEXT_PUBLIC_AUTH_DOMAIN,
   databaseURL: databaseURL,
@@ -18,32 +18,24 @@ var config = {
   measurementId: process.env.NEXT_PUBLIC_MEASUREMENT_ID
 };
 
-var app = App.initializeApp(config);
+let app = App.initializeApp(config);
 
-var database = Database.getDatabase(app);
+let database = Database.getDatabase(app);
 
-var auth = Auth.getAuth();
+let auth = Auth.getAuth();
 
 function useUser() {
-  var match = React.useState(function () {
-        return auth.currentUser;
-      });
-  var setUser = match[1];
-  React.useEffect((function () {
-          return Auth.onAuthStateChanged(auth, (function (user) {
-                        setUser(function (param) {
-                              return user;
-                            });
-                      }), undefined, undefined);
-        }), []);
+  let match = React.useState(() => auth.currentUser);
+  let setUser = match[1];
+  React.useEffect(() => Auth.onAuthStateChanged(auth, user => setUser(param => user), undefined, undefined), []);
   return match[0];
 }
 
 export {
-  app ,
-  database ,
-  auth ,
-  useUser ,
-  databaseURL ,
+  app,
+  database,
+  auth,
+  useUser,
+  databaseURL,
 }
 /* databaseURL Not a pure module */

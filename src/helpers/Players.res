@@ -72,41 +72,42 @@ let playersSchema = Schema.dict(playerSchema)
 
 let addPlayer = async name => {
   let playersRef = Firebase.Database.refPath(Database.database, bucket)
-  let data = switch {
-    name,
-    wins: 0,
-    losses: 0,
-    absoluteWins: 0,
-    absoluteLosses: 0,
-    games: 0,
-    teamGoals: 0,
-    teamGoalsAgainst: 0,
-    redGames: 0,
-    blueGames: 0,
-    redWins: 0,
-    blueWins: 0,
-    elo: 1000.0,
-    lastEloChange: 0.0,
-    key: "",
-    mattermostHandle: None,
-    lastGames: [],
-    hidden: None,
-    mu: 25.0,
-    sigma: 8.333,
-    ordinal: 0.0,
-    lastOpenSkillChange: 0.0,
-    dartsElo: 1000.0,
-    dartsLastEloChange: 0.0,
-    dartsGames: 0,
-    dartsWins: 0,
-    dartsLosses: 0,
-    dartsLastGames: [],
-  }->Schema.serializeWith(playerSchema) {
-  | Ok(data) => data
-  | Error(_error) => panic("Could not serialize player")
+  let data = try {
+    {
+      name,
+      wins: 0,
+      losses: 0,
+      absoluteWins: 0,
+      absoluteLosses: 0,
+      games: 0,
+      teamGoals: 0,
+      teamGoalsAgainst: 0,
+      redGames: 0,
+      blueGames: 0,
+      redWins: 0,
+      blueWins: 0,
+      elo: 1000.0,
+      lastEloChange: 0.0,
+      key: "",
+      mattermostHandle: None,
+      lastGames: [],
+      hidden: None,
+      mu: 25.0,
+      sigma: 8.333,
+      ordinal: 0.0,
+      lastOpenSkillChange: 0.0,
+      dartsElo: 1000.0,
+      dartsLastEloChange: 0.0,
+      dartsGames: 0,
+      dartsWins: 0,
+      dartsLosses: 0,
+      dartsLastGames: [],
+    }->Schema.convertToJsonOrThrow(playerSchema)
+  } catch {
+  | _ => panic("Could not serialize player")
   }
   let ref = await Firebase.Database.pushValue(playersRef, data)
-  switch ref["key"]->Js.Nullable.toOption {
+  switch ref["key"]->Nullable.toOption {
   | Some(key) =>
     await Firebase.Database.set(
       Firebase.Database.refPath(Database.database, bucket ++ "/" ++ key ++ "/key"),
@@ -137,9 +138,11 @@ let useAllPlayers = (~orderBy: playersOrder=#rating, ~asc=false) => {
         Array.forEach(snapshotToArray(snapshot), snap => {
           switch Firebase.Database.Snapshot.val(snap)->Nullable.toOption {
           | Some(val) =>
-            switch val->Schema.parseWith(playerSchema) {
-            | Ok(player) => Array.push(newPlayers, player)
-            | Error(_e) => ()
+            try {
+              let player = val->Schema.parseOrThrow(playerSchema)
+              Array.push(newPlayers, player)
+            } catch {
+            | _ => ()
             }
           | None => ()
           }
@@ -169,13 +172,14 @@ let fetchAllPlayers = async () => {
   let playersRef = Firebase.Database.refPath(Database.database, bucket)
 
   let data = await Firebase.Database.get(playersRef)
-  let empty: Js.Dict.t<player> = Js.Dict.empty()
+  let empty: dict<player> = {}
 
   switch Firebase.Database.Snapshot.val(data)->Js.toOption {
   | Some(data) =>
-    switch data->Schema.parseWith(playersSchema) {
-    | Ok(players) => players
-    | Error(_) => empty
+    try {
+      data->Schema.parseOrThrow(playersSchema)
+    } catch {
+    | _ => empty
     }
   | None => empty
   }
@@ -186,9 +190,10 @@ let fetchPlayerByKey = async key => {
   let data = await Firebase.Database.get(playerRef)
   switch Firebase.Database.Snapshot.val(data)->Js.toOption {
   | Some(player) =>
-    switch player->Schema.parseWith(playerSchema) {
-    | Ok(player) => Some(player)
-    | Error(error) => {
+    try {
+      Some(player->Schema.parseOrThrow(playerSchema))
+    } catch {
+    | error => {
         Console.error(error)
         None
       }
@@ -201,7 +206,7 @@ let playerByKey = (players, key) => players->Array.find(c => c.key == key)
 
 let writePlayer = (player: player) => {
   let playerRef = Firebase.Database.refPath(Database.database, bucket ++ "/" ++ player.key)
-  Firebase.Database.set(playerRef, Schema.reverseConvertToJsonWith(player, playerSchema))
+  Firebase.Database.set(playerRef, player->Schema.convertToJsonOrThrow(playerSchema))
 }
 
 let getLastGames = (lastGames, win) => {
@@ -221,32 +226,27 @@ let updateGameStats = (key, myTeamPoints, opponentTeamPoints, team: team, elo) =
 
   let playerRef = Firebase.Database.refPath(Database.database, bucket ++ "/" ++ key)
   Firebase.Database.runTransaction(playerRef, data => {
-    switch data->Schema.parseWith(playerSchema) {
-    | Ok(player) =>
-      switch Schema.serializeWith(
-        {
-          ...player,
-          games: player.games + 1,
-          teamGoals: player.teamGoals + myTeamPoints,
-          teamGoalsAgainst: player.teamGoalsAgainst + opponentTeamPoints,
-          redGames: team == Red ? player.redGames + 1 : player.redGames,
-          blueGames: team == Blue ? player.blueGames + 1 : player.blueGames,
-          wins: isWin ? player.wins + 1 : player.wins,
-          losses: isLoss ? player.losses + 1 : player.losses,
-          absoluteLosses: isAbsoluteLoss ? player.absoluteLosses + 1 : player.absoluteLosses,
-          absoluteWins: isAbsoluteWin ? player.absoluteWins + 1 : player.absoluteWins,
-          redWins: isRedWin ? player.redWins + 1 : player.redWins,
-          blueWins: isBlueWin ? player.blueWins + 1 : player.blueWins,
-          lastEloChange: elo -. player.elo,
-          elo,
-          lastGames: getLastGames(player.lastGames, isWin),
-        },
-        playerSchema,
-      ) {
-      | Ok(res) => res
-      | _ => data
-      }
-    | Error(_) => data
+    try {
+      let player = data->Schema.parseOrThrow(playerSchema)
+      {
+        ...player,
+        games: player.games + 1,
+        teamGoals: player.teamGoals + myTeamPoints,
+        teamGoalsAgainst: player.teamGoalsAgainst + opponentTeamPoints,
+        redGames: team == Red ? player.redGames + 1 : player.redGames,
+        blueGames: team == Blue ? player.blueGames + 1 : player.blueGames,
+        wins: isWin ? player.wins + 1 : player.wins,
+        losses: isLoss ? player.losses + 1 : player.losses,
+        absoluteLosses: isAbsoluteLoss ? player.absoluteLosses + 1 : player.absoluteLosses,
+        absoluteWins: isAbsoluteWin ? player.absoluteWins + 1 : player.absoluteWins,
+        redWins: isRedWin ? player.redWins + 1 : player.redWins,
+        blueWins: isBlueWin ? player.blueWins + 1 : player.blueWins,
+        lastEloChange: elo -. player.elo,
+        elo,
+        lastGames: getLastGames(player.lastGames, isWin),
+      }->Schema.convertToJsonOrThrow(playerSchema)
+    } catch {
+    | _ => data
     }
   })
 }
@@ -263,23 +263,18 @@ let updateOpenSkillGameStats = (
 ) => {
   let playerRef = Firebase.Database.refPath(Database.database, bucket ++ "/" ++ key)
   Firebase.Database.runTransaction(playerRef, data => {
-    switch data->Schema.parseWith(playerSchema) {
-    | Ok(player) =>
-      switch Schema.serializeWith(
-        {
-          ...player,
-          // Do not modify general game statistics - those are handled by updateGameStats
-          mu,
-          sigma,
-          ordinal,
-          lastOpenSkillChange: ordinal -. player.ordinal,
-        },
-        playerSchema,
-      ) {
-      | Ok(res) => res
-      | _ => data
-      }
-    | Error(_) => data
+    try {
+      let player = data->Schema.parseOrThrow(playerSchema)
+      {
+        ...player,
+        // Do not modify general game statistics - those are handled by updateGameStats
+        mu,
+        sigma,
+        ordinal,
+        lastOpenSkillChange: ordinal -. player.ordinal,
+      }->Schema.convertToJsonOrThrow(playerSchema)
+    } catch {
+    | _ => data
     }
   })
 }
@@ -291,24 +286,19 @@ let updateDartsGameStats = (key, myTeamPoints, elo) => {
 
   let playerRef = Firebase.Database.refPath(Database.database, bucket ++ "/" ++ key)
   Firebase.Database.runTransaction(playerRef, data => {
-    switch data->Schema.parseWith(playerSchema) {
-    | Ok(player) =>
-      switch Schema.serializeWith(
-        {
-          ...player,
-          dartsGames: player.dartsGames + 1,
-          dartsWins: isWin ? player.dartsWins + 1 : player.dartsWins,
-          dartsLosses: isLoss ? player.dartsLosses + 1 : player.dartsLosses,
-          dartsLastGames: getLastGames(player.dartsLastGames, isWin),
-          dartsElo: elo,
-          dartsLastEloChange: elo -. player.dartsElo,
-        },
-        playerSchema,
-      ) {
-      | Ok(res) => res
-      | _ => data
-      }
-    | Error(_) => data
+    try {
+      let player = data->Schema.parseOrThrow(playerSchema)
+      {
+        ...player,
+        dartsGames: player.dartsGames + 1,
+        dartsWins: isWin ? player.dartsWins + 1 : player.dartsWins,
+        dartsLosses: isLoss ? player.dartsLosses + 1 : player.dartsLosses,
+        dartsLastGames: getLastGames(player.dartsLastGames, isWin),
+        dartsElo: elo,
+        dartsLastEloChange: elo -. player.dartsElo,
+      }->Schema.convertToJsonOrThrow(playerSchema)
+    } catch {
+    | _ => data
     }
   })
 }

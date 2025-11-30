@@ -3,105 +3,89 @@
 import * as React from "react";
 import * as Button from "./Button.bs.mjs";
 import * as Players from "../helpers/Players.bs.mjs";
-import * as Caml_obj from "rescript/lib/es6/caml_obj.js";
 import * as GridItem from "./GridItem.bs.mjs";
 import * as ReactHookForm from "react-hook-form";
 import * as JsxRuntime from "react/jsx-runtime";
 import * as NewPlayerFormModuleCss from "./new-player-form.module.css";
 
-var styles = NewPlayerFormModuleCss;
+let styles = NewPlayerFormModuleCss;
 
 function NewPlayerForm(props) {
-  var match = React.useState(function () {
-        return "Hidden";
-      });
-  var setFormState = match[1];
-  var formState = match[0];
-  var match$1 = ReactHookForm.useForm();
-  var reset = match$1.reset;
-  var addCreeper = async function (name) {
-    setFormState(function (param) {
-          return "Loading";
-        });
+  let match = React.useState(() => "Hidden");
+  let setFormState = match[1];
+  let formState = match[0];
+  let match$1 = ReactHookForm.useForm();
+  let reset = match$1.reset;
+  let addCreeper = async name => {
+    setFormState(param => "Loading");
     await Players.addPlayer(name);
-    return setFormState(function (param) {
-                return "Finished";
-              });
+    return setFormState(param => "Finished");
   };
-  var onSubmit = function (data) {
+  let onSubmit = data => {
     addCreeper(data.name);
   };
-  React.useEffect((function () {
-          if (formState !== "Finished") {
-            return ;
-          }
-          reset(undefined);
-          var timeoutId = setTimeout((function () {
-                  setFormState(function (param) {
-                        return "Hidden";
-                      });
-                }), 4000);
-          return (function () {
-                    clearTimeout(timeoutId);
-                  });
-        }), [formState]);
-  var showForm = function (param) {
-    setFormState(function (param) {
-          return "Visible";
-        });
-  };
-  var content;
+  React.useEffect(() => {
+    if (formState !== "Finished") {
+      return;
+    }
+    reset(undefined);
+    let timeoutId = setTimeout(() => setFormState(param => "Hidden"), 4000);
+    return () => {
+      clearTimeout(timeoutId);
+    };
+  }, [formState]);
+  let showForm = param => setFormState(param => "Visible");
+  let content;
   switch (formState) {
     case "Hidden" :
-        content = JsxRuntime.jsx("button", {
-              children: "+",
-              className: styles.addCreeperButton,
-              onClick: showForm
-            });
-        break;
+      content = JsxRuntime.jsx("button", {
+        children: "+",
+        className: styles.addCreeperButton,
+        onClick: showForm
+      });
+      break;
     case "Visible" :
-        var newrecord = Caml_obj.obj_dup(match$1.register("name", {
-                  required: true
-                }));
-        content = JsxRuntime.jsxs("form", {
-              children: [
-                JsxRuntime.jsx("input", (newrecord.placeholder = "Naam", newrecord.className = styles.input + " text-black rounded", newrecord)),
-                JsxRuntime.jsx(Button.make, {
-                      className: styles.submit,
-                      variant: "Grey",
-                      children: "Kruiper toevoegen",
-                      type_: "submit"
-                    })
-              ],
-              className: styles.form,
-              onSubmit: match$1.handleSubmit(onSubmit)
-            });
-        break;
+      let newrecord = {...match$1.register("name", {
+        required: true
+      })};
+      content = JsxRuntime.jsxs("form", {
+        children: [
+          JsxRuntime.jsx("input", (newrecord.placeholder = "Naam", newrecord.className = styles.input + " text-black rounded", newrecord)),
+          JsxRuntime.jsx(Button.make, {
+            className: styles.submit,
+            variant: "Grey",
+            children: "Kruiper toevoegen",
+            type_: "submit"
+          })
+        ],
+        className: styles.form,
+        onSubmit: match$1.handleSubmit(onSubmit)
+      });
+      break;
     case "Loading" :
-        content = JsxRuntime.jsx("div", {
-              children: "...",
-              className: styles.status
-            });
-        break;
+      content = JsxRuntime.jsx("div", {
+        children: "...",
+        className: styles.status
+      });
+      break;
     case "Finished" :
-        content = JsxRuntime.jsx("div", {
-              children: "✔︎",
-              className: styles.status,
-              onClick: showForm
-            });
-        break;
-    
+      content = JsxRuntime.jsx("div", {
+        children: "✔︎",
+        className: styles.status,
+        onClick: showForm
+      });
+      break;
   }
   return JsxRuntime.jsx(GridItem.make, {
-              active: false,
-              children: content,
-              className: styles.addCreeper
-            });
+    active: false,
+    children: content,
+    className: styles.addCreeper
+  });
 }
 
-var make = NewPlayerForm;
+let make = NewPlayerForm;
 
 export {
-  make ,
+  make,
 }
 /* styles Not a pure module */
