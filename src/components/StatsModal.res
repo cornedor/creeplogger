@@ -44,11 +44,6 @@ let make = (~show, ~setShow) => {
     <div
       className="modal flex flex-col"
       style={ReactDOM.Style.make(~transform=show ? "translateX(0)" : "translateX(-100%)", ())}
-      onClick={_ => {
-        // Stop propagation so clicking inside modal doesn't close it
-        // Event is already handled by React, no need to stop propagation here
-        ()
-      }}
       onMouseDown={event => {
         // Stop propagation so clicking inside modal doesn't close it
         let _ = ReactEvent.Mouse.stopPropagation(event)
