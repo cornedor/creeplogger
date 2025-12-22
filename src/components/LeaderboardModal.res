@@ -1,3 +1,5 @@
+@val external document: {.."addEventListener": (string, Js.t<'a> => unit) => unit, "removeEventListener": (string, Js.t<'a> => unit) => unit} = "document"
+
 @react.component
 let make = (~show, ~setShow, ~gameMode, ~setGameMode) => {
   let (ascOrder, setOrder) = React.useState(_ => false)
@@ -90,9 +92,43 @@ let make = (~show, ~setShow, ~gameMode, ~setGameMode) => {
   // Helper for formatting floats to 2 decimals
   let round2 = v => (v *. 100.0)->Js.Math.round /. 100.0
 
-  <div
-    className="modal"
-    style={ReactDOM.Style.make(~transform=show ? "translateX(0)" : "translateX(-100%)", ())}>
+  // Handle Escape key to close modal
+  React.useEffect(() => {
+    if show {
+      let handleKeyDown = (event: Js.t<'a>) => {
+        let key = event["key"]->Js.Nullable.toOption->Option.getOr("")
+        if key == "Escape" {
+          setShow(_ => false)
+        }
+      }
+      
+      let _ = document["addEventListener"]("keydown", handleKeyDown)
+      Some(() => {
+        let _ = document["removeEventListener"]("keydown", handleKeyDown)
+        ()
+      })
+    } else {
+      None
+    }
+  }, [show])
+
+  <>
+    {if show {
+      <div
+        className="fixed inset-0 z-[199] bg-black/20"
+        onClick={_ => setShow(_ => false)}
+      />
+    } else {
+      React.null
+    }}
+    <div
+      className="modal"
+      style={ReactDOM.Style.make(~transform=show ? "translateX(0)" : "translateX(-100%)", ())}
+      onMouseDown={event => {
+        // Stop propagation so clicking inside modal doesn't close it
+        let _ = ReactEvent.Mouse.stopPropagation(event)
+        ()
+      }}>
     <header className="flex items-center gap-5">
       <Button onClick={_ => setShow(s => !s)} variant={Blue}> {React.string("Terug")} </Button>
       {switch setGameMode {
@@ -231,4 +267,5 @@ let make = (~show, ~setShow, ~gameMode, ~setGameMode) => {
       </tbody>
     </table>
   </div>
+  </>
 }

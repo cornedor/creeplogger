@@ -1,3 +1,5 @@
+@val external document: {.."addEventListener": (string, Js.t<'a> => unit) => unit, "removeEventListener": (string, Js.t<'a> => unit) => unit} = "document"
+
 @react.component
 let make = (~show, ~setShow) => {
   let stats = Stats.useStats()
@@ -10,9 +12,43 @@ let make = (~show, ~setShow) => {
 
   let bluePercentages = (blue /. (blue +. red) *. 100.)->Float.toString
 
-  <div
-    className="modal flex flex-col"
-    style={ReactDOM.Style.make(~transform=show ? "translateX(0)" : "translateX(-100%)", ())}>
+  // Handle Escape key to close modal
+  React.useEffect(() => {
+    if show {
+      let handleKeyDown = (event: Js.t<'a>) => {
+        let key = event["key"]->Js.Nullable.toOption->Option.getOr("")
+        if key == "Escape" {
+          setShow(_ => false)
+        }
+      }
+      
+      let _ = document["addEventListener"]("keydown", handleKeyDown)
+      Some(() => {
+        let _ = document["removeEventListener"]("keydown", handleKeyDown)
+        ()
+      })
+    } else {
+      None
+    }
+  }, [show])
+
+  <>
+    {if show {
+      <div
+        className="fixed inset-0 z-[199] bg-black/20"
+        onClick={_ => setShow(_ => false)}
+      />
+    } else {
+      React.null
+    }}
+    <div
+      className="modal flex flex-col"
+      style={ReactDOM.Style.make(~transform=show ? "translateX(0)" : "translateX(-100%)", ())}
+      onMouseDown={event => {
+        // Stop propagation so clicking inside modal doesn't close it
+        let _ = ReactEvent.Mouse.stopPropagation(event)
+        ()
+      }}>
     <header>
       <Button onClick={_ => setShow(s => !s)} variant={Blue}> {React.string("Terug")} </Button>
     </header>
@@ -72,4 +108,5 @@ let make = (~show, ~setShow) => {
       <a href="https://github.com/cornedor/creeplogger"> {React.string("Contribute on GitHub")} </a>
     </div>
   </div>
+  </>
 }
