@@ -23,8 +23,8 @@ let make = (~show, ~setShow, ~gameMode, ~setGameMode) => {
       | None => true
       }
 
-      let hasEnoughGames = games > 5
-      isVisible && hasEnoughGames
+      // let hasEnoughGames = games > 5
+      isVisible // && hasEnoughGames
     })
   , (players, gameMode))
 
