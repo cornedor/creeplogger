@@ -70,9 +70,15 @@ let make = (
               </button>
             | Games.Darts =>
               <button
-                className="text-white w-[44px] aspect-square text-[26px] flex justify-center items-center -ml-3 rounded-full bg-black/0 transition-all ease-in-out duration-200 shadow-none hover:bg-black/20 hover:shadow-icon-button hover:ring-8 ring-black/20 active:bg-black/20 active:shadow-icon-button active:ring-8 "
-                onClick={_ => setGameMode(_ => Games.Foosball)}>
+                className="text-white w-[44px] aspect-square text-[26px] flex justify-center items-center -ml-3 rounded-full bg-black/0 transition-all ease-in-out duration-200 shadow-none hover:bg-black/20 hover:shadow-icon-button hover:ring-8 ring-black/20 active:bg-black/20 active:shadow-icon-button active:ring-8  plausible-event-name=GameModeFifa"
+                onClick={_ => setGameMode(_ => Games.Fifa)}>
                 <DartsIcon />
+              </button>
+            | Games.Fifa =>
+              <button
+                className="text-white w-[44px] aspect-square text-[26px] flex justify-center items-center -ml-3 rounded-full bg-black/0 transition-all ease-in-out duration-200 shadow-none hover:bg-black/20 hover:shadow-icon-button hover:ring-8 ring-black/20 active:bg-black/20 active:shadow-icon-button active:ring-8  plausible-event-name=GameModeFoosball"
+                onClick={_ => setGameMode(_ => Games.Foosball)}>
+                <SoccerIcon />
               </button>
             }
           | None => <> </>

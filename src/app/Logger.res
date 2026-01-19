@@ -38,6 +38,8 @@ let make = (~players: array<Players.player>) => {
     <UserGrid selectedUsers setSelectedUsers reset setStep players gameMode setGameMode />
   | (ScoreForm, Games.Darts) =>
     <DartsGameModeStep selectedUsers setStep reset setEarnedPoints players gameMode />
+  | (ScoreForm, Games.Fifa) =>
+    <FifaScoreStep selectedUsers setStep reset setEarnedPoints players gameMode />
   | (ScoreForm, _) =>
     <ScoreStep
       selectedUsers

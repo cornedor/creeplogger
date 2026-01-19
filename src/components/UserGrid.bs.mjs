@@ -33,17 +33,31 @@ function UserGrid(props) {
   var setBanner = match$2[1];
   var banner = match$2[0];
   var sorted;
-  sorted = gameMode === "Foosball" ? players.toSorted(function (a, b) {
-          return b.games - a.games | 0;
-        }) : players.toSorted(function (a, b) {
-          return b.dartsGames - a.dartsGames | 0;
-        });
+  switch (gameMode) {
+    case "Foosball" :
+        sorted = players.toSorted(function (a, b) {
+              return b.games - a.games | 0;
+            });
+        break;
+    case "Darts" :
+        sorted = players.toSorted(function (a, b) {
+              return b.dartsGames - a.dartsGames | 0;
+            });
+        break;
+    case "Fifa" :
+        sorted = players.toSorted(function (a, b) {
+              return b.fifaGames - a.fifaGames | 0;
+            });
+        break;
+    
+  }
   var sorted$1 = sorted.filter(function (item) {
         return item.name.toLowerCase().includes(searchQuery.toLowerCase());
       });
   var players$1 = sorted$1.map(function (item) {
         var tmp;
-        tmp = showQueueButtons ? JsxRuntime.jsxs("div", {
+        if (showQueueButtons) {
+          tmp = JsxRuntime.jsxs("div", {
                 children: [
                   JsxRuntime.jsx("button", {
                         children: "15m",
@@ -83,60 +97,98 @@ function UserGrid(props) {
                       })
                 ],
                 className: "grid grid-cols-4"
-              }) : (
-            gameMode === "Foosball" ? JsxRuntime.jsxs("div", {
-                    children: [
-                      JsxRuntime.jsx("button", {
-                            children: "Blauw",
-                            className: "bg-[#86b7ff] border-none cursor-pointer text-xl lg:text-3xl rounded-bl text-black plausible-event-name=SelectBlue",
+              });
+        } else {
+          switch (gameMode) {
+            case "Foosball" :
+                tmp = JsxRuntime.jsxs("div", {
+                      children: [
+                        JsxRuntime.jsx("button", {
+                              children: "Blauw",
+                              className: "bg-[#86b7ff] border-none cursor-pointer text-xl lg:text-3xl rounded-bl text-black plausible-event-name=SelectBlue",
+                              onClick: (function (param) {
+                                  setSelectedUsers(function (s) {
+                                        return Belt_MapString.set(s, item.key, "Blue");
+                                      });
+                                })
+                            }),
+                        JsxRuntime.jsx("button", {
+                              children: "Rood",
+                              className: "bg-[#ff8686] border-none cursor-pointer text-xl lg:text-3xl rounded-br text-black plausible-event-name=SelectRed",
+                              onClick: (function (param) {
+                                  setSelectedUsers(function (s) {
+                                        return Belt_MapString.set(s, item.key, "Red");
+                                      });
+                                })
+                            })
+                      ],
+                      className: "grid grid-cols-2"
+                    });
+                break;
+            case "Darts" :
+                tmp = JsxRuntime.jsxs("div", {
+                      children: [
+                        JsxRuntime.jsx("button", {
+                              children: "Winner",
+                              className: "bg-green-400 border-none cursor-pointer text-3xl rounded-bl text-black plausible-event-name=SelectWinner",
+                              onClick: (function (param) {
+                                  setSelectedUsers(function (s) {
+                                        return Belt_MapString.set(s, item.key, "Blue");
+                                      });
+                                })
+                            }),
+                        JsxRuntime.jsx("button", {
+                              children: "Loser",
+                              className: "bg-[#ff8686] border-none cursor-pointer text-3xl rounded-br text-black plausible-event-name=SelectLoser",
+                              onClick: (function (param) {
+                                  setSelectedUsers(function (s) {
+                                        return Belt_MapString.set(s, item.key, "Red");
+                                      });
+                                })
+                            })
+                      ],
+                      className: "grid grid-cols-2"
+                    });
+                break;
+            case "Fifa" :
+                tmp = JsxRuntime.jsx("div", {
+                      children: JsxRuntime.jsx("button", {
+                            children: "Select",
+                            className: "bg-yellow-500 border-none cursor-pointer text-xl lg:text-3xl rounded-b text-black plausible-event-name=SelectFifa",
                             onClick: (function (param) {
                                 setSelectedUsers(function (s) {
                                       return Belt_MapString.set(s, item.key, "Blue");
                                     });
                               })
                           }),
-                      JsxRuntime.jsx("button", {
-                            children: "Rood",
-                            className: "bg-[#ff8686] border-none cursor-pointer text-xl lg:text-3xl rounded-br text-black plausible-event-name=SelectRed",
-                            onClick: (function (param) {
-                                setSelectedUsers(function (s) {
-                                      return Belt_MapString.set(s, item.key, "Red");
-                                    });
-                              })
-                          })
-                    ],
-                    className: "grid grid-cols-2"
-                  }) : JsxRuntime.jsxs("div", {
-                    children: [
-                      JsxRuntime.jsx("button", {
-                            children: "Winner",
-                            className: "bg-green-400 border-none cursor-pointer text-3xl rounded-bl text-black plausible-event-name=SelectWinner",
-                            onClick: (function (param) {
-                                setSelectedUsers(function (s) {
-                                      return Belt_MapString.set(s, item.key, "Blue");
-                                    });
-                              })
-                          }),
-                      JsxRuntime.jsx("button", {
-                            children: "Loser",
-                            className: "bg-[#ff8686] border-none cursor-pointer text-3xl rounded-br text-black plausible-event-name=SelectLoser",
-                            onClick: (function (param) {
-                                setSelectedUsers(function (s) {
-                                      return Belt_MapString.set(s, item.key, "Red");
-                                    });
-                              })
-                          })
-                    ],
-                    className: "grid grid-cols-2"
-                  })
-          );
+                      className: "grid grid-cols-1"
+                    });
+                break;
+            
+          }
+        }
         var match = Belt_MapString.get(selectedUsers, item.key);
         var tmp$1;
-        tmp$1 = match !== undefined ? (
-            match === "Blue" ? (
-                gameMode === "Foosball" ? "ring-6 ring-blue" : "ring-6 ring-green-500"
-              ) : "ring-6 ring-red"
-          ) : "ring-0";
+        if (match !== undefined) {
+          if (match === "Blue") {
+            switch (gameMode) {
+              case "Foosball" :
+                  tmp$1 = "ring-6 ring-blue";
+                  break;
+              case "Darts" :
+                  tmp$1 = "ring-6 ring-green-500";
+                  break;
+              case "Fifa" :
+                  tmp$1 = "ring-6 ring-yellow-500";
+                  break;
+              
+            }
+          } else {
+            tmp$1 = "ring-6 ring-red";
+          }
+        } else {
+          tmp$1 = "ring-0";
+        }
         return JsxRuntime.jsxs(GridItem.make, {
                     active: Belt_MapString.has(selectedUsers, item.key),
                     children: [

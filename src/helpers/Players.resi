@@ -29,6 +29,14 @@ type player = {
   dartsWins: int,
   dartsLosses: int,
   dartsLastGames: array<int>,
+  fifaElo: float,
+  fifaLastEloChange: float,
+  fifaGames: int,
+  fifaWins: int,
+  fifaLosses: int,
+  fifaLastGames: array<int>,
+  fifaGoalsScored: int,
+  fifaGoalsConceded: int,
 }
 
 type playersOrder = [#games | #elo | #rating | #dartsElo]
@@ -50,6 +58,8 @@ let updateGameStats: (string, int, int, team, float) => Js.Json.t => Js.Json.t
 let updateOpenSkillGameStats: (string, int, int, team, float, float, float) => Js.Json.t => Js.Json.t
 
 let updateDartsGameStats: (string, int, float) => Js.Json.t => Js.Json.t
+
+let updateFifaGameStats: (string, int, int, float) => Js.Json.t => Js.Json.t
 
 let writePlayer: player => promise<unit>
 

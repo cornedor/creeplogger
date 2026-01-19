@@ -255,6 +255,43 @@ ${table}
   }
 }
 
+let sendFifaUpdate = async (
+  allPlayers: array<Players.player>,
+  playerScores: Js.Dict.t<int>,
+) => {
+  let formatHandleOrName = (player: Players.player) =>
+    switch player.mattermostHandle {
+    | Some(handle) => `@${handle}`
+    | None => player.name
+    }
+
+  let playerLines =
+    allPlayers
+    ->Array.map(player => {
+      let score = Js.Dict.get(playerScores, player.key)->Option.getOr(0)
+      let eloChange = player.fifaLastEloChange
+      let sign = eloChange >= 0.0 ? "+" : ""
+      let roundedEloChange = Elo.roundScore(eloChange)
+      `| ${formatHandleOrName(player)} | ${score->Int.toString} | ${sign}${roundedEloChange->Int.toString} |`
+    })
+    ->Array.join("\n")
+
+  let message = `### ⚽ Nieuw FIFA potje geregistreerd!
+
+| Speler | Goals | ELO Change |
+| ------ | ----- | ---------- |
+${playerLines}
+`
+
+  switch publishMessage(message) {
+  | Some(promise) =>
+    let _ = await promise
+  | None => ()
+  }
+
+  0
+}
+
 let sendDaysWithoutReset = async (name: string) => {
   let message = `${name} is reset`
 

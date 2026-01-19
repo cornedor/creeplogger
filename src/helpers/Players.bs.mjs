@@ -38,7 +38,15 @@ var playerSchema = Schema.object(function (s) {
               dartsGames: s.fieldOr("dartsGames", Schema.$$int, 0),
               dartsWins: s.fieldOr("dartsWins", Schema.$$int, 0),
               dartsLosses: s.fieldOr("dartsLosses", Schema.$$int, 0),
-              dartsLastGames: s.fieldOr("dartsLastGames", Schema.array(Schema.$$int), [])
+              dartsLastGames: s.fieldOr("dartsLastGames", Schema.array(Schema.$$int), []),
+              fifaElo: s.fieldOr("fifaElo", Schema.$$float, 1000.0),
+              fifaLastEloChange: s.fieldOr("fifaChange", Schema.$$float, 0.0),
+              fifaGames: s.fieldOr("fifaGames", Schema.$$int, 0),
+              fifaWins: s.fieldOr("fifaWins", Schema.$$int, 0),
+              fifaLosses: s.fieldOr("fifaLosses", Schema.$$int, 0),
+              fifaLastGames: s.fieldOr("fifaLastGames", Schema.array(Schema.$$int), []),
+              fifaGoalsScored: s.fieldOr("fifaGoalsScored", Schema.$$int, 0),
+              fifaGoalsConceded: s.fieldOr("fifaGoalsConceded", Schema.$$int, 0)
             };
     });
 
@@ -74,7 +82,15 @@ async function addPlayer(name) {
         dartsGames: 0,
         dartsWins: 0,
         dartsLosses: 0,
-        dartsLastGames: []
+        dartsLastGames: [],
+        fifaElo: 1000.0,
+        fifaLastEloChange: 0.0,
+        fifaGames: 0,
+        fifaWins: 0,
+        fifaLosses: 0,
+        fifaLastGames: [],
+        fifaGoalsScored: 0,
+        fifaGoalsConceded: 0
       }, playerSchema);
   var data$1;
   data$1 = data.TAG === "Ok" ? data._0 : RescriptCore.panic("Could not serialize player");
@@ -255,6 +271,26 @@ function removePlayer(playerKey) {
   return Database$1.remove(Database$1.ref(Database.database, "players/" + playerKey));
 }
 
+function updateFifaGameStats(key, goalsScored, goalsConceded, elo) {
+  var isWin = goalsScored > goalsConceded;
+  var isLoss = goalsScored < goalsConceded;
+  var playerRef = Database$1.ref(Database.database, "players/" + key);
+  return Database$1.runTransaction(playerRef, (function (data) {
+                var player = Schema.parseWith(data, playerSchema);
+                if (player.TAG !== "Ok") {
+                  return data;
+                }
+                var player$1 = player._0;
+                var newrecord = Caml_obj.obj_dup(player$1);
+                var res = Schema.serializeWith((newrecord.fifaGoalsConceded = player$1.fifaGoalsConceded + goalsConceded | 0, newrecord.fifaGoalsScored = player$1.fifaGoalsScored + goalsScored | 0, newrecord.fifaLastGames = getLastGames(player$1.fifaLastGames, isWin), newrecord.fifaLosses = isLoss ? player$1.fifaLosses + 1 | 0 : player$1.fifaLosses, newrecord.fifaWins = isWin ? player$1.fifaWins + 1 | 0 : player$1.fifaWins, newrecord.fifaGames = player$1.fifaGames + 1 | 0, newrecord.fifaLastEloChange = elo - player$1.fifaElo, newrecord.fifaElo = elo, newrecord), playerSchema);
+                if (res.TAG === "Ok") {
+                  return res._0;
+                } else {
+                  return data;
+                }
+              }));
+}
+
 var bucket = "players";
 
 export {
@@ -267,6 +303,7 @@ export {
   updateGameStats ,
   updateOpenSkillGameStats ,
   updateDartsGameStats ,
+  updateFifaGameStats ,
   writePlayer ,
   getLastGames ,
   playersSchema ,
