@@ -63,15 +63,7 @@ function LeaderboardModal(props) {
       case "Darts" :
           return Elo.roundScore(player.dartsElo);
       case "Fifa" :
-          throw {
-                RE_EXN_ID: "Match_failure",
-                _1: [
-                  "LeaderboardModal.res",
-                  33,
-                  4
-                ],
-                Error: new Error()
-              };
+          return Elo.roundScore(player.fifaElo);
       
     }
   };
@@ -82,15 +74,7 @@ function LeaderboardModal(props) {
       case "Darts" :
           return Elo.roundScore(player.dartsElo - player.dartsLastEloChange);
       case "Fifa" :
-          throw {
-                RE_EXN_ID: "Match_failure",
-                _1: [
-                  "LeaderboardModal.res",
-                  39,
-                  4
-                ],
-                Error: new Error()
-              };
+          return Elo.roundScore(player.fifaElo - player.fifaLastEloChange);
       
     }
   };
@@ -201,6 +185,18 @@ function LeaderboardModal(props) {
       case "Darts" :
           tmp = JsxRuntime.jsx("button", {
                 children: JsxRuntime.jsx(DartsIcon.make, {}),
+                "aria-label": "Switch to FIFA leaderboard",
+                className: "text-white w-[44px] aspect-square text-[26px] flex justify-center items-center rounded-full bg-black/0 transition-all ease-in-out duration-200 shadow-none hover:bg-black/20 hover:shadow-icon-button hover:ring-8 ring-black/20 active:bg-black/20 active:shadow-icon-button active:ring-8",
+                onClick: (function (param) {
+                    setGameMode(function (param) {
+                          return "Fifa";
+                        });
+                  })
+              });
+          break;
+      case "Fifa" :
+          tmp = JsxRuntime.jsx("button", {
+                children: JsxRuntime.jsx(SoccerIcon.make, {}),
                 "aria-label": "Switch to Foosball leaderboard",
                 className: "text-white w-[44px] aspect-square text-[26px] flex justify-center items-center rounded-full bg-black/0 transition-all ease-in-out duration-200 shadow-none hover:bg-black/20 hover:shadow-icon-button hover:ring-8 ring-black/20 active:bg-black/20 active:shadow-icon-button active:ring-8",
                 onClick: (function (param) {
@@ -210,16 +206,6 @@ function LeaderboardModal(props) {
                   })
               });
           break;
-      case "Fifa" :
-          throw {
-                RE_EXN_ID: "Match_failure",
-                _1: [
-                  "LeaderboardModal.res",
-                  136,
-                  8
-                ],
-                Error: new Error()
-              };
       
     }
   } else {
@@ -276,15 +262,29 @@ function LeaderboardModal(props) {
             });
         break;
     case "Fifa" :
-        throw {
-              RE_EXN_ID: "Match_failure",
-              _1: [
-                "LeaderboardModal.res",
-                162,
-                11
-              ],
-              Error: new Error()
-            };
+        tmp$1 = JsxRuntime.jsxs(JsxRuntime.Fragment, {
+              children: [
+                JsxRuntime.jsx("th", {
+                      children: JsxRuntime.jsx("button", {
+                            children: "Elo " + (
+                              ascOrder ? "↑" : "↓"
+                            ),
+                            "aria-label": "Toggle sort order",
+                            onClick: (function (param) {
+                                setOrder(function (order) {
+                                      return !order;
+                                    });
+                              })
+                          }),
+                      className: "text-lg text-left"
+                    }),
+                JsxRuntime.jsx("th", {
+                      children: "Δ",
+                      className: "text-lg text-left"
+                    })
+              ]
+            });
+        break;
     
   }
   return JsxRuntime.jsxs(JsxRuntime.Fragment, {
@@ -369,15 +369,14 @@ function LeaderboardModal(props) {
                                                   ];
                                                   break;
                                               case "Fifa" :
-                                                  throw {
-                                                        RE_EXN_ID: "Match_failure",
-                                                        _1: [
-                                                          "LeaderboardModal.res",
-                                                          190,
-                                                          57
-                                                        ],
-                                                        Error: new Error()
-                                                      };
+                                                  match = [
+                                                    player.fifaElo,
+                                                    player.fifaLastEloChange,
+                                                    player.fifaLastGames,
+                                                    player.fifaWins,
+                                                    player.fifaGames
+                                                  ];
+                                                  break;
                                               
                                             }
                                             var games = match[4];
@@ -423,15 +422,20 @@ function LeaderboardModal(props) {
                                                       });
                                                   break;
                                               case "Fifa" :
-                                                  throw {
-                                                        RE_EXN_ID: "Match_failure",
-                                                        _1: [
-                                                          "LeaderboardModal.res",
-                                                          219,
-                                                          13
-                                                        ],
-                                                        Error: new Error()
-                                                      };
+                                                  tmp = JsxRuntime.jsxs(JsxRuntime.Fragment, {
+                                                        children: [
+                                                          JsxRuntime.jsx("td", {
+                                                                children: Elo.roundScore(player.fifaElo)
+                                                              }),
+                                                          JsxRuntime.jsx("td", {
+                                                                children: JsxRuntime.jsx("small", {
+                                                                      children: delta === 0 ? "-" : deltaAbs,
+                                                                      className: deltaColor
+                                                                    })
+                                                              })
+                                                        ]
+                                                      });
+                                                  break;
                                               
                                             }
                                             return JsxRuntime.jsxs("tr", {

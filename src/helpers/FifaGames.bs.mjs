@@ -93,12 +93,9 @@ function useLastGames() {
 }
 
 export {
-  playerScoreSchema ,
-  fifaGameSchema ,
   addFifaGame ,
   fetchAllGames ,
   removeGame ,
-  empty ,
   useLastGames ,
 }
 /* playerScoreSchema Not a pure module */

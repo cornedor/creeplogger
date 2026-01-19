@@ -67,6 +67,19 @@ let make = (
       let player = Players.playerByKey(players, key)->Option.getExn
       let myScore = Js.Dict.get(playerScores, key)->Option.getOr(0)
 
+      // Calculate average opponent ELO
+      let opponentPlayers =
+        selectedPlayerKeys
+        ->Array.filter(k => k != key)
+        ->Array.filterMap(k => Players.playerByKey(players, k))
+
+      let opponentAvgElo = switch Array.length(opponentPlayers) {
+      | 0 => 1000.0
+      | n =>
+        opponentPlayers
+        ->Array.reduce(0.0, (acc, p) => acc +. p.fifaElo) /. Int.toFloat(n)
+      }
+
       // Calculate average opponent score
       let opponentScores =
         playerScoresArray
@@ -81,13 +94,22 @@ let make = (
         ->Int.toFloat /. Int.toFloat(n)
       }
 
-      let isWin = Int.toFloat(myScore) > opponentAvgScore
-      let expectedScore = 1.0 /. (1.0 +. 10.0 ** ((1000.0 -. player.fifaElo) /. 400.0))
-      let actualScore = isWin ? 1.0 : 0.0
-      let k = 32.0
-      let newElo = player.fifaElo +. k *. (actualScore -. expectedScore)
+      // Calculate actual score (1.0 for win, 0.5 for draw, 0.0 for loss)
+      let actualScore = if Int.toFloat(myScore) > opponentAvgScore {
+        1.0
+      } else if Int.toFloat(myScore) == opponentAvgScore {
+        0.5
+      } else {
+        0.0
+      }
 
-      {...player, fifaElo: newElo}
+      // Standard ELO formula with proper opponent ELO
+      let expectedScore = 1.0 /. (1.0 +. 10.0 ** ((opponentAvgElo -. player.fifaElo) /. 400.0))
+      let k = 32.0
+      let eloChange = k *. (actualScore -. expectedScore)
+      let newElo = player.fifaElo +. eloChange
+
+      {...player, fifaElo: newElo, fifaLastEloChange: eloChange}
     })
 
     // Calculate points earned (using the winner's score)

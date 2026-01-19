@@ -33,12 +33,14 @@ let make = (~show, ~setShow, ~gameMode, ~setGameMode) => {
     switch gameMode {
     | Games.Darts => Elo.roundScore(player.dartsElo)
     | Games.Foosball => OpenSkillRating.toDisplayOrdinal(player.ordinal)
+    | Games.Fifa => Elo.roundScore(player.fifaElo)
     }
 
   let getPreviousCompareValue = (player: Players.player) =>
     switch gameMode {
     | Games.Darts => Elo.roundScore(player.dartsElo -. player.dartsLastEloChange)
     | Games.Foosball => OpenSkillRating.toDisplayOrdinal(player.ordinal -. player.lastOpenSkillChange)
+    | Games.Fifa => Elo.roundScore(player.fifaElo -. player.fifaLastEloChange)
     }
 
   // Compute position maps (key -> rank) with tie handling
@@ -143,10 +145,17 @@ let make = (~show, ~setShow, ~gameMode, ~setGameMode) => {
           </button>
         | Games.Darts =>
           <button
+            ariaLabel="Switch to FIFA leaderboard"
+            className="text-white w-[44px] aspect-square text-[26px] flex justify-center items-center rounded-full bg-black/0 transition-all ease-in-out duration-200 shadow-none hover:bg-black/20 hover:shadow-icon-button hover:ring-8 ring-black/20 active:bg-black/20 active:shadow-icon-button active:ring-8"
+            onClick={_ => setGameMode(_ => Games.Fifa)}>
+            <DartsIcon />
+          </button>
+        | Games.Fifa =>
+          <button
             ariaLabel="Switch to Foosball leaderboard"
             className="text-white w-[44px] aspect-square text-[26px] flex justify-center items-center rounded-full bg-black/0 transition-all ease-in-out duration-200 shadow-none hover:bg-black/20 hover:shadow-icon-button hover:ring-8 ring-black/20 active:bg-black/20 active:shadow-icon-button active:ring-8"
             onClick={_ => setGameMode(_ => Games.Foosball)}>
-            <DartsIcon />
+            <SoccerIcon />
           </button>
         }
       | None => React.null
@@ -170,6 +179,15 @@ let make = (~show, ~setShow, ~gameMode, ~setGameMode) => {
               <th className="text-lg text-left"> {React.string("Δ")} </th>
             </>
           | Games.Darts =>
+            <>
+              <th className="text-lg text-left">
+                <button ariaLabel="Toggle sort order" onClick={_ => setOrder(order => !order)}>
+                  {React.string("Elo " ++ (ascOrder ? "↑" : "↓"))}
+                </button>
+              </th>
+              <th className="text-lg text-left"> {React.string("Δ")} </th>
+            </>
+          | Games.Fifa =>
             <>
               <th className="text-lg text-left">
                 <button ariaLabel="Toggle sort order" onClick={_ => setOrder(order => !order)}>
@@ -202,6 +220,13 @@ let make = (~show, ~setShow, ~gameMode, ~setGameMode) => {
               player.wins,
               player.games,
             )
+          | Games.Fifa => (
+              player.fifaElo,
+              player.fifaLastEloChange,
+              player.fifaLastGames,
+              player.fifaWins,
+              player.fifaGames,
+            )
           }
 
           // Derive current and previous positions (canonical ranks)
@@ -231,6 +256,15 @@ let make = (~show, ~setShow, ~gameMode, ~setGameMode) => {
                                                   <td title={"μ=" ++ round2(player.mu)->Js.Float.toString ++ " σ=" ++ round2(player.sigma)->Js.Float.toString ++ " ELO=" ++ round2(player.elo)->Js.Float.toString}>
                    {React.int(OpenSkillRating.toDisplayOrdinal(player.ordinal))}
                  </td>
+                <td>
+                  <small className={deltaColor}>
+                    {delta == 0 ? React.string("-") : React.int(deltaAbs)}
+                  </small>
+                </td>
+              </>
+            | Games.Fifa =>
+              <>
+                <td> {React.int(Elo.roundScore(player.fifaElo))} </td>
                 <td>
                   <small className={deltaColor}>
                     {delta == 0 ? React.string("-") : React.int(deltaAbs)}

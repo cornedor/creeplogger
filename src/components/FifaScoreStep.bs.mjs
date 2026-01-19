@@ -78,20 +78,32 @@ function FifaScoreStep(props) {
     var updatedPlayers = selectedPlayerKeys.map(function (key) {
           var player = Core__Option.getExn(Players.playerByKey(players, key), undefined);
           var myScore = Core__Option.getOr(Js_dict.get(playerScores, key), 0);
+          var opponentPlayers = Core__Array.filterMap(selectedPlayerKeys.filter(function (k) {
+                    return k !== key;
+                  }), (function (k) {
+                  return Players.playerByKey(players, k);
+                }));
+          var n = opponentPlayers.length;
+          var opponentAvgElo = n !== 0 ? Core__Array.reduce(opponentPlayers, 0.0, (function (acc, p) {
+                    return acc + p.fifaElo;
+                  })) / n : 1000.0;
           var opponentScores = playerScoresArray.filter(function (ps) {
                   return ps.playerKey !== key;
                 }).map(function (ps) {
                 return ps.score;
               });
-          var n = opponentScores.length;
-          var opponentAvgScore = n !== 0 ? Core__Array.reduce(opponentScores, 0, (function (acc, score) {
+          var n$1 = opponentScores.length;
+          var opponentAvgScore = n$1 !== 0 ? Core__Array.reduce(opponentScores, 0, (function (acc, score) {
                     return acc + score | 0;
-                  })) / n : 0.0;
-          var isWin = myScore > opponentAvgScore;
-          var expectedScore = 1.0 / (1.0 + Math.pow(10.0, (1000.0 - player.fifaElo) / 400.0));
-          var actualScore = isWin ? 1.0 : 0.0;
-          var newElo = player.fifaElo + 32.0 * (actualScore - expectedScore);
+                  })) / n$1 : 0.0;
+          var actualScore = myScore > opponentAvgScore ? 1.0 : (
+              myScore === opponentAvgScore ? 0.5 : 0.0
+            );
+          var expectedScore = 1.0 / (1.0 + Math.pow(10.0, (opponentAvgElo - player.fifaElo) / 400.0));
+          var eloChange = 32.0 * (actualScore - expectedScore);
+          var newElo = player.fifaElo + eloChange;
           var newrecord = Caml_obj.obj_dup(player);
+          newrecord.fifaLastEloChange = eloChange;
           newrecord.fifaElo = newElo;
           return newrecord;
         });
