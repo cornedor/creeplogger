@@ -3,26 +3,48 @@
 type team = array<Players.player>
 
 @inline
-let getOpenSkillRating = (player: Players.player) =>
-  OpenSkill.createRating(~mu=player.mu, ~sigma=player.sigma, ())
+let getOpenSkillRating = (player: Players.player, ~gameMode: Games.gameMode=Games.Foosball) =>
+  switch gameMode {
+  | Games.Fifa => OpenSkill.createRating(~mu=player.fifaMu, ~sigma=player.fifaSigma, ())
+  | _ => OpenSkill.createRating(~mu=player.mu, ~sigma=player.sigma, ())
+  }
 
 @inline
 let calculateOrdinal = (mu: float, sigma: float) => mu -. 3.0 *. sigma
 
 // Convert team of players to array of OpenSkill ratings
-let teamToRatings = (team: team) => Array.map(team, getOpenSkillRating)
+let teamToRatings = (team: team, ~gameMode: Games.gameMode=Games.Foosball) =>
+  Array.map(team, player => getOpenSkillRating(player, ~gameMode))
 
 // Update a player with new OpenSkill values
-let updatePlayerRating = (player: Players.player, newRating: OpenSkill.rating) => {
+let updatePlayerRating = (
+  player: Players.player,
+  newRating: OpenSkill.rating,
+  ~gameMode: Games.gameMode=Games.Foosball,
+) => {
   let newOrdinal = calculateOrdinal(newRating.mu, newRating.sigma)
-  let osDelta = newOrdinal -. player.ordinal
 
-  {
-    ...player,
-    mu: newRating.mu,
-    sigma: newRating.sigma,
-    ordinal: newOrdinal,
-    lastOpenSkillChange: osDelta,
+  switch gameMode {
+  | Games.Fifa => {
+      let osDelta = newOrdinal -. player.fifaOrdinal
+      {
+        ...player,
+        fifaMu: newRating.mu,
+        fifaSigma: newRating.sigma,
+        fifaOrdinal: newOrdinal,
+        fifaLastOpenSkillChange: osDelta,
+      }
+    }
+  | _ => {
+      let osDelta = newOrdinal -. player.ordinal
+      {
+        ...player,
+        mu: newRating.mu,
+        sigma: newRating.sigma,
+        ordinal: newOrdinal,
+        lastOpenSkillChange: osDelta,
+      }
+    }
   }
 }
 
@@ -37,10 +59,8 @@ let toDisplayDelta = (delta: float) => (delta *. 60.0)->Js.Math.round->Float.toI
 // Returns (updated winners, updated losers, points change for display)
 let calculateScore = (winners: team, losers: team, ~gameMode: Games.gameMode=Games.Foosball) => {
   // Convert teams to OpenSkill ratings
-  let winnerRatings = teamToRatings(winners)
-  let loserRatings = teamToRatings(losers)
-
-  let _todo = gameMode
+  let winnerRatings = teamToRatings(winners, ~gameMode)
+  let loserRatings = teamToRatings(losers, ~gameMode)
 
   // Calculate new ratings
   let (newWinnerRatings, newLoserRatings) = OpenSkill.rateGame(winnerRatings, loserRatings)
@@ -48,18 +68,23 @@ let calculateScore = (winners: team, losers: team, ~gameMode: Games.gameMode=Gam
   // Update players with new ratings
   let updatedWinners = Array.mapWithIndex(winners, (player, index) => {
     let newRating = Array.getUnsafe(newWinnerRatings, index)
-    updatePlayerRating(player, newRating)
+    updatePlayerRating(player, newRating, ~gameMode)
   })
 
   let updatedLosers = Array.mapWithIndex(losers, (player, index) => {
     let newRating = Array.getUnsafe(newLoserRatings, index)
-    updatePlayerRating(player, newRating)
+    updatePlayerRating(player, newRating, ~gameMode)
   })
 
   // Calculate average rating change for display (using OpenSkill delta)
-  let avgWinnerChange =
+  let avgWinnerChange = switch gameMode {
+  | Games.Fifa =>
+    Array.reduce(updatedWinners, 0.0, (acc, player) => acc +. player.fifaLastOpenSkillChange) /.
+    Int.toFloat(Array.length(updatedWinners))
+  | _ =>
     Array.reduce(updatedWinners, 0.0, (acc, player) => acc +. player.lastOpenSkillChange) /.
     Int.toFloat(Array.length(updatedWinners))
+  }
 
   (updatedWinners, updatedLosers, avgWinnerChange)
 }

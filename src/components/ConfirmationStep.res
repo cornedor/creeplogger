@@ -20,7 +20,7 @@ let make = (~score, ~winners, ~reset, ~players, ~perPlayerDeltas: option<Js.Dict
       className="text-lime-400 text-[160px]"
       style={ReactDOM.Style.make(~textShadow="0 0 20px rgb(163 230 53)", ())}>
       {React.string("+")}
-      {React.int(score)}
+      {React.int(Math.round(score)->Float.toInt)}
     </div>
     {switch perPlayerDeltas {
     | Some(map) => {

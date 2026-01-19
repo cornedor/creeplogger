@@ -121,7 +121,7 @@ let make = (
 
     let roundedPoints = OpenSkillRating.toDisplayDelta(osPoints)
 
-    setEarnedPoints(_ => roundedPoints)
+    setEarnedPoints(_ => Int.toFloat(roundedPoints))
 
     // Collect per-player display deltas for winners and losers
     let deltas: Js.Dict.t<int> = Js.Dict.empty()

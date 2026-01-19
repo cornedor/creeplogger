@@ -49,7 +49,7 @@ function ConfirmationStep(props) {
                 JsxRuntime.jsxs("div", {
                       children: [
                         "+",
-                        props.score
+                        Math.round(props.score) | 0
                       ],
                       className: "text-lime-400 text-[160px]",
                       style: {

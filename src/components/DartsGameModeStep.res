@@ -74,7 +74,7 @@ let make = (~selectedUsers, ~setStep, ~reset, ~setEarnedPoints, ~players, ~gameM
 
     let roundedPoints = Elo.roundScore(points)
 
-    setEarnedPoints(_ => roundedPoints)
+    setEarnedPoints(_ => Int.toFloat(roundedPoints))
 
     let _ = await Promise.all(
       Array.map(winners, async player => {

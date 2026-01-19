@@ -1,22 +1,18 @@
 open Firebase
 
-type playerScore = {
-  playerKey: string,
-  score: int,
-}
-
 type fifaGame = {
-  playerScores: array<playerScore>,
+  blueScore: int,
+  redScore: int,
+  blueTeam: array<string>,
+  redTeam: array<string>,
   date: Date.t,
 }
 
-let playerScoreSchema = Schema.object(s => {
-  playerKey: s.field("p", Schema.string),
-  score: s.field("s", Schema.int),
-})
-
 let fifaGameSchema = Schema.object(s => {
-  playerScores: s.field("ps", Schema.array(playerScoreSchema)),
+  blueScore: s.field("bs", Schema.int),
+  redScore: s.field("rs", Schema.int),
+  blueTeam: s.field("bt", Schema.array(Schema.string)),
+  redTeam: s.field("rt", Schema.array(Schema.string)),
   date: s.field(
     "d",
     Schema.float->Schema.transform(_ => {

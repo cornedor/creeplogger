@@ -37,7 +37,7 @@ function Logger(props) {
   var setBlueState = match$4[1];
   var blueState = match$4[0];
   var match$5 = React.useState(function () {
-        return 0;
+        return 0.0;
       });
   var setEarnedPoints = match$5[1];
   var match$6 = React.useState(function () {
@@ -61,7 +61,7 @@ function Logger(props) {
           return -1;
         });
     setEarnedPoints(function (param) {
-          return 0;
+          return 0.0;
         });
   };
   Games.getTimePeriod("Daily");

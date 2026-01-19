@@ -6,16 +6,12 @@ import * as Database from "./Database.bs.mjs";
 import * as RescriptCore from "@rescript/core/src/RescriptCore.bs.mjs";
 import * as Database$1 from "firebase/database";
 
-var playerScoreSchema = Schema.object(function (s) {
-      return {
-              playerKey: s.f("p", Schema.string),
-              score: s.f("s", Schema.$$int)
-            };
-    });
-
 var fifaGameSchema = Schema.object(function (s) {
       return {
-              playerScores: s.f("ps", Schema.array(playerScoreSchema)),
+              blueScore: s.f("bs", Schema.$$int),
+              redScore: s.f("rs", Schema.$$int),
+              blueTeam: s.f("bt", Schema.array(Schema.string)),
+              redTeam: s.f("rt", Schema.array(Schema.string)),
               date: s.f("d", Schema.transform(Schema.$$float, (function (param) {
                           return {
                                   p: (function (prim) {
@@ -98,4 +94,4 @@ export {
   removeGame ,
   useLastGames ,
 }
-/* playerScoreSchema Not a pure module */
+/* fifaGameSchema Not a pure module */

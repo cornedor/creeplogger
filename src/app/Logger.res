@@ -13,7 +13,7 @@ let make = (~players: array<Players.player>) => {
   let (step, setStep) = React.useState(_ => LoggerStep.UserSelection)
   let (redState, setRedState) = React.useState(_ => -1)
   let (blueState, setBlueState) = React.useState(_ => -1)
-  let (earnedPoints, setEarnedPoints) = React.useState(_ => 0)
+  let (earnedPoints, setEarnedPoints) = React.useState(_ => 0.0)
   let (perPlayerDeltas, setPerPlayerDeltas) = React.useState(_ => Js.Dict.empty())
   let (gameMode, setGameMode) = React.useState(_ => Games.Foosball)
 
@@ -22,7 +22,7 @@ let make = (~players: array<Players.player>) => {
     setSelectedUsers(_ => Belt.Map.String.empty)
     setBlueState(_ => -1)
     setRedState(_ => -1)
-    setEarnedPoints(_ => 0)
+    setEarnedPoints(_ => 0.0)
   }
 
   let _ = Games.getTimePeriod(Daily)

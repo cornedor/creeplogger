@@ -1,10 +1,8 @@
-type playerScore = {
-  playerKey: string,
-  score: int,
-}
-
 type fifaGame = {
-  playerScores: array<playerScore>,
+  blueScore: int,
+  redScore: int,
+  blueTeam: array<string>,
+  redTeam: array<string>,
   date: Date.t,
 }
 

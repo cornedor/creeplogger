@@ -256,31 +256,41 @@ ${table}
 }
 
 let sendFifaUpdate = async (
-  allPlayers: array<Players.player>,
-  playerScores: Js.Dict.t<int>,
+  bluePlayers: array<Players.player>,
+  redPlayers: array<Players.player>,
+  blueScore: int,
+  redScore: int,
 ) => {
-  let formatHandleOrName = (player: Players.player) =>
-    switch player.mattermostHandle {
+  let formatPlayerWithChange = (player: Players.player) => {
+    let name = switch player.mattermostHandle {
     | Some(handle) => `@${handle}`
     | None => player.name
     }
+    let change = OpenSkillRating.toDisplayDelta(player.fifaLastOpenSkillChange)
+    let sign = change >= 0 ? "+" : ""
+    `${name} (${sign}${change->Int.toString})`
+  }
 
-  let playerLines =
-    allPlayers
-    ->Array.map(player => {
-      let score = Js.Dict.get(playerScores, player.key)->Option.getOr(0)
-      let eloChange = player.fifaLastEloChange
-      let sign = eloChange >= 0.0 ? "+" : ""
-      let roundedEloChange = Elo.roundScore(eloChange)
-      `| ${formatHandleOrName(player)} | ${score->Int.toString} | ${sign}${roundedEloChange->Int.toString} |`
-    })
-    ->Array.join("\n")
+  let blueNames =
+    bluePlayers
+    ->Array.map(formatPlayerWithChange)
+    ->Array.join(", ")
+
+  let redNames =
+    redPlayers
+    ->Array.map(formatPlayerWithChange)
+    ->Array.join(", ")
+
+  let winningTeam = blueScore > redScore ? "Blauw" : "Rood"
 
   let message = `### ⚽ Nieuw FIFA potje geregistreerd!
 
-| Speler | Goals | ELO Change |
-| ------ | ----- | ---------- |
-${playerLines}
+**${winningTeam}** heeft gewonnen!
+
+| Team | Spelers | Score |
+| ---- | ------- | ----- |
+| Blauw | ${blueNames} | ${blueScore->Int.toString} |
+| Rood | ${redNames} | ${redScore->Int.toString} |
 `
 
   switch publishMessage(message) {

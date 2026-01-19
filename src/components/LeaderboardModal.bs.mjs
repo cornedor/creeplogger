@@ -28,17 +28,22 @@ function LeaderboardModal(props) {
           return players.filter(function (player) {
                       var match;
                       switch (gameMode) {
+                        case "Foosball" :
+                            match = [
+                              player.ordinal,
+                              player.games
+                            ];
+                            break;
                         case "Darts" :
                             match = [
                               player.dartsElo,
                               player.dartsGames
                             ];
                             break;
-                        case "Foosball" :
                         case "Fifa" :
                             match = [
-                              player.ordinal,
-                              player.games
+                              player.fifaOrdinal,
+                              player.fifaGames
                             ];
                             break;
                         
@@ -63,7 +68,7 @@ function LeaderboardModal(props) {
       case "Darts" :
           return Elo.roundScore(player.dartsElo);
       case "Fifa" :
-          return Elo.roundScore(player.fifaElo);
+          return OpenSkillRating.toDisplayOrdinal(player.fifaOrdinal);
       
     }
   };
@@ -74,7 +79,7 @@ function LeaderboardModal(props) {
       case "Darts" :
           return Elo.roundScore(player.dartsElo - player.dartsLastEloChange);
       case "Fifa" :
-          return Elo.roundScore(player.fifaElo - player.fifaLastEloChange);
+          return OpenSkillRating.toDisplayOrdinal(player.fifaOrdinal - player.fifaLastOpenSkillChange);
       
     }
   };
@@ -266,7 +271,7 @@ function LeaderboardModal(props) {
               children: [
                 JsxRuntime.jsx("th", {
                       children: JsxRuntime.jsx("button", {
-                            children: "Elo " + (
+                            children: "Score " + (
                               ascOrder ? "↑" : "↓"
                             ),
                             "aria-label": "Toggle sort order",
@@ -370,8 +375,8 @@ function LeaderboardModal(props) {
                                                   break;
                                               case "Fifa" :
                                                   match = [
-                                                    player.fifaElo,
-                                                    player.fifaLastEloChange,
+                                                    player.fifaOrdinal,
+                                                    player.fifaLastOpenSkillChange,
                                                     player.fifaLastGames,
                                                     player.fifaWins,
                                                     player.fifaGames
@@ -425,7 +430,8 @@ function LeaderboardModal(props) {
                                                   tmp = JsxRuntime.jsxs(JsxRuntime.Fragment, {
                                                         children: [
                                                           JsxRuntime.jsx("td", {
-                                                                children: Elo.roundScore(player.fifaElo)
+                                                                children: OpenSkillRating.toDisplayOrdinal(player.fifaOrdinal),
+                                                                title: "μ=" + round2(player.fifaMu).toString() + " σ=" + round2(player.fifaSigma).toString()
                                                               }),
                                                           JsxRuntime.jsx("td", {
                                                                 children: JsxRuntime.jsx("small", {

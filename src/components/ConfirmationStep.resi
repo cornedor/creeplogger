@@ -1,6 +1,6 @@
 @react.component
 let make: (
-  ~score: int,
+  ~score: float,
   ~winners: array<string>,
   ~reset: unit => unit,
   ~players: array<Players.player>,

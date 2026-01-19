@@ -2,17 +2,15 @@
 
 import * as React from "react";
 import * as Header from "./Header.bs.mjs";
-import * as Js_dict from "rescript/lib/es6/js_dict.js";
 import * as Players from "../helpers/Players.bs.mjs";
-import * as Caml_obj from "rescript/lib/es6/caml_obj.js";
 import * as Core__Int from "@rescript/core/src/Core__Int.bs.mjs";
 import * as FifaGames from "../helpers/FifaGames.bs.mjs";
-import * as Caml_int32 from "rescript/lib/es6/caml_int32.js";
 import * as LoggerStep from "../helpers/LoggerStep.bs.mjs";
 import * as Mattermost from "../helpers/Mattermost.bs.mjs";
-import * as Core__Array from "@rescript/core/src/Core__Array.bs.mjs";
 import * as Core__Option from "@rescript/core/src/Core__Option.bs.mjs";
+import * as RescriptCore from "@rescript/core/src/RescriptCore.bs.mjs";
 import * as Belt_MapString from "rescript/lib/es6/belt_MapString.js";
+import * as OpenSkillRating from "../helpers/OpenSkillRating.bs.mjs";
 import * as JsxRuntime from "react/jsx-runtime";
 
 function mapUser(players, key) {
@@ -32,96 +30,78 @@ function FifaScoreStep(props) {
   var players = props.players;
   var setEarnedPoints = props.setEarnedPoints;
   var setStep = props.setStep;
+  var selectedUsers = props.selectedUsers;
   var match = React.useState(function () {
         return false;
       });
   var setIsSaving = match[1];
   var match$1 = React.useState(function () {
-        return {};
+        return "";
       });
-  var setPlayerScores = match$1[1];
-  var playerScores = match$1[0];
+  var setBlueScore = match$1[1];
+  var blueScore = match$1[0];
+  var match$2 = React.useState(function () {
+        return "";
+      });
+  var setRedScore = match$2[1];
+  var redScore = match$2[0];
   var mapUser$1 = function (extra) {
     return mapUser(players, extra);
   };
-  var selectedPlayerKeys = Belt_MapString.keysToArray(props.selectedUsers);
-  var allPlayers = selectedPlayerKeys.map(function (key) {
+  var selectedBlueUsers = Belt_MapString.keysToArray(Belt_MapString.keep(selectedUsers, (function (param, value) {
+              return value === "Blue";
+            })));
+  var selectedRedUsers = Belt_MapString.keysToArray(Belt_MapString.keep(selectedUsers, (function (param, value) {
+              return value === "Red";
+            })));
+  var blueUsers = selectedBlueUsers.map(mapUser$1);
+  var redUsers = selectedRedUsers.map(mapUser$1);
+  var redPlayers = selectedRedUsers.map(function (key) {
         return Core__Option.getExn(Players.playerByKey(players, key), undefined);
       });
-  var allScoresEntered = selectedPlayerKeys.every(function (key) {
-        return Core__Option.isSome(Js_dict.get(playerScores, key));
+  var bluePlayers = selectedBlueUsers.map(function (key) {
+        return Core__Option.getExn(Players.playerByKey(players, key), undefined);
       });
+  var sendUpdate = function (extra, extra$1) {
+    return Mattermost.sendFifaUpdate(bluePlayers, redPlayers, extra, extra$1);
+  };
+  var blueScoreInt = Core__Option.getOr(Core__Int.fromString(blueScore, undefined), 0);
+  var redScoreInt = Core__Option.getOr(Core__Int.fromString(redScore, undefined), 0);
   var saveGame = async function () {
     setIsSaving(function (param) {
           return true;
         });
-    var playerScoresArray = selectedPlayerKeys.map(function (key) {
-          var score = Core__Option.getOr(Js_dict.get(playerScores, key), 0);
-          return {
-                  playerKey: key,
-                  score: score
-                };
-        });
     await FifaGames.addFifaGame({
-          playerScores: playerScoresArray,
+          blueScore: blueScoreInt,
+          redScore: redScoreInt,
+          blueTeam: selectedBlueUsers,
+          redTeam: selectedRedUsers,
           date: new Date()
         });
-    var maxScore = Core__Array.reduce(playerScoresArray.map(function (ps) {
-              return ps.score;
-            }), 0, (function (acc, score) {
-            if (acc > score) {
-              return acc;
-            } else {
-              return score;
-            }
-          }));
-    var updatedPlayers = selectedPlayerKeys.map(function (key) {
-          var player = Core__Option.getExn(Players.playerByKey(players, key), undefined);
-          var myScore = Core__Option.getOr(Js_dict.get(playerScores, key), 0);
-          var opponentPlayers = Core__Array.filterMap(selectedPlayerKeys.filter(function (k) {
-                    return k !== key;
-                  }), (function (k) {
-                  return Players.playerByKey(players, k);
-                }));
-          var n = opponentPlayers.length;
-          var opponentAvgElo = n !== 0 ? Core__Array.reduce(opponentPlayers, 0.0, (function (acc, p) {
-                    return acc + p.fifaElo;
-                  })) / n : 1000.0;
-          var opponentScores = playerScoresArray.filter(function (ps) {
-                  return ps.playerKey !== key;
-                }).map(function (ps) {
-                return ps.score;
-              });
-          var n$1 = opponentScores.length;
-          var opponentAvgScore = n$1 !== 0 ? Core__Array.reduce(opponentScores, 0, (function (acc, score) {
-                    return acc + score | 0;
-                  })) / n$1 : 0.0;
-          var actualScore = myScore > opponentAvgScore ? 1.0 : (
-              myScore === opponentAvgScore ? 0.5 : 0.0
-            );
-          var expectedScore = 1.0 / (1.0 + Math.pow(10.0, (opponentAvgElo - player.fifaElo) / 400.0));
-          var eloChange = 32.0 * (actualScore - expectedScore);
-          var newElo = player.fifaElo + eloChange;
-          var newrecord = Caml_obj.obj_dup(player);
-          newrecord.fifaLastEloChange = eloChange;
-          newrecord.fifaElo = newElo;
-          return newrecord;
-        });
+    var winningTeam = blueScoreInt > redScoreInt ? "Blue" : (
+        redScoreInt > blueScoreInt ? "Red" : RescriptCore.panic("Tie not implemented for FIFA")
+      );
+    var match;
+    if (winningTeam === "Blue") {
+      match = OpenSkillRating.calculateScore(bluePlayers, redPlayers, "Fifa");
+    } else {
+      var match$1 = OpenSkillRating.calculateScore(redPlayers, bluePlayers, "Fifa");
+      match = [
+        match$1[1],
+        match$1[0],
+        match$1[2]
+      ];
+    }
+    var osPoints = match[2];
     setEarnedPoints(function (param) {
-          return maxScore;
+          return osPoints;
         });
-    await Promise.all(updatedPlayers.map(async function (player) {
-              var myScore = Core__Option.getOr(Js_dict.get(playerScores, player.key), 0);
-              var totalOpponentScore = Core__Array.reduce(playerScoresArray.filter(function (ps) {
-                        return ps.playerKey !== player.key;
-                      }), 0, (function (acc, ps) {
-                      return acc + ps.score | 0;
-                    }));
-              var n = playerScoresArray.length - 1 | 0;
-              var avgOpponentScore = n !== 0 ? Caml_int32.div(totalOpponentScore, n) : 0;
-              return Players.updateFifaGameStats(player.key, myScore, avgOpponentScore, player.fifaElo);
-            }));
-    await Mattermost.sendFifaUpdate(allPlayers, playerScores);
+    await Promise.all(match[0].map(async function (player) {
+                return Players.updateFifaGameStats(player.key, blueScoreInt, redScoreInt, player.fifaMu, player.fifaSigma, player.fifaOrdinal, player.fifaLastOpenSkillChange);
+              }).concat(match[1].map(async function (player) {
+                  return Players.updateFifaGameStats(player.key, redScoreInt, blueScoreInt, player.fifaMu, player.fifaSigma, player.fifaOrdinal, player.fifaLastOpenSkillChange);
+                })));
+    await sendUpdate(blueScoreInt, redScoreInt);
     setIsSaving(function (param) {
           return false;
         });
@@ -129,6 +109,7 @@ function FifaScoreStep(props) {
                 return LoggerStep.getNextStep(step);
               });
   };
+  var allScoresEntered = blueScore !== "" && redScore !== "";
   return JsxRuntime.jsxs(JsxRuntime.Fragment, {
               children: [
                 JsxRuntime.jsx(Header.make, {
@@ -148,60 +129,50 @@ function FifaScoreStep(props) {
                         JsxRuntime.jsxs("div", {
                               children: [
                                 JsxRuntime.jsx("h2", {
-                                      children: "FIFA Scores",
-                                      className: "font-bold text-3xl"
+                                      children: "Blauw",
+                                      className: "font-bold text-3xl text-[#86b7ff]"
                                     }),
-                                JsxRuntime.jsx("div", {
-                                      children: selectedPlayerKeys.map(function (key) {
-                                            var player = Players.playerByKey(players, key);
-                                            if (player !== undefined) {
-                                              return JsxRuntime.jsxs("div", {
-                                                          children: [
-                                                            JsxRuntime.jsx("label", {
-                                                                  children: player.name,
-                                                                  className: "text-xl w-32"
-                                                                }),
-                                                            JsxRuntime.jsx("input", {
-                                                                  className: "w-24 px-3 py-2 text-2xl text-white bg-white/10 rounded mr-4",
-                                                                  min: "0",
-                                                                  type: "number",
-                                                                  value: Core__Option.getOr(Core__Option.map(Js_dict.get(playerScores, key), (function (score) {
-                                                                              return score.toString();
-                                                                            })), ""),
-                                                                  onChange: (function (e) {
-                                                                      var value = e.target.value;
-                                                                      var newScores = Js_dict.fromArray(Js_dict.entries(playerScores));
-                                                                      var score = Core__Int.fromString(value, undefined);
-                                                                      if (score !== undefined) {
-                                                                        newScores[key] = score;
-                                                                      } else {
-                                                                        newScores[key] = 0;
-                                                                      }
-                                                                      setPlayerScores(function (param) {
-                                                                            return newScores;
-                                                                          });
-                                                                    })
-                                                                })
-                                                          ],
-                                                          className: "flex items-center gap-4"
-                                                        }, key);
-                                            } else {
-                                              return null;
-                                            }
-                                          }),
-                                      className: "flex flex-col gap-4 pt-4"
+                                JsxRuntime.jsx("ol", {
+                                      children: blueUsers,
+                                      className: "pl-5 pt-4 pb-8 list-decimal text-2xl"
+                                    }),
+                                JsxRuntime.jsx("input", {
+                                      className: "w-32 px-4 py-3 text-3xl text-white bg-white/10 rounded",
+                                      min: "0",
+                                      placeholder: "Score",
+                                      type: "number",
+                                      value: blueScore,
+                                      onChange: (function (e) {
+                                          var value = e.target.value;
+                                          setBlueScore(function (param) {
+                                                return value;
+                                              });
+                                        })
                                     })
                               ]
                             }),
                         JsxRuntime.jsxs("div", {
                               children: [
                                 JsxRuntime.jsx("h2", {
-                                      children: "Players",
-                                      className: "font-bold text-3xl"
+                                      children: "Rood",
+                                      className: "font-bold text-3xl text-[#ff8686]"
                                     }),
                                 JsxRuntime.jsx("ol", {
-                                      children: selectedPlayerKeys.map(mapUser$1),
+                                      children: redUsers,
                                       className: "pl-5 pt-4 pb-8 list-decimal text-2xl"
+                                    }),
+                                JsxRuntime.jsx("input", {
+                                      className: "w-32 px-4 py-3 text-3xl text-white bg-white/10 rounded",
+                                      min: "0",
+                                      placeholder: "Score",
+                                      type: "number",
+                                      value: redScore,
+                                      onChange: (function (e) {
+                                          var value = e.target.value;
+                                          setRedScore(function (param) {
+                                                return value;
+                                              });
+                                        })
                                     })
                               ]
                             })

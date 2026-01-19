@@ -31,14 +31,16 @@ type player = {
   dartsLosses: int,
   dartsLastGames: array<int>,
   // FIFA fields
-  fifaElo: float,
-  fifaLastEloChange: float,
   fifaGames: int,
   fifaWins: int,
   fifaLosses: int,
   fifaLastGames: array<int>,
   fifaGoalsScored: int,
   fifaGoalsConceded: int,
+  fifaMu: float,
+  fifaSigma: float,
+  fifaOrdinal: float,
+  fifaLastOpenSkillChange: float,
 }
 
 type team = Blue | Red
@@ -75,14 +77,16 @@ let playerSchema = Schema.object(s => {
   dartsWins: s.fieldOr("dartsWins", Schema.int, 0),
   dartsLosses: s.fieldOr("dartsLosses", Schema.int, 0),
   dartsLastGames: s.fieldOr("dartsLastGames", Schema.array(Schema.int), []),
-  fifaElo: s.fieldOr("fifaElo", Schema.float, 1000.0),
-  fifaLastEloChange: s.fieldOr("fifaChange", Schema.float, 0.0),
   fifaGames: s.fieldOr("fifaGames", Schema.int, 0),
   fifaWins: s.fieldOr("fifaWins", Schema.int, 0),
   fifaLosses: s.fieldOr("fifaLosses", Schema.int, 0),
   fifaLastGames: s.fieldOr("fifaLastGames", Schema.array(Schema.int), []),
   fifaGoalsScored: s.fieldOr("fifaGoalsScored", Schema.int, 0),
   fifaGoalsConceded: s.fieldOr("fifaGoalsConceded", Schema.int, 0),
+  fifaMu: s.fieldOr("fifaMu", Schema.float, 25.0),
+  fifaSigma: s.fieldOr("fifaSigma", Schema.float, 8.333),
+  fifaOrdinal: s.fieldOr("fifaOrdinal", Schema.float, 0.0),
+  fifaLastOpenSkillChange: s.fieldOr("fifaOsChange", Schema.float, 0.0),
 })
 
 let playersSchema = Schema.dict(playerSchema)
@@ -118,14 +122,16 @@ let addPlayer = async name => {
     dartsWins: 0,
     dartsLosses: 0,
     dartsLastGames: [],
-    fifaElo: 1000.0,
-    fifaLastEloChange: 0.0,
     fifaGames: 0,
     fifaWins: 0,
     fifaLosses: 0,
     fifaLastGames: [],
     fifaGoalsScored: 0,
     fifaGoalsConceded: 0,
+    fifaMu: 25.0,
+    fifaSigma: 8.333,
+    fifaOrdinal: 0.0,
+    fifaLastOpenSkillChange: 0.0,
   }->Schema.serializeWith(playerSchema) {
   | Ok(data) => data
   | Error(_error) => panic("Could not serialize player")
@@ -344,7 +350,7 @@ let removePlayer = playerKey => {
 }
 
 // Update FIFA game stats
-let updateFifaGameStats = (key, goalsScored, goalsConceded, elo) => {
+let updateFifaGameStats = (key, goalsScored, goalsConceded, mu, sigma, ordinal, osChange) => {
   let isWin = goalsScored > goalsConceded
   let isLoss = goalsScored < goalsConceded
 
@@ -361,8 +367,10 @@ let updateFifaGameStats = (key, goalsScored, goalsConceded, elo) => {
           fifaLastGames: getLastGames(player.fifaLastGames, isWin),
           fifaGoalsScored: player.fifaGoalsScored + goalsScored,
           fifaGoalsConceded: player.fifaGoalsConceded + goalsConceded,
-          fifaElo: elo,
-          fifaLastEloChange: elo -. player.fifaElo,
+          fifaMu: mu,
+          fifaSigma: sigma,
+          fifaOrdinal: ordinal,
+          fifaLastOpenSkillChange: osChange,
         },
         playerSchema,
       ) {
