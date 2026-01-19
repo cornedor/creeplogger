@@ -162,7 +162,7 @@ function FifaScoreStep(props) {
                                                                   className: "text-xl w-32"
                                                                 }),
                                                             JsxRuntime.jsx("input", {
-                                                                  className: "w-24 px-3 py-2 text-xl text-black rounded",
+                                                                  className: "w-24 px-3 py-2 text-2xl text-white bg-white/10 rounded mr-4",
                                                                   min: "0",
                                                                   type: "number",
                                                                   value: Core__Option.getOr(Core__Option.map(Js_dict.get(playerScores, key), (function (score) {

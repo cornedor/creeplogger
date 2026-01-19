@@ -169,7 +169,7 @@ let make = (
                 <input
                   type_="number"
                   min="0"
-                  className="w-24 px-3 py-2 text-xl text-black rounded"
+                  className="w-24 px-3 py-2 text-2xl text-white bg-white/10 rounded mr-4"
                   value={Js.Dict.get(playerScores, key)
                   ->Option.map(score => Int.toString(score))
                   ->Option.getOr("")}
