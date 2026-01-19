@@ -151,17 +151,28 @@ function UserGrid(props) {
                     });
                 break;
             case "Fifa" :
-                tmp = JsxRuntime.jsx("div", {
-                      children: JsxRuntime.jsx("button", {
-                            children: "Select",
-                            className: "bg-yellow-500 border-none cursor-pointer text-xl lg:text-3xl rounded-b text-black plausible-event-name=SelectFifa",
-                            onClick: (function (param) {
-                                setSelectedUsers(function (s) {
-                                      return Belt_MapString.set(s, item.key, "Blue");
-                                    });
-                              })
-                          }),
-                      className: "grid grid-cols-1"
+                tmp = JsxRuntime.jsxs("div", {
+                      children: [
+                        JsxRuntime.jsx("button", {
+                              children: "Blauw",
+                              className: "bg-[#86b7ff] border-none cursor-pointer text-xl lg:text-3xl rounded-bl text-black plausible-event-name=SelectBlue",
+                              onClick: (function (param) {
+                                  setSelectedUsers(function (s) {
+                                        return Belt_MapString.set(s, item.key, "Blue");
+                                      });
+                                })
+                            }),
+                        JsxRuntime.jsx("button", {
+                              children: "Rood",
+                              className: "bg-[#ff8686] border-none cursor-pointer text-xl lg:text-3xl rounded-br text-black plausible-event-name=SelectRed",
+                              onClick: (function (param) {
+                                  setSelectedUsers(function (s) {
+                                        return Belt_MapString.set(s, item.key, "Red");
+                                      });
+                                })
+                            })
+                      ],
+                      className: "grid grid-cols-2"
                     });
                 break;
             
@@ -172,14 +183,12 @@ function UserGrid(props) {
         if (match !== undefined) {
           if (match === "Blue") {
             switch (gameMode) {
-              case "Foosball" :
-                  tmp$1 = "ring-6 ring-blue";
-                  break;
               case "Darts" :
                   tmp$1 = "ring-6 ring-green-500";
                   break;
+              case "Foosball" :
               case "Fifa" :
-                  tmp$1 = "ring-6 ring-yellow-500";
+                  tmp$1 = "ring-6 ring-blue";
                   break;
               
             }
