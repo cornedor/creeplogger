@@ -6,6 +6,6 @@ type dailyLine = {
   goalDiff: int,
 }
 
-let getDailyOverview: string => promise<RescriptCore.Map.t<string, dailyLine>>
+let getDailyOverview: Games.period => promise<RescriptCore.Map.t<string, dailyLine>>
 
 let toAPIObject: RescriptCore.Map.t<string, dailyLine> => Js.Dict.t<dailyLine>

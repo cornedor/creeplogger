@@ -7,21 +7,7 @@ import * as PervasivesU from "rescript/lib/es6/pervasivesU.js";
 import * as Core__Option from "@rescript/core/src/Core__Option.bs.mjs";
 
 async function getDailyOverview(period) {
-  var periodEnum;
-  switch (period) {
-    case "All" :
-        periodEnum = "All";
-        break;
-    case "Monthly" :
-        periodEnum = "Monthly";
-        break;
-    case "Weekly" :
-        periodEnum = "Weekly";
-        break;
-    default:
-      periodEnum = "Daily";
-  }
-  var games = await Games.getTimePeriod(periodEnum);
+  var games = await Games.getTimePeriod(period);
   var players = await Players.fetchAllPlayers();
   var creepsMap = new Map();
   Object.values(games).forEach(function (game) {

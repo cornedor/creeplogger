@@ -6,15 +6,8 @@ type dailyLine = {
   goalDiff: int,
 }
 
-let getDailyOverview = async (period: string) => {
-  let periodEnum = switch period {
-  | "Daily" => Games.Daily
-  | "Weekly" => Games.Weekly
-  | "Monthly" => Games.Monthly
-  | "All" => Games.All
-  | _ => Games.Daily
-  }
-  let games = await Games.getTimePeriod(periodEnum)
+let getDailyOverview = async period => {
+  let games = await Games.getTimePeriod(period)
   let players = await Players.fetchAllPlayers()
 
   let creepsMap = Map.make()

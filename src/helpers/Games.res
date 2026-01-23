@@ -2,7 +2,7 @@ open Firebase
 
 type modifier = Handicap(int, int) | OneVOne
 
-type peroid = Daily | Weekly | Monthly | All
+type period = Daily | Weekly | Monthly | All
 
 type gameMode = Foosball | Darts | Fifa
 
