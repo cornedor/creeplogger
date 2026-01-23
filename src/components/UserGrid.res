@@ -12,7 +12,11 @@ let make = (
 ) => {
   let (showQueueButtons, setShowQueueButtons) = React.useState(_ => false)
   let (searchQuery, setSearchQuery) = React.useState(_ => "")
-  let (banner, setBanner) = React.useState(() => (None: option<(array<Players.player>, array<Players.player>, float)>))
+  let (banner, setBanner) = React.useState((): option<(
+    array<Players.player>,
+    array<Players.player>,
+    float,
+  )> => None)
   let closeBanner = () => setBanner(_ => None)
   let sorted = switch gameMode {
   | Games.Foosball => players->Array.toSorted((a, b) => Int.toFloat(b.games - a.games))
@@ -72,12 +76,12 @@ let make = (
         <div className="grid grid-cols-2">
           <button
             onClick={_ => setSelectedUsers(s => Belt.Map.String.set(s, item.key, Players.Blue))}
-            className="bg-green-400 border-none cursor-pointer text-3xl rounded-bl text-black plausible-event-name=SelectWinner">
+            className="bg-green-400 border-none cursor-pointer text-2xl rounded-bl text-black plausible-event-name=SelectWinner">
             {React.string("Winner")}
           </button>
           <button
             onClick={_ => setSelectedUsers(s => Belt.Map.String.set(s, item.key, Players.Red))}
-            className="bg-[#ff8686] border-none cursor-pointer text-3xl rounded-br text-black plausible-event-name=SelectLoser">
+            className="bg-[#ff8686] border-none cursor-pointer text-2xl rounded-br text-black plausible-event-name=SelectLoser">
             {React.string("Loser")}
           </button>
         </div>
@@ -86,12 +90,12 @@ let make = (
           <button
             onClick={_ => setSelectedUsers(s => Belt.Map.String.set(s, item.key, Players.Red))}
             className="bg-[#ff8686] border-none cursor-pointer text-xl lg:text-3xl rounded-bl text-black plausible-event-name=SelectRed">
-            {React.string("Rood")}
+            {React.string("Thuis")}
           </button>
           <button
             onClick={_ => setSelectedUsers(s => Belt.Map.String.set(s, item.key, Players.Blue))}
             className="bg-[#ffeb3b] border-none cursor-pointer text-xl lg:text-3xl rounded-br text-black plausible-event-name=SelectYellow">
-            {React.string("Geel")}
+            {React.string("Uit")}
           </button>
         </div>
       | (Games.Foosball, _) =>
@@ -123,7 +127,9 @@ let make = (
       setSelectedUsers={Some(setSelectedUsers)}
       searchQuery={Some(searchQuery)}
       setSearchQuery={Some(setSearchQuery)}
-      onMatchFound={Some((blueTeam, redTeam, pBlue) => setBanner(_ => Some((blueTeam, redTeam, pBlue))))}
+      onMatchFound={Some(
+        (blueTeam, redTeam, pBlue) => setBanner(_ => Some((blueTeam, redTeam, pBlue))),
+      )}
     />
     <div
       className="grid 2xl:grid-cols-5 xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-3 grid-cols-2 gap-4 lg:gap-10 mt-4 lg:mt-8 px-4 lg:content-padding pb-20 md:pb-4">
@@ -135,18 +141,28 @@ let make = (
     {switch banner {
     | Some((_blue, _red, pBlue)) =>
       <div className="fixed left-2 right-2 z-50 bottom-16 md:bottom-4">
-        <div className={headerStyles["glassHeader"] ++ " relative px-4 py-4 rounded shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] flex items-center justify-between"}>
+        <div
+          className={headerStyles["glassHeader"] ++ " relative px-4 py-4 rounded shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] flex items-center justify-between"}>
           <div className={headerStyles["backdrop"]} />
           <div className={headerStyles["backdropEdge"]} />
           <div className="relative z-10 text-white">
             <strong className="text-xl"> {React.string("Match found")} </strong>
             <div className="text-white/80 text-base md:text-lg">
-              {let pctBlue = (pBlue *. 100.0)->Js.Math.round
-              ; let pctRed = (100.0 -. pctBlue)->Js.Math.round
-              ; React.string("Blue " ++ Js.Int.toString(pctBlue->Float.toInt) ++ "% · Red " ++ Js.Int.toString(pctRed->Float.toInt) ++ "%")}
+              {
+                let pctBlue = (pBlue *. 100.0)->Js.Math.round
+                let pctRed = (100.0 -. pctBlue)->Js.Math.round
+                React.string(
+                  "Blue " ++
+                  Js.Int.toString(pctBlue->Float.toInt) ++
+                  "% · Red " ++
+                  Js.Int.toString(pctRed->Float.toInt) ++ "%",
+                )
+              }
             </div>
           </div>
-          <Button className="relative z-10" variant={Blue} onClick={_ => closeBanner()}> {React.string("OK")} </Button>
+          <Button className="relative z-10" variant={Blue} onClick={_ => closeBanner()}>
+            {React.string("OK")}
+          </Button>
         </div>
       </div>
     | None => React.null

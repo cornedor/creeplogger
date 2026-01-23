@@ -130,7 +130,7 @@ function UserGrid(props) {
                       children: [
                         JsxRuntime.jsx("button", {
                               children: "Winner",
-                              className: "bg-green-400 border-none cursor-pointer text-3xl rounded-bl text-black plausible-event-name=SelectWinner",
+                              className: "bg-green-400 border-none cursor-pointer text-2xl rounded-bl text-black plausible-event-name=SelectWinner",
                               onClick: (function (param) {
                                   setSelectedUsers(function (s) {
                                         return Belt_MapString.set(s, item.key, "Blue");
@@ -139,7 +139,7 @@ function UserGrid(props) {
                             }),
                         JsxRuntime.jsx("button", {
                               children: "Loser",
-                              className: "bg-[#ff8686] border-none cursor-pointer text-3xl rounded-br text-black plausible-event-name=SelectLoser",
+                              className: "bg-[#ff8686] border-none cursor-pointer text-2xl rounded-br text-black plausible-event-name=SelectLoser",
                               onClick: (function (param) {
                                   setSelectedUsers(function (s) {
                                         return Belt_MapString.set(s, item.key, "Red");
@@ -154,7 +154,7 @@ function UserGrid(props) {
                 tmp = JsxRuntime.jsxs("div", {
                       children: [
                         JsxRuntime.jsx("button", {
-                              children: "Rood",
+                              children: "Thuis",
                               className: "bg-[#ff8686] border-none cursor-pointer text-xl lg:text-3xl rounded-bl text-black plausible-event-name=SelectRed",
                               onClick: (function (param) {
                                   setSelectedUsers(function (s) {
@@ -163,7 +163,7 @@ function UserGrid(props) {
                                 })
                             }),
                         JsxRuntime.jsx("button", {
-                              children: "Geel",
+                              children: "Uit",
                               className: "bg-[#ffeb3b] border-none cursor-pointer text-xl lg:text-3xl rounded-br text-black plausible-event-name=SelectYellow",
                               onClick: (function (param) {
                                   setSelectedUsers(function (s) {
