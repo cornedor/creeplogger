@@ -47,18 +47,13 @@ let make = (
   let saveGame = async () => {
     setIsSaving(_ => true)
 
-    let gameData: FifaGames.fifaGame = {
+    let _ = await FifaGames.addFifaGame({
       blueScore: blueScoreInt,
       redScore: redScoreInt,
       redTeam: selectedRedUsers,
       blueTeam: selectedBlueUsers,
       date: Date.make(),
-    }
-
-    Console.log("FIFA Game - Saving game to Firebase:")
-    Console.log2("Game data:", gameData)
-
-    let _ = await FifaGames.addFifaGame(gameData)
+    })
 
     let winningTeam = switch (blueScoreInt, redScoreInt) {
     | (b, r) if b > r => Players.Blue
@@ -78,32 +73,6 @@ let make = (
     setEarnedPoints(_ => osPoints)
 
     // Update all player stats
-    Console.log("FIFA Game - Updating player stats:")
-    blueOS->Array.forEach(player => {
-      Console.log2("Blue player update:", {
-        "key": player.key,
-        "name": player.name,
-        "goalsFor": blueScoreInt,
-        "goalsAgainst": redScoreInt,
-        "fifaMu": player.fifaMu,
-        "fifaSigma": player.fifaSigma,
-        "fifaOrdinal": player.fifaOrdinal,
-        "fifaLastOpenSkillChange": player.fifaLastOpenSkillChange,
-      })
-    })
-    redOS->Array.forEach(player => {
-      Console.log2("Red player update:", {
-        "key": player.key,
-        "name": player.name,
-        "goalsFor": redScoreInt,
-        "goalsAgainst": blueScoreInt,
-        "fifaMu": player.fifaMu,
-        "fifaSigma": player.fifaSigma,
-        "fifaOrdinal": player.fifaOrdinal,
-        "fifaLastOpenSkillChange": player.fifaLastOpenSkillChange,
-      })
-    })
-
     let _ = await Promise.all(
       Array.concat(
         blueOS->Array.map(async player => {
@@ -157,21 +126,6 @@ let make = (
     />
     <div className="flex flex-wrap content-padding gap-10">
       <div>
-        <h2 className="font-bold text-3xl text-[#86b7ff]"> {React.string("Blauw")} </h2>
-        <ol className="pl-5 pt-4 pb-8 list-decimal text-2xl"> {React.array(blueUsers)} </ol>
-        <input
-          type_="number"
-          min="0"
-          placeholder="Score"
-          className="w-32 px-4 py-3 text-3xl text-white bg-white/10 rounded"
-          value={blueScore}
-          onChange={e => {
-            let value = (e->ReactEvent.Form.target)["value"]
-            setBlueScore(_ => value)
-          }}
-        />
-      </div>
-      <div>
         <h2 className="font-bold text-3xl text-[#ff8686]"> {React.string("Rood")} </h2>
         <ol className="pl-5 pt-4 pb-8 list-decimal text-2xl"> {React.array(redUsers)} </ol>
         <input
@@ -183,6 +137,21 @@ let make = (
           onChange={e => {
             let value = (e->ReactEvent.Form.target)["value"]
             setRedScore(_ => value)
+          }}
+        />
+      </div>
+      <div>
+        <h2 className="font-bold text-3xl text-[#ffeb3b]"> {React.string("Geel")} </h2>
+        <ol className="pl-5 pt-4 pb-8 list-decimal text-2xl"> {React.array(blueUsers)} </ol>
+        <input
+          type_="number"
+          min="0"
+          placeholder="Score"
+          className="w-32 px-4 py-3 text-3xl text-white bg-white/10 rounded"
+          value={blueScore}
+          onChange={e => {
+            let value = (e->ReactEvent.Form.target)["value"]
+            setBlueScore(_ => value)
           }}
         />
       </div>

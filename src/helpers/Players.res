@@ -358,33 +358,26 @@ let updateFifaGameStats = (key, goalsScored, goalsConceded, mu, sigma, ordinal, 
   Firebase.Database.runTransaction(playerRef, data => {
     switch data->Schema.parseWith(playerSchema) {
     | Ok(player) =>
-      let updatedPlayer = {
-        ...player,
-        fifaGames: player.fifaGames + 1,
-        fifaWins: isWin ? player.fifaWins + 1 : player.fifaWins,
-        fifaLosses: isLoss ? player.fifaLosses + 1 : player.fifaLosses,
-        fifaLastGames: getLastGames(player.fifaLastGames, isWin),
-        fifaGoalsScored: player.fifaGoalsScored + goalsScored,
-        fifaGoalsConceded: player.fifaGoalsConceded + goalsConceded,
-        fifaMu: mu,
-        fifaSigma: sigma,
-        fifaOrdinal: ordinal,
-        fifaLastOpenSkillChange: osChange,
+      switch Schema.serializeWith(
+        {
+          ...player,
+          fifaGames: player.fifaGames + 1,
+          fifaWins: isWin ? player.fifaWins + 1 : player.fifaWins,
+          fifaLosses: isLoss ? player.fifaLosses + 1 : player.fifaLosses,
+          fifaLastGames: getLastGames(player.fifaLastGames, isWin),
+          fifaGoalsScored: player.fifaGoalsScored + goalsScored,
+          fifaGoalsConceded: player.fifaGoalsConceded + goalsConceded,
+          fifaMu: mu,
+          fifaSigma: sigma,
+          fifaOrdinal: ordinal,
+          fifaLastOpenSkillChange: osChange,
+        },
+        playerSchema,
+      ) {
+      | Ok(res) => res
+      | Error(_) => data
       }
-      switch Schema.serializeWith(updatedPlayer, playerSchema) {
-      | Ok(res) => {
-          Console.log2("FIFA - Firebase player update for " ++ player.name ++ ":", res)
-          res
-        }
-      | Error(e) => {
-          Console.error2("FIFA - Failed to serialize player data for " ++ player.name ++ ":", e)
-          data
-        }
-      }
-    | Error(e) => {
-        Console.error2("FIFA - Failed to parse player data:", e)
-        data
-      }
+    | Error(_) => data
     }
   })
 }

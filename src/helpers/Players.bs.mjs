@@ -281,30 +281,17 @@ function updateFifaGameStats(key, goalsScored, goalsConceded, mu, sigma, ordinal
   var playerRef = Database$1.ref(Database.database, "players/" + key);
   return Database$1.runTransaction(playerRef, (function (data) {
                 var player = Schema.parseWith(data, playerSchema);
-                if (player.TAG === "Ok") {
-                  var player$1 = player._0;
-                  var newrecord = Caml_obj.obj_dup(player$1);
-                  newrecord.fifaLastOpenSkillChange = osChange;
-                  newrecord.fifaOrdinal = ordinal;
-                  newrecord.fifaSigma = sigma;
-                  newrecord.fifaMu = mu;
-                  newrecord.fifaGoalsConceded = player$1.fifaGoalsConceded + goalsConceded | 0;
-                  newrecord.fifaGoalsScored = player$1.fifaGoalsScored + goalsScored | 0;
-                  newrecord.fifaLastGames = getLastGames(player$1.fifaLastGames, isWin);
-                  newrecord.fifaLosses = isLoss ? player$1.fifaLosses + 1 | 0 : player$1.fifaLosses;
-                  newrecord.fifaWins = isWin ? player$1.fifaWins + 1 | 0 : player$1.fifaWins;
-                  newrecord.fifaGames = player$1.fifaGames + 1 | 0;
-                  var res = Schema.serializeWith(newrecord, playerSchema);
-                  if (res.TAG === "Ok") {
-                    var res$1 = res._0;
-                    console.log("FIFA - Firebase player update for " + player$1.name + ":", res$1);
-                    return res$1;
-                  }
-                  console.error("FIFA - Failed to serialize player data for " + player$1.name + ":", res._0);
+                if (player.TAG !== "Ok") {
                   return data;
                 }
-                console.error("FIFA - Failed to parse player data:", player._0);
-                return data;
+                var player$1 = player._0;
+                var newrecord = Caml_obj.obj_dup(player$1);
+                var res = Schema.serializeWith((newrecord.fifaLastOpenSkillChange = osChange, newrecord.fifaOrdinal = ordinal, newrecord.fifaSigma = sigma, newrecord.fifaMu = mu, newrecord.fifaGoalsConceded = player$1.fifaGoalsConceded + goalsConceded | 0, newrecord.fifaGoalsScored = player$1.fifaGoalsScored + goalsScored | 0, newrecord.fifaLastGames = getLastGames(player$1.fifaLastGames, isWin), newrecord.fifaLosses = isLoss ? player$1.fifaLosses + 1 | 0 : player$1.fifaLosses, newrecord.fifaWins = isWin ? player$1.fifaWins + 1 | 0 : player$1.fifaWins, newrecord.fifaGames = player$1.fifaGames + 1 | 0, newrecord), playerSchema);
+                if (res.TAG === "Ok") {
+                  return res._0;
+                } else {
+                  return data;
+                }
               }));
 }
 

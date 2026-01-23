@@ -142,21 +142,21 @@ let make = (~show, ~setShow, ~gameMode, ~setGameMode) => {
             ariaLabel="Switch to Darts leaderboard"
             className="text-white w-[44px] aspect-square text-[26px] flex justify-center items-center rounded-full bg-black/0 transition-all ease-in-out duration-200 shadow-none hover:bg-black/20 hover:shadow-icon-button hover:ring-8 ring-black/20 active:bg-black/20 active:shadow-icon-button active:ring-8"
             onClick={_ => setGameMode(_ => Games.Darts)}>
-            <DartsIcon />
+            <SoccerIcon />
           </button>
         | Games.Darts =>
           <button
             ariaLabel="Switch to FIFA leaderboard"
             className="text-white w-[44px] aspect-square text-[26px] flex justify-center items-center rounded-full bg-black/0 transition-all ease-in-out duration-200 shadow-none hover:bg-black/20 hover:shadow-icon-button hover:ring-8 ring-black/20 active:bg-black/20 active:shadow-icon-button active:ring-8"
             onClick={_ => setGameMode(_ => Games.Fifa)}>
-            <FifaIcon />
+            <DartsIcon />
           </button>
         | Games.Fifa =>
           <button
             ariaLabel="Switch to Foosball leaderboard"
             className="text-white w-[44px] aspect-square text-[26px] flex justify-center items-center rounded-full bg-black/0 transition-all ease-in-out duration-200 shadow-none hover:bg-black/20 hover:shadow-icon-button hover:ring-8 ring-black/20 active:bg-black/20 active:shadow-icon-button active:ring-8"
             onClick={_ => setGameMode(_ => Games.Foosball)}>
-            <SoccerIcon />
+            <FifaIcon />
           </button>
         }
       | None => React.null

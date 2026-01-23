@@ -71,17 +71,13 @@ function FifaScoreStep(props) {
     setIsSaving(function (param) {
           return true;
         });
-    var gameData_date = new Date();
-    var gameData = {
-      blueScore: blueScoreInt,
-      redScore: redScoreInt,
-      blueTeam: selectedBlueUsers,
-      redTeam: selectedRedUsers,
-      date: gameData_date
-    };
-    console.log("FIFA Game - Saving game to Firebase:");
-    console.log("Game data:", gameData);
-    await FifaGames.addFifaGame(gameData);
+    await FifaGames.addFifaGame({
+          blueScore: blueScoreInt,
+          redScore: redScoreInt,
+          blueTeam: selectedBlueUsers,
+          redTeam: selectedRedUsers,
+          date: new Date()
+        });
     var winningTeam = blueScoreInt > redScoreInt ? "Blue" : (
         redScoreInt > blueScoreInt ? "Red" : RescriptCore.panic("Tie not implemented for FIFA")
       );
@@ -97,39 +93,12 @@ function FifaScoreStep(props) {
       ];
     }
     var osPoints = match[2];
-    var redOS = match[1];
-    var blueOS = match[0];
     setEarnedPoints(function (param) {
           return osPoints;
         });
-    console.log("FIFA Game - Updating player stats:");
-    blueOS.forEach(function (player) {
-          console.log("Blue player update:", {
-                key: player.key,
-                name: player.name,
-                goalsFor: blueScoreInt,
-                goalsAgainst: redScoreInt,
-                fifaMu: player.fifaMu,
-                fifaSigma: player.fifaSigma,
-                fifaOrdinal: player.fifaOrdinal,
-                fifaLastOpenSkillChange: player.fifaLastOpenSkillChange
-              });
-        });
-    redOS.forEach(function (player) {
-          console.log("Red player update:", {
-                key: player.key,
-                name: player.name,
-                goalsFor: redScoreInt,
-                goalsAgainst: blueScoreInt,
-                fifaMu: player.fifaMu,
-                fifaSigma: player.fifaSigma,
-                fifaOrdinal: player.fifaOrdinal,
-                fifaLastOpenSkillChange: player.fifaLastOpenSkillChange
-              });
-        });
-    await Promise.all(blueOS.map(async function (player) {
+    await Promise.all(match[0].map(async function (player) {
                 return Players.updateFifaGameStats(player.key, blueScoreInt, redScoreInt, player.fifaMu, player.fifaSigma, player.fifaOrdinal, player.fifaLastOpenSkillChange);
-              }).concat(redOS.map(async function (player) {
+              }).concat(match[1].map(async function (player) {
                   return Players.updateFifaGameStats(player.key, redScoreInt, blueScoreInt, player.fifaMu, player.fifaSigma, player.fifaOrdinal, player.fifaLastOpenSkillChange);
                 })));
     await sendUpdate(blueScoreInt, redScoreInt);
@@ -160,31 +129,6 @@ function FifaScoreStep(props) {
                         JsxRuntime.jsxs("div", {
                               children: [
                                 JsxRuntime.jsx("h2", {
-                                      children: "Blauw",
-                                      className: "font-bold text-3xl text-[#86b7ff]"
-                                    }),
-                                JsxRuntime.jsx("ol", {
-                                      children: blueUsers,
-                                      className: "pl-5 pt-4 pb-8 list-decimal text-2xl"
-                                    }),
-                                JsxRuntime.jsx("input", {
-                                      className: "w-32 px-4 py-3 text-3xl text-white bg-white/10 rounded",
-                                      min: "0",
-                                      placeholder: "Score",
-                                      type: "number",
-                                      value: blueScore,
-                                      onChange: (function (e) {
-                                          var value = e.target.value;
-                                          setBlueScore(function (param) {
-                                                return value;
-                                              });
-                                        })
-                                    })
-                              ]
-                            }),
-                        JsxRuntime.jsxs("div", {
-                              children: [
-                                JsxRuntime.jsx("h2", {
                                       children: "Rood",
                                       className: "font-bold text-3xl text-[#ff8686]"
                                     }),
@@ -201,6 +145,31 @@ function FifaScoreStep(props) {
                                       onChange: (function (e) {
                                           var value = e.target.value;
                                           setRedScore(function (param) {
+                                                return value;
+                                              });
+                                        })
+                                    })
+                              ]
+                            }),
+                        JsxRuntime.jsxs("div", {
+                              children: [
+                                JsxRuntime.jsx("h2", {
+                                      children: "Geel",
+                                      className: "font-bold text-3xl text-[#ffeb3b]"
+                                    }),
+                                JsxRuntime.jsx("ol", {
+                                      children: blueUsers,
+                                      className: "pl-5 pt-4 pb-8 list-decimal text-2xl"
+                                    }),
+                                JsxRuntime.jsx("input", {
+                                      className: "w-32 px-4 py-3 text-3xl text-white bg-white/10 rounded",
+                                      min: "0",
+                                      placeholder: "Score",
+                                      type: "number",
+                                      value: blueScore,
+                                      onChange: (function (e) {
+                                          var value = e.target.value;
+                                          setBlueScore(function (param) {
                                                 return value;
                                               });
                                         })

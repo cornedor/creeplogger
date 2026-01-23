@@ -29,13 +29,10 @@ function addFifaGame(fifaGame) {
   var fifaGamesRef = Database$1.ref(Database.database, "fifaGames");
   var data = Schema.serializeWith(fifaGame, fifaGameSchema);
   if (data.TAG === "Ok") {
-    var data$1 = data._0;
-    console.log("FIFA - Adding game to Firebase:");
-    console.log("Serialized game data:", data$1);
-    return Database$1.push(fifaGamesRef, data$1);
+    return Database$1.push(fifaGamesRef, data._0);
+  } else {
+    return RescriptCore.panic("Could not create FIFA game");
   }
-  console.error("FIFA - Failed to serialize game data:", data._0);
-  return RescriptCore.panic("Could not create FIFA game");
 }
 
 async function fetchAllGames() {

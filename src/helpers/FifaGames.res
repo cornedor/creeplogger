@@ -26,15 +26,8 @@ let addFifaGame = fifaGame => {
   let fifaGamesRef = Firebase.Database.refPath(Database.database, "fifaGames")
 
   switch Schema.serializeWith(fifaGame, fifaGameSchema) {
-  | Ok(data) => {
-      Console.log("FIFA - Adding game to Firebase:")
-      Console.log2("Serialized game data:", data)
-      Firebase.Database.pushValue(fifaGamesRef, data)
-    }
-  | Error(e) => {
-      Console.error2("FIFA - Failed to serialize game data:", e)
-      panic("Could not create FIFA game")
-    }
+  | Ok(data) => Firebase.Database.pushValue(fifaGamesRef, data)
+  | Error(_) => panic("Could not create FIFA game")
   }
 }
 
