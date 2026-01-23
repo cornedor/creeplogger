@@ -154,20 +154,20 @@ function UserGrid(props) {
                 tmp = JsxRuntime.jsxs("div", {
                       children: [
                         JsxRuntime.jsx("button", {
-                              children: "Blauw",
-                              className: "bg-[#86b7ff] border-none cursor-pointer text-xl lg:text-3xl rounded-bl text-black plausible-event-name=SelectBlue",
+                              children: "Rood",
+                              className: "bg-[#ff8686] border-none cursor-pointer text-xl lg:text-3xl rounded-bl text-black plausible-event-name=SelectRed",
                               onClick: (function (param) {
                                   setSelectedUsers(function (s) {
-                                        return Belt_MapString.set(s, item.key, "Blue");
+                                        return Belt_MapString.set(s, item.key, "Red");
                                       });
                                 })
                             }),
                         JsxRuntime.jsx("button", {
-                              children: "Rood",
-                              className: "bg-[#ff8686] border-none cursor-pointer text-xl lg:text-3xl rounded-br text-black plausible-event-name=SelectRed",
+                              children: "Geel",
+                              className: "bg-[#ffeb3b] border-none cursor-pointer text-xl lg:text-3xl rounded-br text-black plausible-event-name=SelectYellow",
                               onClick: (function (param) {
                                   setSelectedUsers(function (s) {
-                                        return Belt_MapString.set(s, item.key, "Red");
+                                        return Belt_MapString.set(s, item.key, "Blue");
                                       });
                                 })
                             })
@@ -183,12 +183,14 @@ function UserGrid(props) {
         if (match !== undefined) {
           if (match === "Blue") {
             switch (gameMode) {
+              case "Foosball" :
+                  tmp$1 = "ring-6 ring-blue";
+                  break;
               case "Darts" :
                   tmp$1 = "ring-6 ring-green-500";
                   break;
-              case "Foosball" :
               case "Fifa" :
-                  tmp$1 = "ring-6 ring-blue";
+                  tmp$1 = "ring-6 ring-yellow-400";
                   break;
               
             }

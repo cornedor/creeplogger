@@ -30,7 +30,8 @@ let make = (
       className={Cn.make([
         "rounded-2xl bg-white/10 border border-white/10 backdrop-blur-md shadow-lg hover:shadow-2xl hover:-translate-y-1 transform grid grid-rows-user auto-rows-[1fr] h-[160px] lg:h-[220px] transition-all duration-200 ease-out relative overflow-hidden",
         switch (Belt.Map.String.get(selectedUsers, item.key), gameMode) {
-        | (Some(Players.Blue), Games.Foosball | Games.Fifa) => "ring-6 ring-blue"
+        | (Some(Players.Blue), Games.Foosball) => "ring-6 ring-blue"
+        | (Some(Players.Blue), Games.Fifa) => "ring-6 ring-yellow-400"
         | (Some(Players.Blue), Games.Darts) => "ring-6 ring-green-500"
         | (Some(Players.Red), _) => "ring-6 ring-red"
         | _ => "ring-0"
@@ -83,14 +84,14 @@ let make = (
       | (Games.Fifa, false) =>
         <div className="grid grid-cols-2">
           <button
-            onClick={_ => setSelectedUsers(s => Belt.Map.String.set(s, item.key, Players.Blue))}
-            className="bg-[#86b7ff] border-none cursor-pointer text-xl lg:text-3xl rounded-bl text-black plausible-event-name=SelectBlue">
-            {React.string("Blauw")}
+            onClick={_ => setSelectedUsers(s => Belt.Map.String.set(s, item.key, Players.Red))}
+            className="bg-[#ff8686] border-none cursor-pointer text-xl lg:text-3xl rounded-bl text-black plausible-event-name=SelectRed">
+            {React.string("Rood")}
           </button>
           <button
-            onClick={_ => setSelectedUsers(s => Belt.Map.String.set(s, item.key, Players.Red))}
-            className="bg-[#ff8686] border-none cursor-pointer text-xl lg:text-3xl rounded-br text-black plausible-event-name=SelectRed">
-            {React.string("Rood")}
+            onClick={_ => setSelectedUsers(s => Belt.Map.String.set(s, item.key, Players.Blue))}
+            className="bg-[#ffeb3b] border-none cursor-pointer text-xl lg:text-3xl rounded-br text-black plausible-event-name=SelectYellow">
+            {React.string("Geel")}
           </button>
         </div>
       | (Games.Foosball, _) =>

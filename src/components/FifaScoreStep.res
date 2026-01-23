@@ -47,13 +47,18 @@ let make = (
   let saveGame = async () => {
     setIsSaving(_ => true)
 
-    let _ = await FifaGames.addFifaGame({
+    let gameData: FifaGames.fifaGame = {
       blueScore: blueScoreInt,
       redScore: redScoreInt,
       redTeam: selectedRedUsers,
       blueTeam: selectedBlueUsers,
       date: Date.make(),
-    })
+    }
+
+    Console.log("FIFA Game - Saving game to Firebase:")
+    Console.log2("Game data:", gameData)
+
+    let _ = await FifaGames.addFifaGame(gameData)
 
     let winningTeam = switch (blueScoreInt, redScoreInt) {
     | (b, r) if b > r => Players.Blue
@@ -73,6 +78,32 @@ let make = (
     setEarnedPoints(_ => osPoints)
 
     // Update all player stats
+    Console.log("FIFA Game - Updating player stats:")
+    blueOS->Array.forEach(player => {
+      Console.log2("Blue player update:", {
+        "key": player.key,
+        "name": player.name,
+        "goalsFor": blueScoreInt,
+        "goalsAgainst": redScoreInt,
+        "fifaMu": player.fifaMu,
+        "fifaSigma": player.fifaSigma,
+        "fifaOrdinal": player.fifaOrdinal,
+        "fifaLastOpenSkillChange": player.fifaLastOpenSkillChange,
+      })
+    })
+    redOS->Array.forEach(player => {
+      Console.log2("Red player update:", {
+        "key": player.key,
+        "name": player.name,
+        "goalsFor": redScoreInt,
+        "goalsAgainst": blueScoreInt,
+        "fifaMu": player.fifaMu,
+        "fifaSigma": player.fifaSigma,
+        "fifaOrdinal": player.fifaOrdinal,
+        "fifaLastOpenSkillChange": player.fifaLastOpenSkillChange,
+      })
+    })
+
     let _ = await Promise.all(
       Array.concat(
         blueOS->Array.map(async player => {
