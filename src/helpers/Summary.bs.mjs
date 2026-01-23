@@ -27,10 +27,111 @@ async function getDailyOverview(period) {
   var creepsMap = new Map();
   Object.values(games).forEach(function (game) {
         var winner = game.blueScore > game.redScore ? "Blue" : "Red";
-        var isAbsolute = PervasivesU.abs(game.blueScore - game.redScore | 0) === 7;
         var absGoalDiff = PervasivesU.abs(game.blueScore - game.redScore | 0);
-        game.blueTeam.forEach(function (player) {
-              var match = Core__Option.getOr(creepsMap.get(player), {
+        var deltas = game.scoreDeltas;
+        if (deltas !== undefined) {
+          Js_dict.entries(deltas).forEach(function (param) {
+                var scoreDelta = param[1];
+                var playerKey = param[0];
+                var player = Core__Option.getOr(players[playerKey], {
+                      name: "Unknown",
+                      wins: 0,
+                      losses: 0,
+                      absoluteWins: 0,
+                      absoluteLosses: 0,
+                      games: 0,
+                      teamGoals: 0,
+                      teamGoalsAgainst: 0,
+                      blueGames: 0,
+                      redGames: 0,
+                      blueWins: 0,
+                      redWins: 0,
+                      elo: 1000.0,
+                      lastEloChange: 0.0,
+                      key: playerKey,
+                      mattermostHandle: undefined,
+                      lastGames: [],
+                      hidden: undefined,
+                      mu: 25.0,
+                      sigma: 8.333,
+                      ordinal: 0.0,
+                      lastOpenSkillChange: 0.0,
+                      dartsElo: 1000.0,
+                      dartsLastEloChange: 0.0,
+                      dartsGames: 0,
+                      dartsWins: 0,
+                      dartsLosses: 0,
+                      dartsLastGames: [],
+                      fifaGames: 0,
+                      fifaWins: 0,
+                      fifaLosses: 0,
+                      fifaLastGames: [],
+                      fifaGoalsScored: 0,
+                      fifaGoalsConceded: 0,
+                      fifaMu: 25.0,
+                      fifaSigma: 8.333,
+                      fifaOrdinal: 0.0,
+                      fifaLastOpenSkillChange: 0.0
+                    });
+                var lost = game.blueTeam.includes(playerKey) ? winner === "Red" : winner === "Blue";
+                var goalDiffDelta = game.blueTeam.includes(playerKey) ? (
+                    winner === "Red" ? -absGoalDiff | 0 : absGoalDiff
+                  ) : (
+                    winner === "Blue" ? -absGoalDiff | 0 : absGoalDiff
+                  );
+                var match = Core__Option.getOr(creepsMap.get(playerKey), {
+                      name: player.name,
+                      creeps: 0,
+                      games: 0,
+                      score: 0,
+                      goalDiff: 0
+                    });
+                var goalDiff = match.goalDiff;
+                var score = match.score;
+                var games = match.games;
+                var creeps = match.creeps;
+                var match$1 = lost ? [
+                    creeps + 1 | 0,
+                    games + 1 | 0,
+                    score + scoreDelta | 0,
+                    goalDiff + goalDiffDelta | 0
+                  ] : [
+                    creeps + 0 | 0,
+                    games + 1 | 0,
+                    score + scoreDelta | 0,
+                    goalDiff + goalDiffDelta | 0
+                  ];
+                creepsMap.set(playerKey, {
+                      name: player.name,
+                      creeps: match$1[0],
+                      games: match$1[1],
+                      score: match$1[2],
+                      goalDiff: match$1[3]
+                    });
+              });
+          return ;
+        }
+        var blueTeamPlayers = game.blueTeam.map(function (key) {
+              return Core__Option.getExn(players[key], undefined);
+            });
+        var redTeamPlayers = game.redTeam.map(function (key) {
+              return Core__Option.getExn(players[key], undefined);
+            });
+        var match;
+        if (winner === "Blue") {
+          match = OpenSkillRating.calculateScore(blueTeamPlayers, redTeamPlayers, "Foosball");
+        } else {
+          var match$1 = OpenSkillRating.calculateScore(redTeamPlayers, blueTeamPlayers, "Foosball");
+          match = [
+            match$1[1],
+            match$1[0],
+            match$1[2]
+          ];
+        }
+        match[0].forEach(function (player) {
+              var scoreDelta = OpenSkillRating.toDisplayDelta(player.lastOpenSkillChange);
+              var lost = winner === "Red";
+              var match = Core__Option.getOr(creepsMap.get(player.key), {
                     name: "",
                     creeps: 0,
                     games: 0,
@@ -49,23 +150,11 @@ async function getDailyOverview(period) {
                 ] : [
                   creeps + 0 | 0,
                   games + 1 | 0,
-                  score + 16 | 0,
+                  score + scoreDelta | 0,
                   goalDiff + absGoalDiff | 0
-                ] : (
-                  isAbsolute ? [
-                      creeps + 2 | 0,
-                      games + 1 | 0,
-                      score - 16 | 0,
-                      goalDiff - absGoalDiff | 0
-                    ] : [
-                      creeps + 1 | 0,
-                      games + 1 | 0,
-                      score - 16 | 0,
-                      goalDiff - absGoalDiff | 0
-                    ]
-                );
-              creepsMap.set(player, {
-                    name: players[player].name,
+                ];
+              creepsMap.set(player.key, {
+                    name: player.name,
                     creeps: match$1[0],
                     games: match$1[1],
                     score: match$1[2],
@@ -86,27 +175,19 @@ async function getDailyOverview(period) {
               var score = match.score;
               var games = match.games;
               var creeps = match.creeps;
-              var match$1;
-              match$1 = winner === "Blue" ? (
-                  isAbsolute ? [
-                      creeps + 2 | 0,
-                      games + 1 | 0,
-                      score - 16 | 0,
-                      goalDiff - absGoalDiff | 0
-                    ] : [
-                      creeps + 1 | 0,
-                      games + 1 | 0,
-                      score - 16 | 0,
-                      goalDiff - absGoalDiff | 0
-                    ]
-                ) : [
+              var match$1 = lost ? [
+                  creeps + 1 | 0,
+                  games + 1 | 0,
+                  score + scoreDelta | 0,
+                  goalDiff - absGoalDiff | 0
+                ] : [
                   creeps + 0 | 0,
                   games + 1 | 0,
-                  score + 16 | 0,
+                  score + scoreDelta | 0,
                   goalDiff + absGoalDiff | 0
                 ];
-              creepsMap.set(player, {
-                    name: players[player].name,
+              creepsMap.set(player.key, {
+                    name: player.name,
                     creeps: match$1[0],
                     games: match$1[1],
                     score: match$1[2],

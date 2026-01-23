@@ -58,6 +58,16 @@ let getDailyOverview = async (period: string) => {
             dartsWins: 0,
             dartsLosses: 0,
             dartsLastGames: [],
+            fifaGames: 0,
+            fifaWins: 0,
+            fifaLosses: 0,
+            fifaLastGames: [],
+            fifaGoalsScored: 0,
+            fifaGoalsConceded: 0,
+            fifaMu: 25.0,
+            fifaSigma: 8.333,
+            fifaOrdinal: 0.0,
+            fifaLastOpenSkillChange: 0.0,
           })
 
           let lost = if game.blueTeam->Array.includes(playerKey) {
