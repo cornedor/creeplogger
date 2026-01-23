@@ -38,7 +38,8 @@ var gameSchema = Schema.object(function (s) {
                                     })
                                 };
                         }))),
-              modifiers: s.f("modifiers", FirebaseSchema.nullableTransform(Schema.option(Schema.array(modifierSchema))))
+              modifiers: s.f("modifiers", FirebaseSchema.nullableTransform(Schema.option(Schema.array(modifierSchema)))),
+              scoreDeltas: s.f("scoreDeltas", FirebaseSchema.nullableTransform(Schema.option(Schema.dict(Schema.$$int))))
             };
     });
 
@@ -66,7 +67,7 @@ async function getTimePeriod(period) {
         date.setDate(newDate);
         break;
     case "Monthly" :
-        date.setDate(0);
+        date.setDate(1);
         break;
     case "All" :
         date.setFullYear(2000);

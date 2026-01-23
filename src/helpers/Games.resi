@@ -1,6 +1,6 @@
 type modifier = Handicap(int, int) | OneVOne
 
-type peroid = Daily | Weekly | Monthly | All
+type period = Daily | Weekly | Monthly | All
 
 type gameMode = Foosball | Darts | Fifa
 
@@ -11,11 +11,12 @@ type game = {
   redTeam: array<string>,
   date: Date.t,
   modifiers: option<array<modifier>>,
+  scoreDeltas: option<Js.Dict.t<int>>,
 }
 
 let addGame: game => promise<Firebase.databaseReference>
 
-let getTimePeriod: peroid => promise<Js.Dict.t<game>>
+let getTimePeriod: period => promise<Js.Dict.t<game>>
 
 let fetchAllGames: unit => promise<array<game>>
 

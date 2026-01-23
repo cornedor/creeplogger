@@ -2,7 +2,7 @@ open Firebase
 
 type modifier = Handicap(int, int) | OneVOne
 
-type peroid = Daily | Weekly | Monthly | All
+type period = Daily | Weekly | Monthly | All
 
 type gameMode = Foosball | Darts | Fifa
 
@@ -13,6 +13,7 @@ type game = {
   redTeam: array<string>,
   date: Date.t,
   modifiers: option<array<modifier>>,
+  scoreDeltas: option<Js.Dict.t<int>>, // Store the score changes per player
 }
 
 let modifierSchema = Schema.union([
@@ -42,6 +43,10 @@ let gameSchema = Schema.object(s => {
     "modifiers",
     Schema.option(Schema.array(modifierSchema))->FirebaseSchema.nullableTransform,
   ),
+  scoreDeltas: s.field(
+    "scoreDeltas",
+    Schema.option(Schema.dict(Schema.int))->FirebaseSchema.nullableTransform,
+  ),
 })
 
 let addGame = game => {
@@ -64,17 +69,15 @@ let getTimePeriod = async period => {
       let newDate = Date.getDate(date) - (x == 0 ? 7 : x) + 1
       Date.setDate(date, newDate)
     }
-
-  | Monthly => Date.setDate(date, 0)
+  | Monthly => Date.setDate(date, 1)
   | All => Date.setFullYear(date, 2000)
   }
 
-  let games =
-    await Firebase.Database.query2(
-      Firebase.Database.refPath(Database.database, "games"),
-      Firebase.Database.orderByChild("date"),
-      Firebase.Database.startAt(Date.getTime(date)),
-    )->Firebase.Database.get
+  let games = await Firebase.Database.query2(
+    Firebase.Database.refPath(Database.database, "games"),
+    Firebase.Database.orderByChild("date"),
+    Firebase.Database.startAt(Date.getTime(date)),
+  )->Firebase.Database.get
 
   switch games->Firebase.Database.Snapshot.val->Nullable.toOption {
   | Some(val) =>

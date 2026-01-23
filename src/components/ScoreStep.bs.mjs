@@ -91,28 +91,20 @@ function ScoreStep(props) {
     setIsSaving(function (param) {
           return true;
         });
-    await Games.addGame({
-          blueScore: blueState,
-          redScore: redState,
-          blueTeam: selectedBlueUsers,
-          redTeam: selectedRedUsers,
-          date: new Date(),
-          modifiers: redPlayers.length === 1 && bluePlayers.length === 1 ? ["OneVOne"] : []
-        });
     var winningTeam = blueState > redState ? "Blue" : (
         redState > blueState ? "Red" : RescriptCore.panic("Tie not implemented")
       );
-    var redPlayers$1 = selectedRedUsers.map(function (key) {
+    var redPlayers = selectedRedUsers.map(function (key) {
           return Core__Option.getExn(Players.playerByKey(players, key), undefined);
         });
-    var bluePlayers$1 = selectedBlueUsers.map(function (key) {
+    var bluePlayers = selectedBlueUsers.map(function (key) {
           return Core__Option.getExn(Players.playerByKey(players, key), undefined);
         });
     var match;
     if (winningTeam === "Blue") {
-      match = OpenSkillRating.calculateScore(bluePlayers$1, redPlayers$1, "Foosball");
+      match = OpenSkillRating.calculateScore(bluePlayers, redPlayers, "Foosball");
     } else {
-      var match$1 = OpenSkillRating.calculateScore(redPlayers$1, bluePlayers$1, "Foosball");
+      var match$1 = OpenSkillRating.calculateScore(redPlayers, bluePlayers, "Foosball");
       match = [
         match$1[1],
         match$1[0],
@@ -121,11 +113,29 @@ function ScoreStep(props) {
     }
     var redOS = match[1];
     var blueOS = match[0];
+    var scoreDeltas = {};
+    blueOS.forEach(function (player) {
+          var delta = OpenSkillRating.toDisplayDelta(player.lastOpenSkillChange);
+          scoreDeltas[player.key] = delta;
+        });
+    redOS.forEach(function (player) {
+          var delta = OpenSkillRating.toDisplayDelta(player.lastOpenSkillChange);
+          scoreDeltas[player.key] = delta;
+        });
+    await Games.addGame({
+          blueScore: blueState,
+          redScore: redState,
+          blueTeam: selectedBlueUsers,
+          redTeam: selectedRedUsers,
+          date: new Date(),
+          modifiers: redPlayers.length === 1 && bluePlayers.length === 1 ? ["OneVOne"] : [],
+          scoreDeltas: scoreDeltas
+        });
     var match$2;
     if (winningTeam === "Blue") {
-      match$2 = Elo.calculateScore(bluePlayers$1, redPlayers$1, "Foosball");
+      match$2 = Elo.calculateScore(bluePlayers, redPlayers, "Foosball");
     } else {
-      var match$3 = Elo.calculateScore(redPlayers$1, bluePlayers$1, "Foosball");
+      var match$3 = Elo.calculateScore(redPlayers, bluePlayers, "Foosball");
       match$2 = [
         match$3[1],
         match$3[0],

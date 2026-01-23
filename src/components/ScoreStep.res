@@ -72,17 +72,8 @@ let make = (
 
   let saveGame = async () => {
     setIsSaving(_ => true)
-    let _ = await Games.addGame({
-      blueScore: blueState,
-      redScore: redState,
-      redTeam: selectedRedUsers,
-      blueTeam: selectedBlueUsers,
-      date: Date.make(),
-      modifiers: redPlayers->Array.length == 1 && bluePlayers->Array.length == 1
-        ? Some([Games.OneVOne])
-        : Some([]),
-    })
 
+    // Calculate score deltas before saving the game
     let winningTeam = switch (blueState, redState) {
     | (b, r) if b > r => Players.Blue
     | (b, r) if r > b => Players.Red
@@ -94,7 +85,7 @@ let make = (
     let bluePlayers =
       selectedBlueUsers->Array.map(key => Players.playerByKey(players, key)->Option.getExn)
 
-    // Calculate both OpenSkill and Elo outcomes
+    // Calculate OpenSkill scores once
     let (blueOS, redOS, osPoints) = switch winningTeam {
     | Blue => OpenSkillRating.calculateScore(bluePlayers, redPlayers, ~gameMode=Games.Foosball)
     | Red => {
@@ -107,6 +98,30 @@ let make = (
       }
     }
 
+    // Collect score deltas for storage
+    let scoreDeltas = Js.Dict.empty()
+    blueOS->Array.forEach(player => {
+      let delta = OpenSkillRating.toDisplayDelta(player.lastOpenSkillChange)
+      Js.Dict.set(scoreDeltas, player.key, delta)
+    })
+    redOS->Array.forEach(player => {
+      let delta = OpenSkillRating.toDisplayDelta(player.lastOpenSkillChange)
+      Js.Dict.set(scoreDeltas, player.key, delta)
+    })
+
+    let _ = await Games.addGame({
+      blueScore: blueState,
+      redScore: redState,
+      redTeam: selectedRedUsers,
+      blueTeam: selectedBlueUsers,
+      date: Date.make(),
+      modifiers: redPlayers->Array.length == 1 && bluePlayers->Array.length == 1
+        ? Some([Games.OneVOne])
+        : Some([]),
+      scoreDeltas: Some(scoreDeltas),
+    })
+
+    // Calculate Elo scores
     let (blueElo, redElo, _eloPoints) = switch winningTeam {
     | Blue => Elo.calculateScore(bluePlayers, redPlayers, ~gameMode=Games.Foosball)
     | Red => {

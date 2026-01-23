@@ -198,7 +198,7 @@ Game mode: ${mode}
 }
 
 let sendDailyUpdate = async () => {
-  let overview = await Summary.getDailyOverview(Daily)
+  let overview = await Summary.getDailyOverview("Daily")
   let overviewArray =
     overview
     ->Map.values
