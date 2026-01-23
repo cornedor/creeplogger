@@ -10,6 +10,7 @@ let make = () => {
   let players = Players.useAllPlayers()
   let games = Games.useLastGames()
   let dartsGames = DartsGames.useLastGames()
+  let fifaGames = FifaGames.useLastGames()
   // let (games, setGames) = React.useState(_ => empty)
 
   // React.useEffect(() => {
@@ -197,6 +198,66 @@ let make = () => {
                       onClick={_ => {
                         if confirm("Are you sure you want to remove this (" ++ key ++ ") game?") {
                           let _ = DartsGames.removeGame(key)
+                        }
+                      }}>
+                      {React.string("Remove")}
+                    </button>
+                  </td>
+                </tr>
+              })
+              ->React.array}
+            </tbody>
+          </table>
+        </details>
+        <details>
+          <summary className="p-2 bg-white/5 mt-2 hover:bg-white/10 select-none rounded">
+            {React.string("Last FIFA games")}
+          </summary>
+          <table>
+            <thead>
+              <tr>
+                <th> {React.string("Red team")} </th>
+                <th> {React.string("Yellow team")} </th>
+                <th> {React.string("When")} </th>
+                <th> {React.string("Score")} </th>
+                <th> {React.string("Actions")} </th>
+              </tr>
+            </thead>
+            <tbody>
+              {fifaGames
+              ->Js.Dict.entries
+              ->Array.toReversed
+              ->Array.map(((key, game)) => {
+                let redPlayers = Array.map(game.redTeam, player => {
+                  switch Array.find(players, p => p.key == player) {
+                  | Some(player) => player.name
+                  | None => "..."
+                  }
+                })
+                let yellowPlayers = Array.map(game.blueTeam, player => {
+                  switch Array.find(players, p => p.key == player) {
+                  | Some(player) => player.name
+                  | None => "..."
+                  }
+                })
+                <tr key={game.date->Date.toString}>
+                  <td className="px-2 py-1"> {React.string(Array.join(redPlayers, ", "))} </td>
+                  <td className="px-2 py-1"> {React.string(Array.join(yellowPlayers, ", "))} </td>
+                  <td className="px-2 py-1"> {React.string(Date.toISOString(game.date))} </td>
+                  <td className="px-2 py-1">
+                    {React.string(
+                      "Red " ++
+                      game.redScore->Int.toString ++
+                      ":" ++
+                      game.blueScore->Int.toString ++ " Yellow",
+                    )}
+                  </td>
+                  <td className="px-2 py-1 flex gap-2">
+                    <button
+                      className="bg-slate-300 rounded py-1 px-3 text-black"
+                      onClick={_ => {
+                        if confirm("Are you sure you want to remove this (" ++ key ++ ") FIFA game?") {
+                          let _ = FifaGames.removeGame(key)
                         }
                       }}>
                       {React.string("Remove")}

@@ -3,6 +3,7 @@
 import * as React from "react";
 import * as Button from "./Button.bs.mjs";
 import * as Database from "../helpers/Database.bs.mjs";
+import * as FifaIcon from "./FifaIcon.bs.mjs";
 import * as ListIcon from "./ListIcon.bs.mjs";
 import * as AdminIcon from "./AdminIcon.bs.mjs";
 import * as DartsIcon from "./DartsIcon.bs.mjs";
@@ -56,25 +57,46 @@ function Header(props) {
     
   }
   var tmp;
-  tmp = setGameMode !== undefined ? (
-      gameMode === "Foosball" ? JsxRuntime.jsx("button", {
-              children: JsxRuntime.jsx(SoccerIcon.make, {}),
-              className: "text-white w-[44px] aspect-square text-[26px] flex justify-center items-center -ml-3 rounded-full bg-black/0 transition-all ease-in-out duration-200 shadow-none hover:bg-black/20 hover:shadow-icon-button hover:ring-8 ring-black/20 active:bg-black/20 active:shadow-icon-button active:ring-8  plausible-event-name=GameModeDarts",
-              onClick: (function (param) {
-                  setGameMode(function (param) {
-                        return "Darts";
-                      });
-                })
-            }) : JsxRuntime.jsx("button", {
-              children: JsxRuntime.jsx(DartsIcon.make, {}),
-              className: "text-white w-[44px] aspect-square text-[26px] flex justify-center items-center -ml-3 rounded-full bg-black/0 transition-all ease-in-out duration-200 shadow-none hover:bg-black/20 hover:shadow-icon-button hover:ring-8 ring-black/20 active:bg-black/20 active:shadow-icon-button active:ring-8 ",
-              onClick: (function (param) {
-                  setGameMode(function (param) {
-                        return "Foosball";
-                      });
-                })
-            })
-    ) : JsxRuntime.jsx(JsxRuntime.Fragment, {});
+  if (setGameMode !== undefined) {
+    switch (gameMode) {
+      case "Foosball" :
+          tmp = JsxRuntime.jsx("button", {
+                children: JsxRuntime.jsx(SoccerIcon.make, {}),
+                className: "text-white w-[44px] aspect-square text-[26px] flex justify-center items-center -ml-3 rounded-full bg-black/0 transition-all ease-in-out duration-200 shadow-none hover:bg-black/20 hover:shadow-icon-button hover:ring-8 ring-black/20 active:bg-black/20 active:shadow-icon-button active:ring-8  plausible-event-name=GameModeDarts",
+                onClick: (function (param) {
+                    setGameMode(function (param) {
+                          return "Darts";
+                        });
+                  })
+              });
+          break;
+      case "Darts" :
+          tmp = JsxRuntime.jsx("button", {
+                children: JsxRuntime.jsx(DartsIcon.make, {}),
+                className: "text-white w-[44px] aspect-square text-[26px] flex justify-center items-center -ml-3 rounded-full bg-black/0 transition-all ease-in-out duration-200 shadow-none hover:bg-black/20 hover:shadow-icon-button hover:ring-8 ring-black/20 active:bg-black/20 active:shadow-icon-button active:ring-8  plausible-event-name=GameModeFifa",
+                onClick: (function (param) {
+                    setGameMode(function (param) {
+                          return "Fifa";
+                        });
+                  })
+              });
+          break;
+      case "Fifa" :
+          tmp = JsxRuntime.jsx("button", {
+                children: JsxRuntime.jsx(FifaIcon.make, {}),
+                className: "text-white w-[44px] aspect-square text-[26px] flex justify-center items-center -ml-3 rounded-full bg-black/0 transition-all ease-in-out duration-200 shadow-none hover:bg-black/20 hover:shadow-icon-button hover:ring-8 ring-black/20 active:bg-black/20 active:shadow-icon-button active:ring-8  plausible-event-name=GameModeFoosball",
+                onClick: (function (param) {
+                    setGameMode(function (param) {
+                          return "Foosball";
+                        });
+                  })
+              });
+          break;
+      
+    }
+  } else {
+    tmp = JsxRuntime.jsx(JsxRuntime.Fragment, {});
+  }
   var tmp$1;
   tmp$1 = user === null || user === undefined ? JsxRuntime.jsx(JsxRuntime.Fragment, {}) : JsxRuntime.jsx(Link, {
           href: "/admin",

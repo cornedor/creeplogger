@@ -6,6 +6,7 @@ import * as React from "react";
 import * as Players from "../helpers/Players.bs.mjs";
 import * as UserGrid from "../components/UserGrid.bs.mjs";
 import * as ScoreStep from "../components/ScoreStep.bs.mjs";
+import * as FifaScoreStep from "../components/FifaScoreStep.bs.mjs";
 import * as Belt_MapString from "rescript/lib/es6/belt_MapString.js";
 import * as Fonts from "../helpers/fonts";
 import * as ConfirmationStep from "../components/ConfirmationStep.bs.mjs";
@@ -36,7 +37,7 @@ function Logger(props) {
   var setBlueState = match$4[1];
   var blueState = match$4[0];
   var match$5 = React.useState(function () {
-        return 0;
+        return 0.0;
       });
   var setEarnedPoints = match$5[1];
   var match$6 = React.useState(function () {
@@ -60,7 +61,7 @@ function Logger(props) {
           return -1;
         });
     setEarnedPoints(function (param) {
-          return 0;
+          return 0.0;
         });
   };
   Games.getTimePeriod("Daily");
@@ -82,26 +83,44 @@ function Logger(props) {
             });
         break;
     case "ScoreForm" :
-        stepComponent = gameMode === "Foosball" ? JsxRuntime.jsx(ScoreStep.make, {
-                selectedUsers: selectedUsers,
-                setStep: setStep,
-                reset: reset,
-                blueState: blueState,
-                setBlueState: setBlueState,
-                redState: redState,
-                setRedState: setRedState,
-                setEarnedPoints: setEarnedPoints,
-                setPerPlayerDeltas: match$6[1],
-                players: players,
-                gameMode: gameMode
-              }) : JsxRuntime.jsx(DartsGameModeStep.make, {
-                selectedUsers: selectedUsers,
-                setStep: setStep,
-                reset: reset,
-                setEarnedPoints: setEarnedPoints,
-                players: players,
-                gameMode: gameMode
-              });
+        switch (gameMode) {
+          case "Foosball" :
+              stepComponent = JsxRuntime.jsx(ScoreStep.make, {
+                    selectedUsers: selectedUsers,
+                    setStep: setStep,
+                    reset: reset,
+                    blueState: blueState,
+                    setBlueState: setBlueState,
+                    redState: redState,
+                    setRedState: setRedState,
+                    setEarnedPoints: setEarnedPoints,
+                    setPerPlayerDeltas: match$6[1],
+                    players: players,
+                    gameMode: gameMode
+                  });
+              break;
+          case "Darts" :
+              stepComponent = JsxRuntime.jsx(DartsGameModeStep.make, {
+                    selectedUsers: selectedUsers,
+                    setStep: setStep,
+                    reset: reset,
+                    setEarnedPoints: setEarnedPoints,
+                    players: players,
+                    gameMode: gameMode
+                  });
+              break;
+          case "Fifa" :
+              stepComponent = JsxRuntime.jsx(FifaScoreStep.make, {
+                    selectedUsers: selectedUsers,
+                    setStep: setStep,
+                    reset: reset,
+                    setEarnedPoints: setEarnedPoints,
+                    players: players,
+                    gameMode: gameMode
+                  });
+              break;
+          
+        }
         break;
     case "Confirmation" :
         stepComponent = JsxRuntime.jsx(ConfirmationStep.make, {

@@ -255,6 +255,53 @@ ${table}
   }
 }
 
+let sendFifaUpdate = async (
+  bluePlayers: array<Players.player>,
+  redPlayers: array<Players.player>,
+  blueScore: int,
+  redScore: int,
+) => {
+  let formatPlayerWithChange = (player: Players.player) => {
+    let name = switch player.mattermostHandle {
+    | Some(handle) => `@${handle}`
+    | None => player.name
+    }
+    let change = OpenSkillRating.toDisplayDelta(player.fifaLastOpenSkillChange)
+    let sign = change >= 0 ? "+" : ""
+    `${name} (${sign}${change->Int.toString})`
+  }
+
+  let blueNames =
+    bluePlayers
+    ->Array.map(formatPlayerWithChange)
+    ->Array.join(", ")
+
+  let redNames =
+    redPlayers
+    ->Array.map(formatPlayerWithChange)
+    ->Array.join(", ")
+
+  let winningTeam = blueScore > redScore ? "Blauw" : "Rood"
+
+  let message = `### ⚽ Nieuw FIFA potje geregistreerd!
+
+**${winningTeam}** heeft gewonnen!
+
+| Team | Spelers | Score |
+| ---- | ------- | ----- |
+| Blauw | ${blueNames} | ${blueScore->Int.toString} |
+| Rood | ${redNames} | ${redScore->Int.toString} |
+`
+
+  switch publishMessage(message) {
+  | Some(promise) =>
+    let _ = await promise
+  | None => ()
+  }
+
+  0
+}
+
 let sendDaysWithoutReset = async (name: string) => {
   let message = `${name} is reset`
 

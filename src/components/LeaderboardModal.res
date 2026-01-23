@@ -14,7 +14,8 @@ let make = (~show, ~setShow, ~gameMode, ~setGameMode) => {
     ->Array.filter(player => {
       let (_, games) = switch gameMode {
       | Games.Darts => (player.dartsElo, player.dartsGames)
-      | _ => (player.ordinal, player.games)
+      | Games.Fifa => (player.fifaOrdinal, player.fifaGames)
+      | Games.Foosball => (player.ordinal, player.games)
       }
 
       let isVisible = switch player.hidden {
@@ -33,12 +34,14 @@ let make = (~show, ~setShow, ~gameMode, ~setGameMode) => {
     switch gameMode {
     | Games.Darts => Elo.roundScore(player.dartsElo)
     | Games.Foosball => OpenSkillRating.toDisplayOrdinal(player.ordinal)
+    | Games.Fifa => OpenSkillRating.toDisplayOrdinal(player.fifaOrdinal)
     }
 
   let getPreviousCompareValue = (player: Players.player) =>
     switch gameMode {
     | Games.Darts => Elo.roundScore(player.dartsElo -. player.dartsLastEloChange)
     | Games.Foosball => OpenSkillRating.toDisplayOrdinal(player.ordinal -. player.lastOpenSkillChange)
+    | Games.Fifa => OpenSkillRating.toDisplayOrdinal(player.fifaOrdinal -. player.fifaLastOpenSkillChange)
     }
 
   // Compute position maps (key -> rank) with tie handling
@@ -143,10 +146,17 @@ let make = (~show, ~setShow, ~gameMode, ~setGameMode) => {
           </button>
         | Games.Darts =>
           <button
+            ariaLabel="Switch to FIFA leaderboard"
+            className="text-white w-[44px] aspect-square text-[26px] flex justify-center items-center rounded-full bg-black/0 transition-all ease-in-out duration-200 shadow-none hover:bg-black/20 hover:shadow-icon-button hover:ring-8 ring-black/20 active:bg-black/20 active:shadow-icon-button active:ring-8"
+            onClick={_ => setGameMode(_ => Games.Fifa)}>
+            <DartsIcon />
+          </button>
+        | Games.Fifa =>
+          <button
             ariaLabel="Switch to Foosball leaderboard"
             className="text-white w-[44px] aspect-square text-[26px] flex justify-center items-center rounded-full bg-black/0 transition-all ease-in-out duration-200 shadow-none hover:bg-black/20 hover:shadow-icon-button hover:ring-8 ring-black/20 active:bg-black/20 active:shadow-icon-button active:ring-8"
             onClick={_ => setGameMode(_ => Games.Foosball)}>
-            <DartsIcon />
+            <FifaIcon />
           </button>
         }
       | None => React.null
@@ -178,6 +188,15 @@ let make = (~show, ~setShow, ~gameMode, ~setGameMode) => {
               </th>
               <th className="text-lg text-left"> {React.string("Δ")} </th>
             </>
+          | Games.Fifa =>
+            <>
+              <th className="text-lg text-left">
+                <button ariaLabel="Toggle sort order" onClick={_ => setOrder(order => !order)}>
+                  {React.string("Score " ++ (ascOrder ? "↑" : "↓"))}
+                </button>
+              </th>
+              <th className="text-lg text-left"> {React.string("Δ")} </th>
+            </>
           }}
           <th className="text-lg text-left"> {React.string("Last 5")} </th>
                      <th className="text-lg text-left"> {React.string("G/W")} </th>
@@ -201,6 +220,13 @@ let make = (~show, ~setShow, ~gameMode, ~setGameMode) => {
               player.lastGames,
               player.wins,
               player.games,
+            )
+          | Games.Fifa => (
+              player.fifaOrdinal,
+              player.fifaLastOpenSkillChange,
+              player.fifaLastGames,
+              player.fifaWins,
+              player.fifaGames,
             )
           }
 
@@ -231,6 +257,17 @@ let make = (~show, ~setShow, ~gameMode, ~setGameMode) => {
                                                   <td title={"μ=" ++ round2(player.mu)->Js.Float.toString ++ " σ=" ++ round2(player.sigma)->Js.Float.toString ++ " ELO=" ++ round2(player.elo)->Js.Float.toString}>
                    {React.int(OpenSkillRating.toDisplayOrdinal(player.ordinal))}
                  </td>
+                <td>
+                  <small className={deltaColor}>
+                    {delta == 0 ? React.string("-") : React.int(deltaAbs)}
+                  </small>
+                </td>
+              </>
+            | Games.Fifa =>
+              <>
+                <td title={"μ=" ++ round2(player.fifaMu)->Js.Float.toString ++ " σ=" ++ round2(player.fifaSigma)->Js.Float.toString}>
+                  {React.int(OpenSkillRating.toDisplayOrdinal(player.fifaOrdinal))}
+                </td>
                 <td>
                   <small className={deltaColor}>
                     {delta == 0 ? React.string("-") : React.int(deltaAbs)}

@@ -4,7 +4,16 @@ import * as Caml_obj from "rescript/lib/es6/caml_obj.js";
 import * as OpenSkill from "./OpenSkill.bs.mjs";
 import * as Core__Array from "@rescript/core/src/Core__Array.bs.mjs";
 
-function getOpenSkillRating(player) {
+function getOpenSkillRating(player, gameModeOpt) {
+  var gameMode = gameModeOpt !== undefined ? gameModeOpt : "Foosball";
+  switch (gameMode) {
+    case "Foosball" :
+    case "Darts" :
+        break;
+    case "Fifa" :
+        return OpenSkill.createRating(player.fifaMu, player.fifaSigma, undefined);
+    
+  }
   return OpenSkill.createRating(player.mu, player.sigma, undefined);
 }
 
@@ -12,19 +21,46 @@ function calculateOrdinal(mu, sigma) {
   return mu - 3.0 * sigma;
 }
 
-function teamToRatings(team) {
-  return team.map(getOpenSkillRating);
+function teamToRatings(team, gameModeOpt) {
+  var gameMode = gameModeOpt !== undefined ? gameModeOpt : "Foosball";
+  return team.map(function (player) {
+              var gameModeOpt = gameMode;
+              switch (gameModeOpt) {
+                case "Foosball" :
+                case "Darts" :
+                    break;
+                case "Fifa" :
+                    return OpenSkill.createRating(player.fifaMu, player.fifaSigma, undefined);
+                
+              }
+              return OpenSkill.createRating(player.mu, player.sigma, undefined);
+            });
 }
 
-function updatePlayerRating(player, newRating) {
+function updatePlayerRating(player, newRating, gameModeOpt) {
+  var gameMode = gameModeOpt !== undefined ? gameModeOpt : "Foosball";
   var newOrdinal = newRating.mu - 3.0 * newRating.sigma;
-  var osDelta = newOrdinal - player.ordinal;
-  var newrecord = Caml_obj.obj_dup(player);
-  newrecord.lastOpenSkillChange = osDelta;
-  newrecord.ordinal = newOrdinal;
-  newrecord.sigma = newRating.sigma;
-  newrecord.mu = newRating.mu;
-  return newrecord;
+  switch (gameMode) {
+    case "Foosball" :
+    case "Darts" :
+        break;
+    case "Fifa" :
+        var osDelta = newOrdinal - player.fifaOrdinal;
+        var newrecord = Caml_obj.obj_dup(player);
+        newrecord.fifaLastOpenSkillChange = osDelta;
+        newrecord.fifaOrdinal = newOrdinal;
+        newrecord.fifaSigma = newRating.sigma;
+        newrecord.fifaMu = newRating.mu;
+        return newrecord;
+    
+  }
+  var osDelta$1 = newOrdinal - player.ordinal;
+  var newrecord$1 = Caml_obj.obj_dup(player);
+  newrecord$1.lastOpenSkillChange = osDelta$1;
+  newrecord$1.ordinal = newOrdinal;
+  newrecord$1.sigma = newRating.sigma;
+  newrecord$1.mu = newRating.mu;
+  return newrecord$1;
 }
 
 function toDisplayOrdinal(ordinal) {
@@ -36,22 +72,39 @@ function toDisplayDelta(delta) {
 }
 
 function calculateScore(winners, losers, gameModeOpt) {
-  var winnerRatings = winners.map(getOpenSkillRating);
-  var loserRatings = losers.map(getOpenSkillRating);
+  var gameMode = gameModeOpt !== undefined ? gameModeOpt : "Foosball";
+  var winnerRatings = teamToRatings(winners, gameMode);
+  var loserRatings = teamToRatings(losers, gameMode);
   var match = OpenSkill.rateGame(winnerRatings, loserRatings);
   var newLoserRatings = match[1];
   var newWinnerRatings = match[0];
   var updatedWinners = winners.map(function (player, index) {
         var newRating = newWinnerRatings[index];
-        return updatePlayerRating(player, newRating);
+        return updatePlayerRating(player, newRating, gameMode);
       });
   var updatedLosers = losers.map(function (player, index) {
         var newRating = newLoserRatings[index];
-        return updatePlayerRating(player, newRating);
+        return updatePlayerRating(player, newRating, gameMode);
       });
-  var avgWinnerChange = Core__Array.reduce(updatedWinners, 0.0, (function (acc, player) {
-          return acc + player.lastOpenSkillChange;
-        })) / updatedWinners.length;
+  var avgWinnerChange;
+  var exit = 0;
+  switch (gameMode) {
+    case "Foosball" :
+    case "Darts" :
+        exit = 1;
+        break;
+    case "Fifa" :
+        avgWinnerChange = Core__Array.reduce(updatedWinners, 0.0, (function (acc, player) {
+                return acc + player.fifaLastOpenSkillChange;
+              })) / updatedWinners.length;
+        break;
+    
+  }
+  if (exit === 1) {
+    avgWinnerChange = Core__Array.reduce(updatedWinners, 0.0, (function (acc, player) {
+            return acc + player.lastOpenSkillChange;
+          })) / updatedWinners.length;
+  }
   return [
           updatedWinners,
           updatedLosers,
@@ -60,8 +113,8 @@ function calculateScore(winners, losers, gameModeOpt) {
 }
 
 function getWinProbability(teamA, teamB) {
-  var ratingsA = teamA.map(getOpenSkillRating);
-  var ratingsB = teamB.map(getOpenSkillRating);
+  var ratingsA = teamToRatings(teamA, undefined);
+  var ratingsB = teamToRatings(teamB, undefined);
   return OpenSkill.getWinProbability(ratingsA, ratingsB);
 }
 

@@ -12,6 +12,7 @@ async function getDailyOverview(period) {
   Object.values(games).forEach(function (game) {
         var winner = game.blueScore > game.redScore ? "Blue" : "Red";
         var isAbsolute = PervasivesU.abs(game.blueScore - game.redScore | 0) === 7;
+        var absGoalDiff = PervasivesU.abs(game.blueScore - game.redScore | 0);
         game.blueTeam.forEach(function (player) {
               var match = Core__Option.getOr(creepsMap.get(player), {
                     name: "",
@@ -20,6 +21,7 @@ async function getDailyOverview(period) {
                     score: 0,
                     goalDiff: 0
                   });
+              var goalDiff = match.goalDiff;
               var score = match.score;
               var games = match.games;
               var creeps = match.creeps;
@@ -27,25 +29,27 @@ async function getDailyOverview(period) {
               match$1 = winner === "Blue" ? [
                   creeps + 0 | 0,
                   games + 1 | 0,
-                  score + 16 | 0
+                  score + 16 | 0,
+                  goalDiff + absGoalDiff | 0
                 ] : (
                   isAbsolute ? [
                       creeps + 2 | 0,
                       games + 1 | 0,
-                      score - 16 | 0
+                      score - 16 | 0,
+                      goalDiff - absGoalDiff | 0
                     ] : [
                       creeps + 1 | 0,
                       games + 1 | 0,
-                      score - 16 | 0
+                      score - 16 | 0,
+                      goalDiff - absGoalDiff | 0
                     ]
                 );
-              var goalDiff = match.goalDiff + (game.blueScore - game.redScore | 0) | 0;
               creepsMap.set(player, {
                     name: players[player].name,
                     creeps: match$1[0],
                     games: match$1[1],
                     score: match$1[2],
-                    goalDiff: goalDiff
+                    goalDiff: match$1[3]
                   });
             });
         game.redTeam.forEach(function (player) {
@@ -56,6 +60,7 @@ async function getDailyOverview(period) {
                     score: 0,
                     goalDiff: 0
                   });
+              var goalDiff = match.goalDiff;
               var score = match.score;
               var games = match.games;
               var creeps = match.creeps;
@@ -64,24 +69,26 @@ async function getDailyOverview(period) {
                   isAbsolute ? [
                       creeps + 2 | 0,
                       games + 1 | 0,
-                      score - 16 | 0
+                      score - 16 | 0,
+                      goalDiff - absGoalDiff | 0
                     ] : [
                       creeps + 1 | 0,
                       games + 1 | 0,
-                      score - 16 | 0
+                      score - 16 | 0,
+                      goalDiff - absGoalDiff | 0
                     ]
                 ) : [
                   creeps + 0 | 0,
                   games + 1 | 0,
-                  score + 16 | 0
+                  score + 16 | 0,
+                  goalDiff + absGoalDiff | 0
                 ];
-              var goalDiff = match.goalDiff + (game.redScore - game.blueScore | 0) | 0;
               creepsMap.set(player, {
                     name: players[player].name,
                     creeps: match$1[0],
                     games: match$1[1],
                     score: match$1[2],
-                    goalDiff: goalDiff
+                    goalDiff: match$1[3]
                   });
             });
       });

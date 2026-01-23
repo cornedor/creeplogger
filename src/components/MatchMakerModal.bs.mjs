@@ -5,6 +5,7 @@ import * as React from "react";
 import * as Button from "./Button.bs.mjs";
 import * as Players from "../helpers/Players.bs.mjs";
 import * as OpenSkill from "../helpers/OpenSkill.bs.mjs";
+import * as Caml_option from "rescript/lib/es6/caml_option.js";
 import * as Core__Array from "@rescript/core/src/Core__Array.bs.mjs";
 import * as Core__Option from "@rescript/core/src/Core__Option.bs.mjs";
 import * as Belt_MapString from "rescript/lib/es6/belt_MapString.js";
@@ -16,6 +17,7 @@ function MatchMakerModal(props) {
   var setGameMode = props.setGameMode;
   var setSelectedUsers = props.setSelectedUsers;
   var setShow = props.setShow;
+  var show = props.show;
   var players = Players.useAllPlayers("rating", false);
   var stats = Stats.useStats();
   var match = React.useState(function () {
@@ -243,97 +245,130 @@ function MatchMakerModal(props) {
   var numSelected = Belt_MapString.size(Belt_MapString.keep(selected, (function (param, v) {
               return v === true;
             })));
-  return JsxRuntime.jsxs("div", {
+  React.useEffect((function () {
+          if (!show) {
+            return ;
+          }
+          var handleKeyDown = function ($$event) {
+            var key = Core__Option.getOr(Caml_option.nullable_to_opt($$event.key), "");
+            if (key === "Escape") {
+              return setShow(function (param) {
+                          return false;
+                        });
+            }
+            
+          };
+          document.addEventListener("keydown", handleKeyDown);
+          return (function () {
+                    document.removeEventListener("keydown", handleKeyDown);
+                  });
+        }), [show]);
+  return JsxRuntime.jsxs(JsxRuntime.Fragment, {
               children: [
-                JsxRuntime.jsxs("header", {
-                      children: [
-                        JsxRuntime.jsx(Button.make, {
-                              variant: "Blue",
-                              onClick: (function (param) {
-                                  setShow(function (s) {
-                                        return !s;
-                                      });
-                                }),
-                              children: "Terug"
-                            }),
-                        JsxRuntime.jsx("div", {
-                              className: "flex-1"
-                            }),
-                        JsxRuntime.jsx(Button.make, {
-                              variant: "Blue",
-                              onClick: (function (param) {
-                                  makeMatch();
-                                }),
-                              children: "Make a match",
-                              disabled: numSelected < 4
-                            })
-                      ],
-                      className: "flex items-center gap-4"
-                    }),
-                JsxRuntime.jsx("h2", {
-                      children: "Select players (min 4)",
-                      className: "pt-5 mb-4 block text-2xl"
-                    }),
+                show ? JsxRuntime.jsx("div", {
+                        className: "fixed inset-0 z-[199] bg-black/20",
+                        onClick: (function (param) {
+                            setShow(function (param) {
+                                  return false;
+                                });
+                          })
+                      }) : null,
                 JsxRuntime.jsxs("div", {
                       children: [
-                        "Selected: ",
-                        numSelected
-                      ],
-                      className: "text-white/70 mb-2"
-                    }),
-                JsxRuntime.jsx("ul", {
-                      children: players.map(function (p) {
-                            var match = Belt_MapString.get(selected, p.key);
-                            var isSelected = match !== undefined && match ? true : false;
-                            return JsxRuntime.jsxs("li", {
-                                        children: [
-                                          JsxRuntime.jsxs("button", {
+                        JsxRuntime.jsxs("header", {
+                              children: [
+                                JsxRuntime.jsx(Button.make, {
+                                      variant: "Blue",
+                                      onClick: (function (param) {
+                                          setShow(function (s) {
+                                                return !s;
+                                              });
+                                        }),
+                                      children: "Terug"
+                                    }),
+                                JsxRuntime.jsx("div", {
+                                      className: "flex-1"
+                                    }),
+                                JsxRuntime.jsx(Button.make, {
+                                      variant: "Blue",
+                                      onClick: (function (param) {
+                                          makeMatch();
+                                        }),
+                                      children: "Make a match",
+                                      disabled: numSelected < 4
+                                    })
+                              ],
+                              className: "flex items-center gap-4"
+                            }),
+                        JsxRuntime.jsx("h2", {
+                              children: "Select players (min 4)",
+                              className: "pt-5 mb-4 block text-2xl"
+                            }),
+                        JsxRuntime.jsxs("div", {
+                              children: [
+                                "Selected: ",
+                                numSelected
+                              ],
+                              className: "text-white/70 mb-2"
+                            }),
+                        JsxRuntime.jsx("ul", {
+                              children: players.map(function (p) {
+                                    var match = Belt_MapString.get(selected, p.key);
+                                    var isSelected = match !== undefined && match ? true : false;
+                                    return JsxRuntime.jsxs("li", {
                                                 children: [
-                                                  JsxRuntime.jsx("strong", {
-                                                        children: p.name
+                                                  JsxRuntime.jsxs("button", {
+                                                        children: [
+                                                          JsxRuntime.jsx("strong", {
+                                                                children: p.name
+                                                              }),
+                                                          JsxRuntime.jsx("span", {
+                                                                children: OpenSkillRating.toDisplayOrdinal(p.ordinal).toString(),
+                                                                className: "ml-2 text-white/60"
+                                                              })
+                                                        ],
+                                                        className: "text-left flex-1",
+                                                        onClick: (function (param) {
+                                                            toggleSelected(p.key);
+                                                          })
                                                       }),
-                                                  JsxRuntime.jsx("span", {
-                                                        children: OpenSkillRating.toDisplayOrdinal(p.ordinal).toString(),
-                                                        className: "ml-2 text-white/60"
+                                                  JsxRuntime.jsx("input", {
+                                                        "aria-label": p.name,
+                                                        className: "w-5 h-5",
+                                                        checked: isSelected,
+                                                        type: "checkbox",
+                                                        onChange: (function (param) {
+                                                            toggleSelected(p.key);
+                                                          })
                                                       })
                                                 ],
-                                                className: "text-left flex-1",
-                                                onClick: (function (param) {
-                                                    toggleSelected(p.key);
-                                                  })
-                                              }),
-                                          JsxRuntime.jsx("input", {
-                                                "aria-label": p.name,
-                                                className: "w-5 h-5",
-                                                checked: isSelected,
-                                                type: "checkbox",
-                                                onChange: (function (param) {
-                                                    toggleSelected(p.key);
-                                                  })
-                                              })
-                                        ],
-                                        className: "p-2 rounded border-white/20 border bg-white/5 flex justify-between items-center"
-                                      }, p.key);
-                          }),
-                      className: "grid grid-cols-1 md:grid-cols-2 gap-2 overflow-auto"
-                    }),
-                JsxRuntime.jsx("div", {
-                      children: JsxRuntime.jsx(Button.make, {
-                            variant: "Grey",
-                            onClick: (function (param) {
-                                setSelected(function (param) {
-                                      
-                                    });
-                              }),
-                            children: "Clear"
-                          }),
-                      className: "mt-4 flex gap-2"
+                                                className: "p-2 rounded border-white/20 border bg-white/5 flex justify-between items-center"
+                                              }, p.key);
+                                  }),
+                              className: "grid grid-cols-1 md:grid-cols-2 gap-2 overflow-auto"
+                            }),
+                        JsxRuntime.jsx("div", {
+                              children: JsxRuntime.jsx(Button.make, {
+                                    variant: "Grey",
+                                    onClick: (function (param) {
+                                        setSelected(function (param) {
+                                              
+                                            });
+                                      }),
+                                    children: "Clear"
+                                  }),
+                              className: "mt-4 flex gap-2"
+                            })
+                      ],
+                      className: "modal flex flex-col",
+                      style: {
+                        transform: show ? "translateX(0)" : "translateX(-100%)"
+                      },
+                      onMouseDown: (function ($$event) {
+                          $$event.stopPropagation();
+                        })
                     })
-              ],
-              className: "modal flex flex-col",
-              style: {
-                transform: props.show ? "translateX(0)" : "translateX(-100%)"
-              }
+              ]
             });
 }
 

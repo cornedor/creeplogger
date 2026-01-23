@@ -152,6 +152,25 @@ async function sendDailyUpdate() {
   }
 }
 
+async function sendFifaUpdate(bluePlayers, redPlayers, blueScore, redScore) {
+  var formatPlayerWithChange = function (player) {
+    var handle = player.mattermostHandle;
+    var name = handle !== undefined ? "@" + handle : player.name;
+    var change = OpenSkillRating.toDisplayDelta(player.fifaLastOpenSkillChange);
+    var sign = change >= 0 ? "+" : "";
+    return name + " (" + sign + change.toString() + ")";
+  };
+  var blueNames = bluePlayers.map(formatPlayerWithChange).join(", ");
+  var redNames = redPlayers.map(formatPlayerWithChange).join(", ");
+  var winningTeam = blueScore > redScore ? "Blauw" : "Rood";
+  var message = "### ⚽ Nieuw FIFA potje geregistreerd!\n\n**" + winningTeam + "** heeft gewonnen!\n\n| Team | Spelers | Score |\n| ---- | ------- | ----- |\n| Blauw | " + blueNames + " | " + blueScore.toString() + " |\n| Rood | " + redNames + " | " + redScore.toString() + " |\n";
+  var promise = publishMessage(message);
+  if (promise !== undefined) {
+    await Caml_option.valFromOption(promise);
+  }
+  return 0;
+}
+
 async function sendDaysWithoutReset(name) {
   var message = name + " is reset";
   var promise = publishMessage(message);
@@ -164,6 +183,7 @@ async function sendDaysWithoutReset(name) {
 export {
   sendCreepsUpdate ,
   sendDartsUpdate ,
+  sendFifaUpdate ,
   publishMessage ,
   sendDailyUpdate ,
   sendDaysWithoutReset ,
