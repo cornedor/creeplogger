@@ -3,6 +3,7 @@
 import * as React from "react";
 import * as Schema from "./Schema.bs.mjs";
 import * as Database from "./Database.bs.mjs";
+import * as Caml_option from "rescript/lib/es6/caml_option.js";
 import * as RescriptCore from "@rescript/core/src/RescriptCore.bs.mjs";
 import * as FirebaseSchema from "./FirebaseSchema.bs.mjs";
 import * as Database$1 from "firebase/database";
@@ -38,7 +39,8 @@ var gameSchema = Schema.object(function (s) {
                                     })
                                 };
                         }))),
-              modifiers: s.f("modifiers", FirebaseSchema.nullableTransform(Schema.option(Schema.array(modifierSchema))))
+              modifiers: s.f("modifiers", FirebaseSchema.nullableTransform(Schema.option(Schema.array(modifierSchema)))),
+              scoreDeltas: s.f("scoreDeltas", FirebaseSchema.nullableTransform(Schema.option(Schema.dict(Schema.$$int))))
             };
     });
 
@@ -55,8 +57,12 @@ function addGame(game) {
 async function getTimePeriod(period) {
   var date = new Date();
   date.setHours(0, 0, 0, 0);
+  var endDate;
   switch (period) {
     case "Daily" :
+        var end = new Date();
+        end.setHours(23, 59, 59, 999);
+        endDate = Caml_option.some(end);
         break;
     case "Weekly" :
         var x = date.getDay();
@@ -64,6 +70,33 @@ async function getTimePeriod(period) {
             x === 0 ? 7 : x
           ) | 0) + 1 | 0;
         date.setDate(newDate);
+        var end$1 = new Date();
+        end$1.setDate(date.getDate() + 6 | 0);
+        end$1.setHours(23, 59, 59, 999);
+        endDate = Caml_option.some(end$1);
+        break;
+    case "Monthly" :
+        date.setDate(0);
+        var end$2 = new Date();
+        end$2.setDate(0);
+        end$2.setDate(end$2.getDate() - 1 | 0);
+        end$2.setHours(23, 59, 59, 999);
+        endDate = Caml_option.some(end$2);
+        break;
+    case "All" :
+        endDate = undefined;
+        break;
+    
+  }
+  switch (period) {
+    case "Daily" :
+        break;
+    case "Weekly" :
+        var x$1 = date.getDay();
+        var newDate$1 = (date.getDate() - (
+            x$1 === 0 ? 7 : x$1
+          ) | 0) + 1 | 0;
+        date.setDate(newDate$1);
         break;
     case "Monthly" :
         date.setDate(0);
@@ -73,7 +106,7 @@ async function getTimePeriod(period) {
         break;
     
   }
-  var games = await Database$1.get(Database$1.query(Database$1.ref(Database.database, "games"), Database$1.orderByChild("date"), Database$1.startAt(date.getTime())));
+  var games = endDate !== undefined ? await Database$1.get(Database$1.query(Database$1.ref(Database.database, "games"), Database$1.orderByChild("date"), Database$1.startAt(date.getTime()), Database$1.endAt(Caml_option.valFromOption(endDate).getTime()))) : await Database$1.get(Database$1.query(Database$1.ref(Database.database, "games"), Database$1.orderByChild("date"), Database$1.startAt(date.getTime())));
   var val = games.val();
   if (val == null) {
     return {};

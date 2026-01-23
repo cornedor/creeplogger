@@ -11,6 +11,7 @@ type game = {
   redTeam: array<string>,
   date: Date.t,
   modifiers: option<array<modifier>>,
+  scoreDeltas: option<Js.Dict.t<int>>,
 }
 
 let addGame: game => promise<Firebase.databaseReference>

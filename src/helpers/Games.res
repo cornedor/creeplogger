@@ -13,6 +13,7 @@ type game = {
   redTeam: array<string>,
   date: Date.t,
   modifiers: option<array<modifier>>,
+  scoreDeltas: option<Js.Dict.t<int>>, // Store the score changes per player
 }
 
 let modifierSchema = Schema.union([
@@ -42,6 +43,10 @@ let gameSchema = Schema.object(s => {
     "modifiers",
     Schema.option(Schema.array(modifierSchema))->FirebaseSchema.nullableTransform,
   ),
+  scoreDeltas: s.field(
+    "scoreDeltas",
+    Schema.option(Schema.dict(Schema.int))->FirebaseSchema.nullableTransform,
+  ),
 })
 
 let addGame = game => {
@@ -57,6 +62,32 @@ let getTimePeriod = async period => {
   let date = Date.make()
   Date.setHoursMSMs(date, ~hours=0, ~minutes=0, ~seconds=0, ~milliseconds=0)
 
+  let endDate = switch period {
+  | Daily => {
+      let end = Date.make()
+      Date.setHoursMSMs(end, ~hours=23, ~minutes=59, ~seconds=59, ~milliseconds=999)
+      Some(end)
+    }
+  | Weekly => {
+      let x = Date.getDay(date)
+      let newDate = Date.getDate(date) - (x == 0 ? 7 : x) + 1
+      Date.setDate(date, newDate)
+      let end = Date.make()
+      Date.setDate(end, Date.getDate(date) + 6)
+      Date.setHoursMSMs(end, ~hours=23, ~minutes=59, ~seconds=59, ~milliseconds=999)
+      Some(end)
+    }
+  | Monthly => {
+      Date.setDate(date, 0)
+      let end = Date.make()
+      Date.setDate(end, 0)
+      Date.setDate(end, Date.getDate(end) - 1)
+      Date.setHoursMSMs(end, ~hours=23, ~minutes=59, ~seconds=59, ~milliseconds=999)
+      Some(end)
+    }
+  | All => None
+  }
+
   switch period {
   | Daily => ()
   | Weekly => {
@@ -69,12 +100,21 @@ let getTimePeriod = async period => {
   | All => Date.setFullYear(date, 2000)
   }
 
-  let games =
+  let games = switch endDate {
+  | Some(end) =>
+    await Firebase.Database.query3(
+      Firebase.Database.refPath(Database.database, "games"),
+      Firebase.Database.orderByChild("date"),
+      Firebase.Database.startAt(Date.getTime(date)),
+      Firebase.Database.endAt(Date.getTime(end)),
+    )->Firebase.Database.get
+  | None =>
     await Firebase.Database.query2(
       Firebase.Database.refPath(Database.database, "games"),
       Firebase.Database.orderByChild("date"),
       Firebase.Database.startAt(Date.getTime(date)),
     )->Firebase.Database.get
+  }
 
   switch games->Firebase.Database.Snapshot.val->Nullable.toOption {
   | Some(val) =>
