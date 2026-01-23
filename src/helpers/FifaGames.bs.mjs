@@ -3,6 +3,7 @@
 import * as React from "react";
 import * as Schema from "./Schema.bs.mjs";
 import * as Database from "./Database.bs.mjs";
+import * as Core__Array from "@rescript/core/src/Core__Array.bs.mjs";
 import * as RescriptCore from "@rescript/core/src/RescriptCore.bs.mjs";
 import * as Database$1 from "firebase/database";
 
@@ -37,20 +38,17 @@ function addFifaGame(fifaGame) {
 
 async function fetchAllGames() {
   var games = await Database$1.get(Database$1.query(Database$1.ref(Database.database, "fifaGames"), Database$1.orderByChild("date")));
-  var orderedGames = [];
-  games.forEach(function (snap) {
-        var val = snap.val();
-        if (val == null) {
-          return ;
-        }
-        var val$1 = Schema.parseWith(val, fifaGameSchema);
-        if (val$1.TAG === "Ok") {
-          orderedGames.push(val$1._0);
-          return ;
-        }
-        console.log(val$1._0);
-      });
-  return orderedGames;
+  return Core__Array.filterMap(games, (function (snap) {
+                var val = snap.val();
+                if (val == null) {
+                  return ;
+                }
+                var val$1 = Schema.parseWith(val, fifaGameSchema);
+                if (val$1.TAG === "Ok") {
+                  return val$1._0;
+                }
+                console.log(val$1._0);
+              }));
 }
 
 function removeGame(gameKey) {
