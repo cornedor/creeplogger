@@ -43,6 +43,7 @@ function Logger(props) {
   var match$6 = React.useState(function () {
         return {};
       });
+  var setPerPlayerDeltas = match$6[1];
   var match$7 = React.useState(function () {
         return "Foosball";
       });
@@ -94,7 +95,7 @@ function Logger(props) {
                     redState: redState,
                     setRedState: setRedState,
                     setEarnedPoints: setEarnedPoints,
-                    setPerPlayerDeltas: match$6[1],
+                    setPerPlayerDeltas: setPerPlayerDeltas,
                     players: players,
                     gameMode: gameMode
                   });
@@ -114,7 +115,10 @@ function Logger(props) {
                     selectedUsers: selectedUsers,
                     setStep: setStep,
                     reset: reset,
+                    setRedState: setRedState,
+                    setBlueState: setBlueState,
                     setEarnedPoints: setEarnedPoints,
+                    setPerPlayerDeltas: setPerPlayerDeltas,
                     players: players,
                     gameMode: gameMode
                   });

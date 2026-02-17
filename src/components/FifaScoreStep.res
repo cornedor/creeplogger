@@ -12,7 +12,10 @@ let make = (
   ~selectedUsers,
   ~setStep,
   ~reset,
+  ~setRedState,
+  ~setBlueState,
   ~setEarnedPoints,
+  ~setPerPlayerDeltas,
   ~players,
   ~gameMode,
 ) => {
@@ -38,8 +41,6 @@ let make = (
     selectedRedUsers->Array.map(key => Players.playerByKey(players, key)->Option.getExn)
   let bluePlayers =
     selectedBlueUsers->Array.map(key => Players.playerByKey(players, key)->Option.getExn)
-
-  let sendUpdate = Mattermost.sendFifaUpdate(bluePlayers, redPlayers, ...)
 
   let blueScoreInt = Int.fromString(blueScore)->Option.getOr(0)
   let redScoreInt = Int.fromString(redScore)->Option.getOr(0)
@@ -70,7 +71,25 @@ let make = (
       }
     }
 
-    setEarnedPoints(_ => osPoints)
+    // Scale points for display (same as foosball)
+    let roundedPoints = OpenSkillRating.toDisplayDelta(osPoints)
+    setEarnedPoints(_ => Int.toFloat(roundedPoints))
+
+    // Pass scores up to parent for correct winner determination
+    setRedState(_ => redScoreInt)
+    setBlueState(_ => blueScoreInt)
+
+    // Collect per-player display deltas
+    let deltas: Js.Dict.t<int> = Js.Dict.empty()
+    blueOS->Array.forEach(player => {
+      let delta = OpenSkillRating.toDisplayDelta(player.fifaLastOpenSkillChange)
+      Js.Dict.set(deltas, player.key, delta)
+    })
+    redOS->Array.forEach(player => {
+      let delta = OpenSkillRating.toDisplayDelta(player.fifaLastOpenSkillChange)
+      Js.Dict.set(deltas, player.key, delta)
+    })
+    setPerPlayerDeltas(_ => deltas)
 
     // Update all player stats
     let _ = await Promise.all(
@@ -100,7 +119,8 @@ let make = (
       ),
     )
 
-    let _ = await sendUpdate(blueScoreInt, redScoreInt)
+    // Send Mattermost notification with updated player objects
+    let _ = await Mattermost.sendFifaUpdate(blueOS, redOS, blueScoreInt, redScoreInt)
 
     setIsSaving(_ => false)
     setStep(step => LoggerStep.getNextStep(step))

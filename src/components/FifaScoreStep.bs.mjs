@@ -13,22 +13,12 @@ import * as Belt_MapString from "rescript/lib/es6/belt_MapString.js";
 import * as OpenSkillRating from "../helpers/OpenSkillRating.bs.mjs";
 import * as JsxRuntime from "react/jsx-runtime";
 
-function mapUser(players, key) {
-  var player = Players.playerByKey(players, key);
-  if (player !== undefined) {
-    return JsxRuntime.jsx("li", {
-                children: player.name
-              }, key);
-  } else {
-    return JsxRuntime.jsx("li", {
-                children: "..."
-              }, key);
-  }
-}
-
 function FifaScoreStep(props) {
   var players = props.players;
+  var setPerPlayerDeltas = props.setPerPlayerDeltas;
   var setEarnedPoints = props.setEarnedPoints;
+  var setBlueState = props.setBlueState;
+  var setRedState = props.setRedState;
   var setStep = props.setStep;
   var selectedUsers = props.selectedUsers;
   var match = React.useState(function () {
@@ -45,8 +35,17 @@ function FifaScoreStep(props) {
       });
   var setRedScore = match$2[1];
   var redScore = match$2[0];
-  var mapUser$1 = function (extra) {
-    return mapUser(players, extra);
+  var mapUser = function (extra) {
+    var player = Players.playerByKey(players, extra);
+    if (player !== undefined) {
+      return JsxRuntime.jsx("li", {
+                  children: player.name
+                }, extra);
+    } else {
+      return JsxRuntime.jsx("li", {
+                  children: "..."
+                }, extra);
+    }
   };
   var selectedBlueUsers = Belt_MapString.keysToArray(Belt_MapString.keep(selectedUsers, (function (param, value) {
               return value === "Blue";
@@ -54,17 +53,14 @@ function FifaScoreStep(props) {
   var selectedRedUsers = Belt_MapString.keysToArray(Belt_MapString.keep(selectedUsers, (function (param, value) {
               return value === "Red";
             })));
-  var blueUsers = selectedBlueUsers.map(mapUser$1);
-  var redUsers = selectedRedUsers.map(mapUser$1);
+  var blueUsers = selectedBlueUsers.map(mapUser);
+  var redUsers = selectedRedUsers.map(mapUser);
   var redPlayers = selectedRedUsers.map(function (key) {
         return Core__Option.getExn(Players.playerByKey(players, key), undefined);
       });
   var bluePlayers = selectedBlueUsers.map(function (key) {
         return Core__Option.getExn(Players.playerByKey(players, key), undefined);
       });
-  var sendUpdate = function (extra, extra$1) {
-    return Mattermost.sendFifaUpdate(bluePlayers, redPlayers, extra, extra$1);
-  };
   var blueScoreInt = Core__Option.getOr(Core__Int.fromString(blueScore, undefined), 0);
   var redScoreInt = Core__Option.getOr(Core__Int.fromString(redScore, undefined), 0);
   var saveGame = async function () {
@@ -92,16 +88,36 @@ function FifaScoreStep(props) {
         match$1[2]
       ];
     }
-    var osPoints = match[2];
+    var redOS = match[1];
+    var blueOS = match[0];
+    var roundedPoints = OpenSkillRating.toDisplayDelta(match[2]);
     setEarnedPoints(function (param) {
-          return osPoints;
+          return roundedPoints;
         });
-    await Promise.all(match[0].map(async function (player) {
+    setRedState(function (param) {
+          return redScoreInt;
+        });
+    setBlueState(function (param) {
+          return blueScoreInt;
+        });
+    var deltas = {};
+    blueOS.forEach(function (player) {
+          var delta = OpenSkillRating.toDisplayDelta(player.fifaLastOpenSkillChange);
+          deltas[player.key] = delta;
+        });
+    redOS.forEach(function (player) {
+          var delta = OpenSkillRating.toDisplayDelta(player.fifaLastOpenSkillChange);
+          deltas[player.key] = delta;
+        });
+    setPerPlayerDeltas(function (param) {
+          return deltas;
+        });
+    await Promise.all(blueOS.map(async function (player) {
                 return Players.updateFifaGameStats(player.key, blueScoreInt, redScoreInt, player.fifaMu, player.fifaSigma, player.fifaOrdinal, player.fifaLastOpenSkillChange);
-              }).concat(match[1].map(async function (player) {
+              }).concat(redOS.map(async function (player) {
                   return Players.updateFifaGameStats(player.key, redScoreInt, blueScoreInt, player.fifaMu, player.fifaSigma, player.fifaOrdinal, player.fifaLastOpenSkillChange);
                 })));
-    await sendUpdate(blueScoreInt, redScoreInt);
+    await Mattermost.sendFifaUpdate(blueOS, redOS, blueScoreInt, redScoreInt);
     setIsSaving(function (param) {
           return false;
         });
@@ -186,7 +202,6 @@ function FifaScoreStep(props) {
 var make = FifaScoreStep;
 
 export {
-  mapUser ,
   make ,
 }
 /* react Not a pure module */
