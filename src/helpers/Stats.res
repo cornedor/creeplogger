@@ -127,6 +127,7 @@ let writeStats = async stats => {
 let recalculateStats = async () => {
   let games = await Games.fetchAllGames()
   let dartsGames = await DartsGames.fetchAllGames()
+  let fifaGames = await FifaGames.fetchAllGames()
   let players = await Players.fetchAllPlayers()
 
   let playerKeys = Dict.keysToArray(players)
@@ -164,6 +165,17 @@ let recalculateStats = async () => {
         dartsElo: 1000.0,
         dartsLastEloChange: 0.0,
         dartsLastGames: [],
+        // FIFA game stats
+        fifaGames: 0,
+        fifaWins: 0,
+        fifaLosses: 0,
+        fifaLastGames: [],
+        fifaGoalsScored: 0,
+        fifaGoalsConceded: 0,
+        fifaMu: 25.0,
+        fifaSigma: 8.333,
+        fifaOrdinal: 0.0,
+        fifaLastOpenSkillChange: 0.0,
       },
     )
   })
@@ -299,6 +311,60 @@ let recalculateStats = async () => {
       ...stats,
       totalDartsGames: stats.totalDartsGames + 1,
     }
+  })
+
+  // Process FIFA games
+  Array.forEach(fifaGames, game => {
+    let blueWin = game.blueScore > game.redScore
+
+    let redPlayers = game.redTeam->Array.map(key => Dict.get(players, key)->Option.getExn)
+    let bluePlayers = game.blueTeam->Array.map(key => Dict.get(players, key)->Option.getExn)
+
+    let (blueOS, redOS, _) = switch blueWin {
+    | true => OpenSkillRating.calculateScore(bluePlayers, redPlayers, ~gameMode=Games.Fifa)
+    | false => {
+        let (red, blue, points) = OpenSkillRating.calculateScore(
+          redPlayers,
+          bluePlayers,
+          ~gameMode=Games.Fifa,
+        )
+        (blue, red, points)
+      }
+    }
+
+    Array.forEach(blueOS, player => {
+      let lastGames = Players.getLastGames(player.fifaLastGames, blueWin)
+      Dict.set(
+        players,
+        player.key,
+        {
+          ...player,
+          fifaGames: player.fifaGames + 1,
+          fifaWins: blueWin ? player.fifaWins + 1 : player.fifaWins,
+          fifaLosses: blueWin ? player.fifaLosses : player.fifaLosses + 1,
+          fifaLastGames: lastGames,
+          fifaGoalsScored: player.fifaGoalsScored + game.blueScore,
+          fifaGoalsConceded: player.fifaGoalsConceded + game.redScore,
+        },
+      )
+    })
+    Array.forEach(redOS, player => {
+      let redWin = !blueWin
+      let lastGames = Players.getLastGames(player.fifaLastGames, redWin)
+      Dict.set(
+        players,
+        player.key,
+        {
+          ...player,
+          fifaGames: player.fifaGames + 1,
+          fifaWins: redWin ? player.fifaWins + 1 : player.fifaWins,
+          fifaLosses: redWin ? player.fifaLosses : player.fifaLosses + 1,
+          fifaLastGames: lastGames,
+          fifaGoalsScored: player.fifaGoalsScored + game.redScore,
+          fifaGoalsConceded: player.fifaGoalsConceded + game.blueScore,
+        },
+      )
+    })
   })
 
   Js.log(stats)

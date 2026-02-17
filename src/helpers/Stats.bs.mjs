@@ -8,6 +8,7 @@ import * as Schema from "./Schema.bs.mjs";
 import * as Players from "./Players.bs.mjs";
 import * as Caml_obj from "rescript/lib/es6/caml_obj.js";
 import * as Database from "./Database.bs.mjs";
+import * as FifaGames from "./FifaGames.bs.mjs";
 import * as DartsGames from "./DartsGames.bs.mjs";
 import * as Core__Array from "@rescript/core/src/Core__Array.bs.mjs";
 import * as Core__Option from "@rescript/core/src/Core__Option.bs.mjs";
@@ -137,11 +138,22 @@ async function writeStats(stats) {
 async function recalculateStats() {
   var games = await Games.fetchAllGames();
   var dartsGames = await DartsGames.fetchAllGames();
+  var fifaGames = await FifaGames.fetchAllGames();
   var players = await Players.fetchAllPlayers();
   var playerKeys = Object.keys(players);
   playerKeys.forEach(function (key) {
         var player = Core__Option.getExn(players[key], undefined);
         var newrecord = Caml_obj.obj_dup(player);
+        newrecord.fifaLastOpenSkillChange = 0.0;
+        newrecord.fifaOrdinal = 0.0;
+        newrecord.fifaSigma = 8.333;
+        newrecord.fifaMu = 25.0;
+        newrecord.fifaGoalsConceded = 0;
+        newrecord.fifaGoalsScored = 0;
+        newrecord.fifaLastGames = [];
+        newrecord.fifaLosses = 0;
+        newrecord.fifaWins = 0;
+        newrecord.fifaGames = 0;
         newrecord.dartsLastGames = [];
         newrecord.dartsLosses = 0;
         newrecord.dartsWins = 0;
@@ -281,6 +293,49 @@ async function recalculateStats() {
                   totalDartsGames: stats.totalDartsGames + 1 | 0
                 };
         }));
+  fifaGames.forEach(function (game) {
+        var blueWin = game.blueScore > game.redScore;
+        var redPlayers = game.redTeam.map(function (key) {
+              return Core__Option.getExn(players[key], undefined);
+            });
+        var bluePlayers = game.blueTeam.map(function (key) {
+              return Core__Option.getExn(players[key], undefined);
+            });
+        var match;
+        if (blueWin) {
+          match = OpenSkillRating.calculateScore(bluePlayers, redPlayers, "Fifa");
+        } else {
+          var match$1 = OpenSkillRating.calculateScore(redPlayers, bluePlayers, "Fifa");
+          match = [
+            match$1[1],
+            match$1[0],
+            match$1[2]
+          ];
+        }
+        match[0].forEach(function (player) {
+              var lastGames = Players.getLastGames(player.fifaLastGames, blueWin);
+              var newrecord = Caml_obj.obj_dup(player);
+              newrecord.fifaGoalsConceded = player.fifaGoalsConceded + game.redScore | 0;
+              newrecord.fifaGoalsScored = player.fifaGoalsScored + game.blueScore | 0;
+              newrecord.fifaLastGames = lastGames;
+              newrecord.fifaLosses = blueWin ? player.fifaLosses : player.fifaLosses + 1 | 0;
+              newrecord.fifaWins = blueWin ? player.fifaWins + 1 | 0 : player.fifaWins;
+              newrecord.fifaGames = player.fifaGames + 1 | 0;
+              players[player.key] = newrecord;
+            });
+        match[1].forEach(function (player) {
+              var redWin = !blueWin;
+              var lastGames = Players.getLastGames(player.fifaLastGames, redWin);
+              var newrecord = Caml_obj.obj_dup(player);
+              newrecord.fifaGoalsConceded = player.fifaGoalsConceded + game.blueScore | 0;
+              newrecord.fifaGoalsScored = player.fifaGoalsScored + game.redScore | 0;
+              newrecord.fifaLastGames = lastGames;
+              newrecord.fifaLosses = redWin ? player.fifaLosses : player.fifaLosses + 1 | 0;
+              newrecord.fifaWins = redWin ? player.fifaWins + 1 | 0 : player.fifaWins;
+              newrecord.fifaGames = player.fifaGames + 1 | 0;
+              players[player.key] = newrecord;
+            });
+      });
   console.log(stats$1);
   console.log(players);
   await Promise.all(playerKeys.map(function (key) {
