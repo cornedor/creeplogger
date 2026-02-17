@@ -40,19 +40,19 @@ let fetchAllGames = async () => {
       Firebase.Database.orderByChild("date"),
     )->Firebase.Database.get
 
-  snapshotToArray(games)->Array.filterMap(snap => {
+  let orderedGames = []
+  Array.forEach(snapshotToArray(games), snap => {
     switch snap->Firebase.Database.Snapshot.val->Nullable.toOption {
     | Some(val) =>
       switch val->Schema.parseWith(fifaGameSchema) {
-      | Ok(val) => Some(val)
-      | Error(e) => {
-          Js.log(e)
-          None
-        }
+      | Ok(val) => orderedGames->Array.push(val)
+      | Error(e) => Js.log(e)
       }
-    | None => None
+    | None => ()
     }
   })
+
+  orderedGames
 }
 
 let removeGame = gameKey => {
