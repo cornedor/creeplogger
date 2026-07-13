@@ -85,13 +85,22 @@ let make = (
     let bluePlayers =
       selectedBlueUsers->Array.map(key => Players.playerByKey(players, key)->Option.getExn)
 
+    let scoreDiff = abs(blueState - redState)
+
     // Calculate OpenSkill scores once
     let (blueOS, redOS, osPoints) = switch winningTeam {
-    | Blue => OpenSkillRating.calculateScore(bluePlayers, redPlayers, ~gameMode=Games.Foosball)
+    | Blue =>
+      OpenSkillRating.calculateScore(
+        bluePlayers,
+        redPlayers,
+        ~scoreDiff,
+        ~gameMode=Games.Foosball,
+      )
     | Red => {
         let (red, blue, points) = OpenSkillRating.calculateScore(
           redPlayers,
           bluePlayers,
+          ~scoreDiff,
           ~gameMode=Games.Foosball,
         )
         (blue, red, points)

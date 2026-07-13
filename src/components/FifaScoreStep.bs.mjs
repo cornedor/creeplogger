@@ -7,6 +7,7 @@ import * as Core__Int from "@rescript/core/src/Core__Int.bs.mjs";
 import * as FifaGames from "../helpers/FifaGames.bs.mjs";
 import * as LoggerStep from "../helpers/LoggerStep.bs.mjs";
 import * as Mattermost from "../helpers/Mattermost.bs.mjs";
+import * as PervasivesU from "rescript/lib/es6/pervasivesU.js";
 import * as Core__Option from "@rescript/core/src/Core__Option.bs.mjs";
 import * as RescriptCore from "@rescript/core/src/RescriptCore.bs.mjs";
 import * as Belt_MapString from "rescript/lib/es6/belt_MapString.js";
@@ -77,11 +78,12 @@ function FifaScoreStep(props) {
     var winningTeam = blueScoreInt > redScoreInt ? "Blue" : (
         redScoreInt > blueScoreInt ? "Red" : RescriptCore.panic("Tie not implemented for FIFA")
       );
+    var scoreDiff = PervasivesU.abs(blueScoreInt - redScoreInt | 0);
     var match;
     if (winningTeam === "Blue") {
-      match = OpenSkillRating.calculateScore(bluePlayers, redPlayers, "Fifa");
+      match = OpenSkillRating.calculateScore(bluePlayers, redPlayers, scoreDiff, "Fifa");
     } else {
-      var match$1 = OpenSkillRating.calculateScore(redPlayers, bluePlayers, "Fifa");
+      var match$1 = OpenSkillRating.calculateScore(redPlayers, bluePlayers, scoreDiff, "Fifa");
       match = [
         match$1[1],
         match$1[0],

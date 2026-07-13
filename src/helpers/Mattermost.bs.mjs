@@ -3,6 +3,7 @@
 
 import * as Summary from "./Summary.bs.mjs";
 import * as Caml_option from "rescript/lib/es6/caml_option.js";
+import * as PervasivesU from "rescript/lib/es6/pervasivesU.js";
 import * as Core__Option from "@rescript/core/src/Core__Option.bs.mjs";
 import * as RescriptCore from "@rescript/core/src/RescriptCore.bs.mjs";
 import * as OpenSkillRating from "./OpenSkillRating.bs.mjs";
@@ -48,11 +49,12 @@ async function sendCreepsUpdate(bluePlayers, redPlayers, blueScore, redScore, po
           }
         }).join(", ");
   var winningTeam = blueScore > redScore ? "Blue" : "Red";
+  var scoreDiff = PervasivesU.abs(blueScore - redScore | 0);
   var match;
   if (winningTeam === "Blue") {
-    match = OpenSkillRating.calculateScore(bluePlayers, redPlayers, "Foosball");
+    match = OpenSkillRating.calculateScore(bluePlayers, redPlayers, scoreDiff, "Foosball");
   } else {
-    var match$1 = OpenSkillRating.calculateScore(redPlayers, bluePlayers, "Foosball");
+    var match$1 = OpenSkillRating.calculateScore(redPlayers, bluePlayers, scoreDiff, "Foosball");
     match = [
       match$1[0],
       match$1[1],

@@ -62,11 +62,19 @@ let make = (
     | (_b, _r) => panic("Tie not implemented for FIFA")
     }
 
+    let scoreDiff = abs(blueScoreInt - redScoreInt)
+
     // Calculate OpenSkill outcomes
     let (blueOS, redOS, osPoints) = switch winningTeam {
-    | Blue => OpenSkillRating.calculateScore(bluePlayers, redPlayers, ~gameMode=Games.Fifa)
+    | Blue =>
+      OpenSkillRating.calculateScore(bluePlayers, redPlayers, ~scoreDiff, ~gameMode=Games.Fifa)
     | Red => {
-        let (r, b, p) = OpenSkillRating.calculateScore(redPlayers, bluePlayers, ~gameMode=Games.Fifa)
+        let (r, b, p) = OpenSkillRating.calculateScore(
+          redPlayers,
+          bluePlayers,
+          ~scoreDiff,
+          ~gameMode=Games.Fifa,
+        )
         (b, r, p)
       }
     }

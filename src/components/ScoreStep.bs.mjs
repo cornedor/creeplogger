@@ -9,6 +9,7 @@ import * as Header from "./Header.bs.mjs";
 import * as Players from "../helpers/Players.bs.mjs";
 import * as LoggerStep from "../helpers/LoggerStep.bs.mjs";
 import * as Mattermost from "../helpers/Mattermost.bs.mjs";
+import * as PervasivesU from "rescript/lib/es6/pervasivesU.js";
 import * as Core__Option from "@rescript/core/src/Core__Option.bs.mjs";
 import * as RescriptCore from "@rescript/core/src/RescriptCore.bs.mjs";
 import * as Belt_MapString from "rescript/lib/es6/belt_MapString.js";
@@ -100,11 +101,12 @@ function ScoreStep(props) {
     var bluePlayers = selectedBlueUsers.map(function (key) {
           return Core__Option.getExn(Players.playerByKey(players, key), undefined);
         });
+    var scoreDiff = PervasivesU.abs(blueState - redState | 0);
     var match;
     if (winningTeam === "Blue") {
-      match = OpenSkillRating.calculateScore(bluePlayers, redPlayers, "Foosball");
+      match = OpenSkillRating.calculateScore(bluePlayers, redPlayers, scoreDiff, "Foosball");
     } else {
-      var match$1 = OpenSkillRating.calculateScore(redPlayers, bluePlayers, "Foosball");
+      var match$1 = OpenSkillRating.calculateScore(redPlayers, bluePlayers, scoreDiff, "Foosball");
       match = [
         match$1[1],
         match$1[0],

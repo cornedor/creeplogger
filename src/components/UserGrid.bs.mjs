@@ -54,6 +54,12 @@ function UserGrid(props) {
   var sorted$1 = sorted.filter(function (item) {
         return item.name.toLowerCase().includes(searchQuery.toLowerCase());
       });
+  var blueCount = Belt_MapString.size(Belt_MapString.keep(selectedUsers, (function (param, value) {
+              return value === "Blue";
+            })));
+  var redCount = Belt_MapString.size(Belt_MapString.keep(selectedUsers, (function (param, value) {
+              return value === "Red";
+            })));
   var players$1 = sorted$1.map(function (item) {
         var tmp;
         if (showQueueButtons) {
@@ -277,7 +283,7 @@ function UserGrid(props) {
                               });
                         }),
                       onReset: props.reset,
-                      disabled: Belt_MapString.size(selectedUsers) <= 1,
+                      disabled: blueCount === 0 || redCount === 0,
                       setShowQueueButtons: match[1],
                       gameMode: gameMode,
                       setGameMode: props.setGameMode,
