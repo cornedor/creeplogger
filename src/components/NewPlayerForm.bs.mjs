@@ -35,7 +35,7 @@ function NewPlayerForm(props) {
           if (formState !== "Finished") {
             return ;
           }
-          reset(undefined);
+          reset();
           var timeoutId = setTimeout((function () {
                   setFormState(function (param) {
                         return "Hidden";

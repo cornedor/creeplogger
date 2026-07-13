@@ -16,13 +16,8 @@
     "@rescript/core",
     "@glennsl/rescript-fetch",
     "rescript-schema",
-    "@greenlabs/ppx-rhf",
     "rescript-classnames",
     "@dck/rescript-date-fns"
-  ],
-  "ppx-flags": [
-    "@greenlabs/ppx-rhf/ppx",
-    "rescript-schema-ppx/bin"
   ],
   "jsx": {
     "version": 4,

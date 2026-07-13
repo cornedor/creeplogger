@@ -1,6 +1,5 @@
 @module external styles: {..} = "./new-player-form.module.css"
 
-@rhf
 type inputs = {name: string}
 
 type formState = Hidden | Visible | Loading | Finished
@@ -8,7 +7,7 @@ type formState = Hidden | Visible | Loading | Finished
 @react.component
 let make = () => {
   let (formState, setFormState) = React.useState(() => Hidden)
-  let {register, handleSubmit, reset} = useFormOfInputs()
+  let {register, handleSubmit, reset} = ReactHookForm.useForm()
 
   let addCreeper = async name => {
     setFormState(_ => Loading)
@@ -41,7 +40,7 @@ let make = () => {
   | Visible =>
     <form onSubmit={handleSubmit(onSubmit)} className={styles["form"]}>
       <input
-        {...register(Name, ~options={required: true})}
+        {...register("name", {required: true})}
         placeholder="Naam"
         className={styles["input"] ++ " text-black rounded"}
       />
