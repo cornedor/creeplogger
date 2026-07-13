@@ -62,12 +62,16 @@ let sendCreepsUpdate = async (
     Players.Red
   }
 
+  let scoreDiff = abs(blueScore - redScore)
+
   let (winnersOS, losersOS, _avgWinnerChange) = switch winningTeam {
-  | Blue => OpenSkillRating.calculateScore(bluePlayers, redPlayers, ~gameMode=Games.Foosball)
+  | Blue =>
+    OpenSkillRating.calculateScore(bluePlayers, redPlayers, ~scoreDiff, ~gameMode=Games.Foosball)
   | Red => {
       let (red, blue, avg) = OpenSkillRating.calculateScore(
         redPlayers,
         bluePlayers,
+        ~scoreDiff,
         ~gameMode=Games.Foosball,
       )
       (red, blue, avg)

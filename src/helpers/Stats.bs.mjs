@@ -11,6 +11,7 @@ import * as Database from "./Database.bs.mjs";
 import * as FifaGames from "./FifaGames.bs.mjs";
 import * as DartsGames from "./DartsGames.bs.mjs";
 import * as Core__Array from "@rescript/core/src/Core__Array.bs.mjs";
+import * as PervasivesU from "rescript/lib/es6/pervasivesU.js";
 import * as Core__Option from "@rescript/core/src/Core__Option.bs.mjs";
 import * as RescriptCore from "@rescript/core/src/RescriptCore.bs.mjs";
 import * as OpenSkillRating from "./OpenSkillRating.bs.mjs";
@@ -160,6 +161,7 @@ async function recalculateStats() {
         newrecord.dartsGames = 0;
         newrecord.dartsLastEloChange = 0.0;
         newrecord.dartsElo = 1000.0;
+        newrecord.lastOpenSkillChange = 0.0;
         newrecord.ordinal = 0.0;
         newrecord.sigma = 8.333;
         newrecord.mu = 25.0;
@@ -189,31 +191,45 @@ async function recalculateStats() {
           var bluePlayers = game.blueTeam.map(function (key) {
                 return Core__Option.getExn(players[key], undefined);
               });
+          var scoreDiff = PervasivesU.abs(game.blueScore - game.redScore | 0);
+          var isRatable = (blueWin || redWin) && bluePlayers.length > 0 && redPlayers.length > 0;
           var match;
-          if (blueWin) {
-            match = OpenSkillRating.calculateScore(bluePlayers, redPlayers, "Foosball");
-          } else {
-            var match$1 = OpenSkillRating.calculateScore(redPlayers, bluePlayers, "Foosball");
+          if (isRatable) {
+            var match$1;
+            if (blueWin) {
+              match$1 = OpenSkillRating.calculateScore(bluePlayers, redPlayers, scoreDiff, "Foosball");
+            } else {
+              var match$2 = OpenSkillRating.calculateScore(redPlayers, bluePlayers, scoreDiff, "Foosball");
+              match$1 = [
+                match$2[1],
+                match$2[0],
+                match$2[2]
+              ];
+            }
+            var redOS = match$1[1];
+            var blueOS = match$1[0];
+            var match$3;
+            if (blueWin) {
+              match$3 = Elo.calculateScore(blueOS, redOS, "Foosball");
+            } else {
+              var match$4 = Elo.calculateScore(redOS, blueOS, "Foosball");
+              match$3 = [
+                match$4[1],
+                match$4[0],
+                match$4[2]
+              ];
+            }
             match = [
-              match$1[1],
-              match$1[0],
-              match$1[2]
-            ];
-          }
-          var redPlayers$1 = match[1];
-          var bluePlayers$1 = match[0];
-          var match$2;
-          if (blueWin) {
-            match$2 = Elo.calculateScore(bluePlayers$1, redPlayers$1, "Foosball");
-          } else {
-            var match$3 = Elo.calculateScore(redPlayers$1, bluePlayers$1, "Foosball");
-            match$2 = [
-              match$3[1],
               match$3[0],
-              match$3[2]
+              match$3[1]
+            ];
+          } else {
+            match = [
+              bluePlayers,
+              redPlayers
             ];
           }
-          match$2[0].forEach(function (player) {
+          match[0].forEach(function (player) {
                 var lastGames = Players.getLastGames(player.lastGames, blueWin);
                 var newrecord = Caml_obj.obj_dup(player);
                 newrecord.lastGames = lastGames;
@@ -228,7 +244,7 @@ async function recalculateStats() {
                 newrecord.wins = blueWin ? player.wins + 1 | 0 : player.wins;
                 players[player.key] = newrecord;
               });
-          match$2[1].forEach(function (player) {
+          match[1].forEach(function (player) {
                 var lastGames = Players.getLastGames(player.lastGames, redWin);
                 var newrecord = Caml_obj.obj_dup(player);
                 newrecord.lastGames = lastGames;
@@ -264,7 +280,19 @@ async function recalculateStats() {
           var losers = game.losers.map(function (key) {
                 return Core__Option.getExn(players[key], undefined);
               });
-          var match = Elo.calculateScore(winners, losers, "Darts");
+          var match;
+          if (winners.length > 0 && losers.length > 0) {
+            var match$1 = Elo.calculateScore(winners, losers, "Darts");
+            match = [
+              match$1[0],
+              match$1[1]
+            ];
+          } else {
+            match = [
+              winners,
+              losers
+            ];
+          }
           match[0].forEach(function (player) {
                 var lastGames = Players.getLastGames(player.dartsLastGames, true);
                 var newrecord = Caml_obj.obj_dup(player);
@@ -295,21 +323,36 @@ async function recalculateStats() {
         }));
   fifaGames.forEach(function (game) {
         var blueWin = game.blueScore > game.redScore;
+        var redWin = game.redScore > game.blueScore;
+        var scoreDiff = PervasivesU.abs(game.blueScore - game.redScore | 0);
         var redPlayers = game.redTeam.map(function (key) {
               return Core__Option.getExn(players[key], undefined);
             });
         var bluePlayers = game.blueTeam.map(function (key) {
               return Core__Option.getExn(players[key], undefined);
             });
+        var isRatable = (blueWin || redWin) && bluePlayers.length > 0 && redPlayers.length > 0;
         var match;
-        if (blueWin) {
-          match = OpenSkillRating.calculateScore(bluePlayers, redPlayers, "Fifa");
-        } else {
-          var match$1 = OpenSkillRating.calculateScore(redPlayers, bluePlayers, "Fifa");
+        if (isRatable) {
+          var match$1;
+          if (blueWin) {
+            match$1 = OpenSkillRating.calculateScore(bluePlayers, redPlayers, scoreDiff, "Fifa");
+          } else {
+            var match$2 = OpenSkillRating.calculateScore(redPlayers, bluePlayers, scoreDiff, "Fifa");
+            match$1 = [
+              match$2[1],
+              match$2[0],
+              match$2[2]
+            ];
+          }
           match = [
-            match$1[1],
             match$1[0],
-            match$1[2]
+            match$1[1]
+          ];
+        } else {
+          match = [
+            bluePlayers,
+            redPlayers
           ];
         }
         match[0].forEach(function (player) {
@@ -318,19 +361,18 @@ async function recalculateStats() {
               newrecord.fifaGoalsConceded = player.fifaGoalsConceded + game.redScore | 0;
               newrecord.fifaGoalsScored = player.fifaGoalsScored + game.blueScore | 0;
               newrecord.fifaLastGames = lastGames;
-              newrecord.fifaLosses = blueWin ? player.fifaLosses : player.fifaLosses + 1 | 0;
+              newrecord.fifaLosses = redWin ? player.fifaLosses + 1 | 0 : player.fifaLosses;
               newrecord.fifaWins = blueWin ? player.fifaWins + 1 | 0 : player.fifaWins;
               newrecord.fifaGames = player.fifaGames + 1 | 0;
               players[player.key] = newrecord;
             });
         match[1].forEach(function (player) {
-              var redWin = !blueWin;
               var lastGames = Players.getLastGames(player.fifaLastGames, redWin);
               var newrecord = Caml_obj.obj_dup(player);
               newrecord.fifaGoalsConceded = player.fifaGoalsConceded + game.blueScore | 0;
               newrecord.fifaGoalsScored = player.fifaGoalsScored + game.redScore | 0;
               newrecord.fifaLastGames = lastGames;
-              newrecord.fifaLosses = redWin ? player.fifaLosses : player.fifaLosses + 1 | 0;
+              newrecord.fifaLosses = blueWin ? player.fifaLosses + 1 | 0 : player.fifaLosses;
               newrecord.fifaWins = redWin ? player.fifaWins + 1 | 0 : player.fifaWins;
               newrecord.fifaGames = player.fifaGames + 1 | 0;
               players[player.key] = newrecord;

@@ -157,6 +157,7 @@ let recalculateStats = async () => {
         mu: 25.0,
         sigma: 8.333,
         ordinal: 0.0,
+        lastOpenSkillChange: 0.0,
         lastGames: [],
         // Darts game stats
         dartsGames: 0,
@@ -190,34 +191,47 @@ let recalculateStats = async () => {
 
     let redPlayers = game.redTeam->Array.map(key => Dict.get(players, key)->Option.getExn)
     let bluePlayers = game.blueTeam->Array.map(key => Dict.get(players, key)->Option.getExn)
+    let scoreDiff = abs(game.blueScore - game.redScore)
 
-    let (bluePlayers, redPlayers, _) = switch blueWin {
-    | true => OpenSkillRating.calculateScore(bluePlayers, redPlayers, ~gameMode=Games.Foosball)
-    | false => {
-        let (red, blue, points) = OpenSkillRating.calculateScore(
-          redPlayers,
-          bluePlayers,
-          ~gameMode=Games.Foosball,
-        )
-        (blue, red, points)
+    // A draw, or a game logged with an empty team, has no winner and cannot be rated.
+    let isRatable =
+      (blueWin || redWin) && Array.length(bluePlayers) > 0 && Array.length(redPlayers) > 0
+
+    let (bluePlayers, redPlayers) = switch isRatable {
+    | false => (bluePlayers, redPlayers)
+    | true => {
+        let (blueOS, redOS, _) = switch blueWin {
+        | true =>
+          OpenSkillRating.calculateScore(
+            bluePlayers,
+            redPlayers,
+            ~scoreDiff,
+            ~gameMode=Games.Foosball,
+          )
+        | false => {
+            let (red, blue, points) = OpenSkillRating.calculateScore(
+              redPlayers,
+              bluePlayers,
+              ~scoreDiff,
+              ~gameMode=Games.Foosball,
+            )
+            (blue, red, points)
+          }
+        }
+
+        // Also calculate Elo for foosball games (for legacy compatibility)
+        let (blueElo, redElo, _) = switch blueWin {
+        | true => Elo.calculateScore(blueOS, redOS, ~gameMode=Games.Foosball)
+        | false => {
+            let (red, blue, points) = Elo.calculateScore(redOS, blueOS, ~gameMode=Games.Foosball)
+            (blue, red, points)
+          }
+        }
+
+        (blueElo, redElo)
       }
     }
-    
-    // Also calculate Elo for foosball games (for legacy compatibility)
-    let (blueElo, redElo, _) = switch blueWin {
-    | true => Elo.calculateScore(bluePlayers, redPlayers, ~gameMode=Games.Foosball)
-    | false => {
-        let (red, blue, points) = Elo.calculateScore(
-          redPlayers,
-          bluePlayers,
-          ~gameMode=Games.Foosball,
-        )
-        (blue, red, points)
-      }
-    }
-    
-    let bluePlayers = blueElo
-    let redPlayers = redElo
+
     Array.forEach(bluePlayers, player => {
       let lastGames = Players.getLastGames(player.lastGames, blueWin)
       Dict.set(
@@ -273,7 +287,13 @@ let recalculateStats = async () => {
     let winners = game.winners->Array.map(key => Dict.get(players, key)->Option.getExn)
     let losers = game.losers->Array.map(key => Dict.get(players, key)->Option.getExn)
 
-    let (winners, losers, _) = Elo.calculateScore(winners, losers, ~gameMode=Games.Darts)
+    let (winners, losers) = switch Array.length(winners) > 0 && Array.length(losers) > 0 {
+    | false => (winners, losers)
+    | true => {
+        let (winners, losers, _) = Elo.calculateScore(winners, losers, ~gameMode=Games.Darts)
+        (winners, losers)
+      }
+    }
 
     Array.forEach(winners, player => {
       let lastGames = Players.getLastGames(player.dartsLastGames, true)
@@ -316,19 +336,33 @@ let recalculateStats = async () => {
   // Process FIFA games
   Array.forEach(fifaGames, game => {
     let blueWin = game.blueScore > game.redScore
+    let redWin = game.redScore > game.blueScore
+    let scoreDiff = abs(game.blueScore - game.redScore)
 
     let redPlayers = game.redTeam->Array.map(key => Dict.get(players, key)->Option.getExn)
     let bluePlayers = game.blueTeam->Array.map(key => Dict.get(players, key)->Option.getExn)
 
-    let (blueOS, redOS, _) = switch blueWin {
-    | true => OpenSkillRating.calculateScore(bluePlayers, redPlayers, ~gameMode=Games.Fifa)
-    | false => {
-        let (red, blue, points) = OpenSkillRating.calculateScore(
-          redPlayers,
-          bluePlayers,
-          ~gameMode=Games.Fifa,
-        )
-        (blue, red, points)
+    // A draw, or a game logged with an empty team, has no winner and cannot be rated.
+    let isRatable =
+      (blueWin || redWin) && Array.length(bluePlayers) > 0 && Array.length(redPlayers) > 0
+
+    let (blueOS, redOS) = switch isRatable {
+    | false => (bluePlayers, redPlayers)
+    | true => {
+        let (blue, red, _) = switch blueWin {
+        | true =>
+          OpenSkillRating.calculateScore(bluePlayers, redPlayers, ~scoreDiff, ~gameMode=Games.Fifa)
+        | false => {
+            let (red, blue, points) = OpenSkillRating.calculateScore(
+              redPlayers,
+              bluePlayers,
+              ~scoreDiff,
+              ~gameMode=Games.Fifa,
+            )
+            (blue, red, points)
+          }
+        }
+        (blue, red)
       }
     }
 
@@ -341,7 +375,7 @@ let recalculateStats = async () => {
           ...player,
           fifaGames: player.fifaGames + 1,
           fifaWins: blueWin ? player.fifaWins + 1 : player.fifaWins,
-          fifaLosses: blueWin ? player.fifaLosses : player.fifaLosses + 1,
+          fifaLosses: redWin ? player.fifaLosses + 1 : player.fifaLosses,
           fifaLastGames: lastGames,
           fifaGoalsScored: player.fifaGoalsScored + game.blueScore,
           fifaGoalsConceded: player.fifaGoalsConceded + game.redScore,
@@ -349,7 +383,6 @@ let recalculateStats = async () => {
       )
     })
     Array.forEach(redOS, player => {
-      let redWin = !blueWin
       let lastGames = Players.getLastGames(player.fifaLastGames, redWin)
       Dict.set(
         players,
@@ -358,7 +391,7 @@ let recalculateStats = async () => {
           ...player,
           fifaGames: player.fifaGames + 1,
           fifaWins: redWin ? player.fifaWins + 1 : player.fifaWins,
-          fifaLosses: redWin ? player.fifaLosses : player.fifaLosses + 1,
+          fifaLosses: blueWin ? player.fifaLosses + 1 : player.fifaLosses,
           fifaLastGames: lastGames,
           fifaGoalsScored: player.fifaGoalsScored + game.redScore,
           fifaGoalsConceded: player.fifaGoalsConceded + game.blueScore,

@@ -27,6 +27,14 @@ let make = (
     sorted->Array.filter(item =>
       item.name->String.toLowerCase->String.includes(searchQuery->String.toLowerCase)
     )
+  // Both sides need a player: a game against an empty team still awards rating points.
+  let blueCount = Belt.Map.String.keep(selectedUsers, (_, value) =>
+    value == Players.Blue
+  )->Belt.Map.String.size
+  let redCount = Belt.Map.String.keep(selectedUsers, (_, value) =>
+    value == Players.Red
+  )->Belt.Map.String.size
+
   let players = sorted->Js.Array2.map(item =>
     <GridItem
       key={item.key}
@@ -120,7 +128,7 @@ let make = (
       step={LoggerStep.UserSelection}
       onNextStep={() => setStep(step => LoggerStep.getNextStep(step))}
       onReset={reset}
-      disabled={Belt.Map.String.size(selectedUsers) <= 1}
+      disabled={blueCount == 0 || redCount == 0}
       setShowQueueButtons={setShowQueueButtons}
       gameMode
       setGameMode={Some(setGameMode)}
